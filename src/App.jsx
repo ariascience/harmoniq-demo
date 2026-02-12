@@ -1037,8 +1037,8 @@ function ConnectDataModal({ connectors, onToggle, onClose }) {
   const connectedCount = connectors.filter(c => c.status === "connected").length;
 
   return (
-    <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.45)", zIndex: 1000, display: "flex", alignItems: "center", justifyContent: "center" }} onClick={onClose}>
-      <div onClick={e => e.stopPropagation()} style={{ background: "#fff", borderRadius: 18, width: 580, maxHeight: "85vh", overflow: "hidden", boxShadow: "0 20px 60px rgba(0,0,0,0.2)", display: "flex", flexDirection: "column" }}>
+    <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.45)", zIndex: 1000, display: "flex", alignItems: "center", justifyContent: "center", padding: "16px" }} onClick={onClose}>
+      <div onClick={e => e.stopPropagation()} style={{ background: "#fff", borderRadius: 18, width: "100%", maxWidth: 580, maxHeight: "85vh", overflow: "hidden", boxShadow: "0 20px 60px rgba(0,0,0,0.2)", display: "flex", flexDirection: "column" }}>
         <div style={{ padding: "22px 28px", borderBottom: "1px solid #EEE", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
           <div>
             <div style={{ fontSize: 17, fontWeight: 700, color: "#1A1A2E" }}>🔌 Connect Your Data</div>
@@ -1371,8 +1371,8 @@ function ShareModal({ onClose }) {
   const [sharedList, setSharedList] = useState(COLLABORATORS.slice(0, 3));
 
   return (
-    <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.45)", zIndex: 1000, display: "flex", alignItems: "center", justifyContent: "center" }} onClick={onClose}>
-      <div onClick={e => e.stopPropagation()} style={{ background: "#fff", borderRadius: 16, width: 460, maxHeight: "80vh", overflow: "auto", boxShadow: "0 20px 60px rgba(0,0,0,0.2)" }}>
+    <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.45)", zIndex: 1000, display: "flex", alignItems: "center", justifyContent: "center", padding: "16px" }} onClick={onClose}>
+      <div onClick={e => e.stopPropagation()} style={{ background: "#fff", borderRadius: 16, width: "100%", maxWidth: 460, maxHeight: "80vh", overflow: "auto", boxShadow: "0 20px 60px rgba(0,0,0,0.2)" }}>
         <div style={{ padding: "20px 24px", borderBottom: "1px solid #EEE" }}>
           <div style={{ fontSize: 16, fontWeight: 700, color: "#1A1A2E" }}>Share & Collaborate</div>
           <div style={{ fontSize: 12, color: "#888", marginTop: 2 }}>Manage who can access this workflow</div>
@@ -1421,8 +1421,8 @@ function ScheduleModal({ onClose, onSave, templateName }) {
   const [time, setTime] = useState("08:00");
 
   return (
-    <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.45)", zIndex: 1000, display: "flex", alignItems: "center", justifyContent: "center" }} onClick={onClose}>
-      <div onClick={e => e.stopPropagation()} style={{ background: "#fff", borderRadius: 16, width: 420, boxShadow: "0 20px 60px rgba(0,0,0,0.2)" }}>
+    <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.45)", zIndex: 1000, display: "flex", alignItems: "center", justifyContent: "center", padding: "16px" }} onClick={onClose}>
+      <div onClick={e => e.stopPropagation()} style={{ background: "#fff", borderRadius: 16, width: "100%", maxWidth: 420, boxShadow: "0 20px 60px rgba(0,0,0,0.2)" }}>
         <div style={{ padding: "20px 24px", borderBottom: "1px solid #EEE" }}>
           <div style={{ fontSize: 16, fontWeight: 700, color: "#1A1A2E" }}>Schedule Trigger</div>
           <div style={{ fontSize: 12, color: "#888", marginTop: 2 }}>{templateName}</div>
@@ -1460,7 +1460,21 @@ function ScheduleModal({ onClose, onSave, templateName }) {
 }
 
 // ─── Main App ───
+// Mobile detection hook
+function useIsMobile(breakpoint = 768) {
+  const [isMobile, setIsMobile] = useState(() => typeof window !== "undefined" && window.innerWidth < breakpoint);
+  useEffect(() => {
+    const mq = window.matchMedia(`(max-width: ${breakpoint - 1}px)`);
+    const handler = (e) => setIsMobile(e.matches);
+    mq.addEventListener("change", handler);
+    setIsMobile(mq.matches);
+    return () => mq.removeEventListener("change", handler);
+  }, [breakpoint]);
+  return isMobile;
+}
+
 export default function HarmonIQApp() {
+  const isMobile = useIsMobile();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [loginLoading, setLoginLoading] = useState(false);
   const [loginEmail, setLoginEmail] = useState("");
@@ -1487,6 +1501,7 @@ export default function HarmonIQApp() {
   const [activeAgents, setActiveAgents] = useState([]);
   const [connectors, setConnectors] = useState(CONNECTORS);
   const [showAgentBrain, setShowAgentBrain] = useState(true);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [selectedWorkflowAgents, setSelectedWorkflowAgents] = useState([]);
 
   // Active use case tracking (for per-use-case data)
@@ -1811,7 +1826,7 @@ export default function HarmonIQApp() {
   const renderStepIndicator = () => {
     if (workflowStep < 1) return null;
     return (
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 0, padding: "16px 20px 8px", animation: "fadeIn 0.4s ease" }}>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 0, padding: isMobile ? "10px 10px 6px" : "16px 20px 8px", animation: "fadeIn 0.4s ease" }}>
         {STEP_LABELS.map((label, idx) => {
           const stepNum = idx + 1;
           const isComplete = workflowStep > stepNum;
@@ -1819,10 +1834,10 @@ export default function HarmonIQApp() {
           const isFuture = workflowStep < stepNum;
           return (
             <div key={label} style={{ display: "flex", alignItems: "center" }}>
-              <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 4 }}>
+              <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 3 }}>
                 <div style={{
-                  width: 22, height: 22, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center",
-                  fontSize: 10, fontWeight: 700, transition: "all 0.3s",
+                  width: isMobile ? 18 : 22, height: isMobile ? 18 : 22, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center",
+                  fontSize: isMobile ? 8 : 10, fontWeight: 700, transition: "all 0.3s",
                   background: isComplete ? "#7C3AED" : isCurrent ? "#7C3AED" : "#E8E6F0",
                   color: isComplete || isCurrent ? "#fff" : "#999",
                   border: isCurrent ? "2px solid #C4B5FD" : "2px solid transparent",
@@ -1830,10 +1845,10 @@ export default function HarmonIQApp() {
                 }}>
                   {isComplete ? "✓" : stepNum}
                 </div>
-                <div style={{ fontSize: 10, fontWeight: 600, color: isComplete || isCurrent ? "#7C3AED" : "#999", whiteSpace: "nowrap", textTransform: "uppercase", letterSpacing: "0.5px" }}>{label}</div>
+                <div style={{ fontSize: isMobile ? 7 : 10, fontWeight: 600, color: isComplete || isCurrent ? "#7C3AED" : "#999", whiteSpace: "nowrap", textTransform: "uppercase", letterSpacing: "0.3px" }}>{isMobile ? label.split(" ")[0] : label}</div>
               </div>
               {idx < STEP_LABELS.length - 1 && (
-                <div style={{ width: 48, height: 2, background: isComplete ? "#7C3AED" : "#E8E6F0", margin: "0 6px", marginBottom: 18, transition: "background 0.3s" }} />
+                <div style={{ width: isMobile ? 20 : 48, height: 2, background: isComplete ? "#7C3AED" : "#E8E6F0", margin: "0 4px", marginBottom: 16, transition: "background 0.3s" }} />
               )}
             </div>
           );
@@ -1843,16 +1858,16 @@ export default function HarmonIQApp() {
   };
 
   const renderHome = () => (
-    <div style={{ display: "flex", flex: 1, height: "100%" }}>
+    <div style={{ display: "flex", flex: 1, height: "100%", position: "relative" }}>
       <div style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden" }}>
-        <div style={{ padding: "20px 28px 12px", borderBottom: "1px solid #E8E6F0", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-          <div>
-            <div style={{ fontSize: 20, fontWeight: 700, color: "#1A1A2E" }}>{workflowCreated ? "Workflow Builder" : "What can I help you with?"}</div>
-            {!workflowCreated && <div style={{ fontSize: 14, color: "#888", marginTop: 2 }}>Let's align your goal with HarmonIQ better</div>}
+        <div style={{ padding: isMobile ? "14px 16px 10px" : "20px 28px 12px", borderBottom: "1px solid #E8E6F0", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <div style={{ fontSize: isMobile ? 17 : 20, fontWeight: 700, color: "#1A1A2E" }}>{workflowCreated ? "Workflow Builder" : "What can I help you with?"}</div>
+            {!workflowCreated && <div style={{ fontSize: isMobile ? 12 : 14, color: "#888", marginTop: 2 }}>Let's align your goal with HarmonIQ better</div>}
           </div>
-          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-            {workflowCreated && <button onClick={() => setShowShareModal(true)} style={{ padding: "8px 14px", borderRadius: 8, border: "1px solid #DDD", background: "#fff", fontSize: 12, cursor: "pointer", display: "flex", alignItems: "center", gap: 4 }}>🔗 Share</button>}
-            <button onClick={() => setShowAgentBrain(!showAgentBrain)} style={{ padding: "8px 14px", borderRadius: 8, border: "1px solid #DDD", background: showAgentBrain ? "#F0EDFF" : "#fff", fontSize: 12, cursor: "pointer" }}>🧠 Agent Brain</button>
+          <div style={{ display: "flex", alignItems: "center", gap: 6, flexShrink: 0 }}>
+            {workflowCreated && !isMobile && <button onClick={() => setShowShareModal(true)} style={{ padding: "8px 14px", borderRadius: 8, border: "1px solid #DDD", background: "#fff", fontSize: 12, cursor: "pointer", display: "flex", alignItems: "center", gap: 4 }}>🔗 Share</button>}
+            <button onClick={() => setShowAgentBrain(!showAgentBrain)} style={{ padding: isMobile ? "6px 10px" : "8px 14px", borderRadius: 8, border: "1px solid #DDD", background: showAgentBrain ? "#F0EDFF" : "#fff", fontSize: 12, cursor: "pointer" }}>🧠{!isMobile && " Agent Brain"}</button>
           </div>
         </div>
 
@@ -1871,9 +1886,9 @@ export default function HarmonIQApp() {
           </div>
         )}
 
-        <div ref={mainContentRef} style={{ flex: 1, overflowY: "auto", padding: "20px 28px" }}>
+        <div ref={mainContentRef} style={{ flex: 1, overflowY: "auto", padding: isMobile ? "14px 14px" : "20px 28px" }}>
           {!workflowCreated ? (
-            <div style={{ maxWidth: 680, margin: "50px auto", textAlign: "left" }}>
+            <div style={{ maxWidth: 680, margin: isMobile ? "20px auto" : "50px auto", textAlign: "left" }}>
               {/* Mother Agent greeting — conversational */}
               <div style={{ display: "flex", alignItems: "flex-start", gap: 16, marginBottom: 32 }}>
                 <div style={{ width: 48, height: 48, borderRadius: "50%", background: "linear-gradient(135deg, #7C3AED, #2D1554)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 24, flexShrink: 0 }}>🧠</div>
@@ -2004,7 +2019,7 @@ export default function HarmonIQApp() {
                   <div style={{ background: "#F0FFF4", border: "1px solid #C6F6D5", borderRadius: 12, padding: "18px 20px", marginBottom: 20, animation: "fadeIn 0.4s ease" }}>
                     <div style={{ fontSize: 16, fontWeight: 700, color: "#1A1A2E", marginBottom: 8 }}>📋 Solution</div>
                     <div style={{ fontSize: 14, color: "#333", lineHeight: 1.7, marginBottom: 14 }}>{outputData.summary}</div>
-                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginBottom: 14 }}>
+                    <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: 10, marginBottom: 14 }}>
                       {outputData.metrics.map(m => (
                         <div key={m.label} style={{ background: "#fff", borderRadius: 10, padding: "12px 14px", border: "1px solid #E8E6F0" }}>
                           <div style={{ fontSize: 12, color: "#888" }}>{m.label}</div>
@@ -2034,7 +2049,7 @@ export default function HarmonIQApp() {
         </div>
 
         {/* Bottom Input / Action Bar */}
-        <div style={{ padding: "14px 28px", borderTop: "1px solid #E8E6F0", background: "#fff" }}>
+        <div style={{ padding: isMobile ? "10px 14px" : "14px 28px", borderTop: "1px solid #E8E6F0", background: "#fff" }}>
           {!workflowCreated ? (
             <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
               <input
@@ -2092,8 +2107,21 @@ export default function HarmonIQApp() {
         </div>
       </div>
 
-      {/* Agent Brain Panel */}
-      {showAgentBrain && (
+      {/* Agent Brain Panel — slide-over on mobile, side panel on desktop */}
+      {showAgentBrain && isMobile && (
+        <div onClick={() => setShowAgentBrain(false)} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.5)", zIndex: 1100, animation: "fadeIn 0.2s ease" }}>
+          <div onClick={e => e.stopPropagation()} style={{ position: "absolute", right: 0, top: 0, bottom: 0, width: "85vw", maxWidth: 420, animation: "slideInRight 0.25s ease" }}>
+            <AgentBrainPanel
+              thoughts={agentThoughts} isRunning={isRunning} activeAgents={activeAgents} connectors={connectors}
+              hitlPaused={hitlPaused} hitlCheckpoint={hitlCheckpoint} hitlAdjustMode={hitlAdjustMode} hitlAdjustText={hitlAdjustText}
+              onHitlApprove={handleHitlApprove} onHitlStartAdjust={() => setHitlAdjustMode(true)} onHitlAdjustTextChange={setHitlAdjustText} onHitlAdjustSubmit={handleHitlAdjust}
+              constraintPaused={constraintPaused} constraintData={constraintData} constraintInput={constraintInput}
+              onConstraintInputChange={setConstraintInput} onConstraintApply={handleConstraintApply} onConstraintSkip={handleConstraintSkip}
+            />
+          </div>
+        </div>
+      )}
+      {showAgentBrain && !isMobile && (
         <AgentBrainPanel
           thoughts={agentThoughts} isRunning={isRunning} activeAgents={activeAgents} connectors={connectors}
           hitlPaused={hitlPaused} hitlCheckpoint={hitlCheckpoint} hitlAdjustMode={hitlAdjustMode} hitlAdjustText={hitlAdjustText}
@@ -2108,13 +2136,13 @@ export default function HarmonIQApp() {
   const renderTemplates = () => (
     <div style={{ display: "flex", flex: 1, height: "100%" }}>
       <div style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden" }}>
-        <div style={{ padding: "20px 28px 12px", borderBottom: "1px solid #E8E6F0" }}>
-          <div style={{ fontSize: 18, fontWeight: 700, color: "#1A1A2E" }}>📋 Templates</div>
+        <div style={{ padding: isMobile ? "14px 16px 10px" : "20px 28px 12px", borderBottom: "1px solid #E8E6F0" }}>
+          <div style={{ fontSize: isMobile ? 17 : 18, fontWeight: 700, color: "#1A1A2E" }}>📋 Templates</div>
           <div style={{ fontSize: 13, color: "#888", marginTop: 2 }}>Browse, configure, and launch pre-built workflows</div>
         </div>
-        <div style={{ flex: 1, overflowY: "auto", padding: "20px 28px" }}>
+        <div style={{ flex: 1, overflowY: "auto", padding: isMobile ? "14px 14px" : "20px 28px" }}>
           {!selectedTemplate ? (
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))", gap: 14 }}>
+            <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(auto-fill, minmax(300px, 1fr))", gap: 14 }}>
               {SAMPLE_TEMPLATES.map(t => (
                 <div key={t.id} onClick={() => setSelectedTemplate(t)} style={{ border: "1px solid #E8E6F0", borderRadius: 14, padding: "18px 20px", cursor: "pointer", background: "#fff", transition: "all 0.2s", position: "relative" }} onMouseEnter={e => e.currentTarget.style.borderColor = "#6C5CE7"} onMouseLeave={e => e.currentTarget.style.borderColor = "#E8E6F0"}>
                   <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 8 }}>
@@ -2192,21 +2220,21 @@ export default function HarmonIQApp() {
           )}
         </div>
       </div>
-      {showAgentBrain && <AgentBrainPanel thoughts={agentThoughts} isRunning={isRunning} activeAgents={activeAgents} connectors={connectors} />}
+      {showAgentBrain && !isMobile && <AgentBrainPanel thoughts={agentThoughts} isRunning={isRunning} activeAgents={activeAgents} connectors={connectors} />}
     </div>
   );
 
   const renderTriggers = () => (
     <div style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden" }}>
-      <div style={{ padding: "20px 28px 12px", borderBottom: "1px solid #E8E6F0" }}>
-        <div style={{ fontSize: 18, fontWeight: 700, color: "#1A1A2E" }}>⏰ Triggers</div>
+      <div style={{ padding: isMobile ? "14px 16px 10px" : "20px 28px 12px", borderBottom: "1px solid #E8E6F0" }}>
+        <div style={{ fontSize: isMobile ? 17 : 18, fontWeight: 700, color: "#1A1A2E" }}>⏰ Triggers</div>
         <div style={{ fontSize: 13, color: "#888", marginTop: 2 }}>Manage scheduled and automated workflow runs</div>
       </div>
-      <div style={{ flex: 1, overflowY: "auto", padding: "20px 28px" }}>
+      <div style={{ flex: 1, overflowY: "auto", padding: isMobile ? "14px 14px" : "20px 28px" }}>
         <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
           {triggers.map(tr => (
-            <div key={tr.id} style={{ border: "1px solid #E8E6F0", borderRadius: 14, padding: "18px 22px", background: "#fff" }}>
-              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 10 }}>
+            <div key={tr.id} style={{ border: "1px solid #E8E6F0", borderRadius: 14, padding: isMobile ? "14px 14px" : "18px 22px", background: "#fff" }}>
+              <div style={{ display: "flex", alignItems: isMobile ? "flex-start" : "center", justifyContent: "space-between", marginBottom: 10, flexDirection: isMobile ? "column" : "row", gap: isMobile ? 8 : 0 }}>
                 <div style={{ fontSize: 14, fontWeight: 700, color: "#1A1A2E" }}>{tr.template}</div>
                 <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                   <span style={{ fontSize: 11, padding: "4px 10px", borderRadius: 20, fontWeight: 600, background: tr.status === "active" ? "#F0FFF4" : "#FFF8E1", color: tr.status === "active" ? "#00B894" : "#F39C12" }}>{tr.status === "active" ? "● Active" : "⏸ Paused"}</span>
@@ -2216,7 +2244,7 @@ export default function HarmonIQApp() {
                   <button onClick={() => setTriggers(prev => prev.filter(t => t.id !== tr.id))} style={{ padding: "6px 12px", borderRadius: 8, border: "1px solid #FFC0C0", background: "#FFF5F5", fontSize: 11, cursor: "pointer", color: "#E74C3C" }}>Delete</button>
                 </div>
               </div>
-              <div style={{ display: "flex", gap: 24, fontSize: 12, color: "#666" }}>
+              <div style={{ display: "flex", gap: isMobile ? 10 : 24, fontSize: 12, color: "#666", flexWrap: "wrap" }}>
                 <div><span style={{ fontWeight: 600 }}>Schedule:</span> {tr.schedule}</div>
                 <div><span style={{ fontWeight: 600 }}>Next Run:</span> {tr.nextRun}</div>
                 <div>
@@ -2238,12 +2266,12 @@ export default function HarmonIQApp() {
 
   const renderRelics = () => (
     <div style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden" }}>
-      <div style={{ padding: "20px 28px 12px", borderBottom: "1px solid #E8E6F0" }}>
-        <div style={{ fontSize: 18, fontWeight: 700, color: "#1A1A2E" }}>📦 Your Relics</div>
+      <div style={{ padding: isMobile ? "14px 16px 10px" : "20px 28px 12px", borderBottom: "1px solid #E8E6F0" }}>
+        <div style={{ fontSize: isMobile ? 17 : 18, fontWeight: 700, color: "#1A1A2E" }}>📦 Your Relics</div>
         <div style={{ fontSize: 13, color: "#888", marginTop: 2 }}>View all outputs, share and edit them</div>
       </div>
-      <div style={{ flex: 1, overflowY: "auto", padding: "20px 28px" }}>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: 14 }}>
+      <div style={{ flex: 1, overflowY: "auto", padding: isMobile ? "14px 14px" : "20px 28px" }}>
+        <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(auto-fill, minmax(280px, 1fr))", gap: 14 }}>
           {relics.map(r => (
             <div key={r.id} style={{ border: "1px solid #E8E6F0", borderRadius: 14, padding: "18px 20px", background: "#fff" }}>
               <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 8 }}>
@@ -2270,11 +2298,11 @@ export default function HarmonIQApp() {
 
   const renderCollaboration = () => (
     <div style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden" }}>
-      <div style={{ padding: "20px 28px 12px", borderBottom: "1px solid #E8E6F0" }}>
-        <div style={{ fontSize: 18, fontWeight: 700, color: "#1A1A2E" }}>👥 Collaboration</div>
+      <div style={{ padding: isMobile ? "14px 16px 10px" : "20px 28px 12px", borderBottom: "1px solid #E8E6F0" }}>
+        <div style={{ fontSize: isMobile ? 17 : 18, fontWeight: 700, color: "#1A1A2E" }}>👥 Collaboration</div>
         <div style={{ fontSize: 13, color: "#888", marginTop: 2 }}>Manage team members and shared access</div>
       </div>
-      <div style={{ flex: 1, overflowY: "auto", padding: "20px 28px" }}>
+      <div style={{ flex: 1, overflowY: "auto", padding: isMobile ? "14px 14px" : "20px 28px" }}>
         <div style={{ fontSize: 14, fontWeight: 700, color: "#1A1A2E", marginBottom: 12 }}>Team Members</div>
         <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 30 }}>
           {COLLABORATORS.map(u => (
@@ -2292,7 +2320,7 @@ export default function HarmonIQApp() {
         </div>
 
         <div style={{ fontSize: 14, fontWeight: 700, color: "#1A1A2E", marginBottom: 12 }}>Shared With Me</div>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: 12 }}>
+        <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(auto-fill, minmax(280px, 1fr))", gap: 12 }}>
           {SAMPLE_TEMPLATES.filter(t => t.shared && t.author !== "Debonil Chowdhury").map(t => (
             <div key={t.id} style={{ border: "1px solid #E8E6F0", borderRadius: 12, padding: "14px 18px", background: "#fff" }}>
               <div style={{ fontSize: 13, fontWeight: 700, color: "#1A1A2E", marginBottom: 4 }}>{t.name}</div>
@@ -2381,14 +2409,14 @@ export default function HarmonIQApp() {
 
     return (
       <div style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden" }}>
-        <div style={{ padding: "20px 28px 12px", borderBottom: "1px solid #E8E6F0" }}>
-          <div style={{ fontSize: 18, fontWeight: 700, color: "#1A1A2E" }}>📖 Documentation</div>
+        <div style={{ padding: isMobile ? "14px 16px 10px" : "20px 28px 12px", borderBottom: "1px solid #E8E6F0" }}>
+          <div style={{ fontSize: isMobile ? 17 : 18, fontWeight: 700, color: "#1A1A2E" }}>📖 Documentation</div>
           <div style={{ fontSize: 13, color: "#888", marginTop: 2 }}>Learn about HarmonIQ, its architecture, and each Super Agent</div>
         </div>
-        <div style={{ flex: 1, overflowY: "auto", padding: "28px 32px", maxWidth: 860 }}>
+        <div style={{ flex: 1, overflowY: "auto", padding: isMobile ? "14px 14px" : "28px 32px", maxWidth: 860 }}>
 
           {/* Hero */}
-          <div style={{ background: "linear-gradient(135deg, #1A1A2E 0%, #2D1554 100%)", borderRadius: 18, padding: "36px 40px", marginBottom: 36 }}>
+          <div style={{ background: "linear-gradient(135deg, #1A1A2E 0%, #2D1554 100%)", borderRadius: 18, padding: isMobile ? "24px 20px" : "36px 40px", marginBottom: 36 }}>
             <div style={{ marginBottom: 12 }}>
               <HarmonIQLogo variant="large" />
             </div>
@@ -2466,7 +2494,7 @@ export default function HarmonIQApp() {
 
           {/* Key Concepts */}
           <DocSection title="Key Concepts" icon="💡">
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+            <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: 12 }}>
               {[
                 { term: "Templates", def: "Saved workflow configurations that can be reused, shared, and scheduled. A template captures the goal, agent pipeline, instructions, and data connections." },
                 { term: "Triggers", def: "Automated schedules that run templates at recurring intervals — daily, weekly, bi-weekly, or monthly. You receive notifications on completion or failure." },
@@ -2512,10 +2540,10 @@ export default function HarmonIQApp() {
 
   const renderCanvas = () => (
     <div style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden" }}>
-      <div style={{ padding: "20px 28px 12px", borderBottom: "1px solid #E8E6F0" }}>
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+      <div style={{ padding: isMobile ? "14px 16px 10px" : "20px 28px 12px", borderBottom: "1px solid #E8E6F0" }}>
+        <div style={{ display: "flex", alignItems: isMobile ? "flex-start" : "center", justifyContent: "space-between", flexDirection: isMobile ? "column" : "row", gap: isMobile ? 8 : 0 }}>
           <div>
-            <div style={{ fontSize: 18, fontWeight: 700, color: "#1A1A2E" }}>🖼 Canvas</div>
+            <div style={{ fontSize: isMobile ? 17 : 18, fontWeight: 700, color: "#1A1A2E" }}>🖼 Canvas</div>
             <div style={{ fontSize: 13, color: "#888", marginTop: 2 }}>Interactive analysis reports with charts, tables, and insights</div>
           </div>
           {canvasSelectedUseCase && (
@@ -2523,11 +2551,11 @@ export default function HarmonIQApp() {
           )}
         </div>
       </div>
-      <div style={{ flex: 1, overflowY: "auto", padding: canvasSelectedUseCase ? "0" : "20px 28px" }}>
+      <div style={{ flex: 1, overflowY: "auto", padding: canvasSelectedUseCase ? "0" : (isMobile ? "14px 14px" : "20px 28px") }}>
         {!canvasSelectedUseCase ? (
           <div>
             <div style={{ fontSize: 14, fontWeight: 700, color: "#1A1A2E", marginBottom: 16 }}>Analysis Reports</div>
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(320px, 1fr))", gap: 14 }}>
+            <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(auto-fill, minmax(320px, 1fr))", gap: 14 }}>
               {SAMPLE_TEMPLATES.map(t => {
                 const hasReport = !!CANVAS_REPORTS[t.id];
                 return (
@@ -2611,6 +2639,8 @@ export default function HarmonIQApp() {
         @keyframes shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
         @keyframes float { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-8px); } }
         @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        @keyframes slideInLeft { from { transform: translateX(-100%); } to { transform: translateX(0); } }
+        @keyframes slideInRight { from { transform: translateX(100%); } to { transform: translateX(0); } }
         .thinking-dots { display: flex; gap: 4px; padding: 4px 0; }
         .thinking-dots span { width: 6px; height: 6px; border-radius: 50%; background: #6C5CE7; animation: pulse 1.2s infinite; }
         .thinking-dots span:nth-child(2) { animation-delay: 0.2s; }
@@ -2632,10 +2662,10 @@ export default function HarmonIQApp() {
 
       {!isLoggedIn ? (
         /* ─── Login Page ─── */
-        <div style={{ display: "flex", height: "100vh", width: "100vw", fontFamily: "'DM Sans', -apple-system, sans-serif" }}>
+        <div style={{ display: "flex", flexDirection: isMobile ? "column" : "row", height: "100vh", width: "100vw", fontFamily: "'DM Sans', -apple-system, sans-serif" }}>
 
-          {/* Left Panel — Branding */}
-          <div style={{
+          {/* Left Panel — Branding (hidden on mobile) */}
+          {!isMobile && <div style={{
             flex: 1, background: "linear-gradient(155deg, #1A1A2E 0%, #2D1554 40%, #1A1A2E 100%)",
             display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center",
             position: "relative", overflow: "hidden", minWidth: 0,
@@ -2686,15 +2716,15 @@ export default function HarmonIQApp() {
             <div style={{ position: "absolute", bottom: 28, fontSize: 11, color: "#4A4460" }}>
               Powered by <span style={{ fontWeight: 700, color: "#6B6580" }}>Aria Intelligent Solutions</span>
             </div>
-          </div>
+          </div>}
 
           {/* Right Panel — Login Form */}
           <div style={{
-            width: 520, minWidth: 520, background: "#fff",
+            width: isMobile ? "100%" : 520, minWidth: isMobile ? 0 : 520, background: isMobile ? "linear-gradient(180deg, #1A1A2E 0%, #2D1554 30%, #fff 30%)" : "#fff",
             display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center",
-            padding: "40px 60px",
+            padding: isMobile ? "40px 24px" : "40px 60px", flex: isMobile ? 1 : "none",
           }}>
-            <div style={{ width: "100%", maxWidth: 380, animation: "slideUp 0.6s ease" }}>
+            <div style={{ width: "100%", maxWidth: 380, animation: "slideUp 0.6s ease", background: isMobile ? "#fff" : "transparent", borderRadius: isMobile ? 20 : 0, padding: isMobile ? "28px 24px" : 0, boxShadow: isMobile ? "0 8px 32px rgba(0,0,0,0.12)" : "none" }}>
               {/* Mobile-friendly logo */}
               <div style={{ marginBottom: 36 }}>
                 <HarmonIQLogo variant="light" />
@@ -2789,7 +2819,25 @@ export default function HarmonIQApp() {
       ) : (
       /* ─── Main App ─── */
       <div style={{ display: "flex", height: "100vh", width: "100vw", background: "#F5F4FA", fontFamily: "'DM Sans', -apple-system, sans-serif" }}>
-        {/* ─── Sidebar ─── */}
+        {/* ─── Sidebar (hidden on mobile, replaced by slide-over) ─── */}
+        {isMobile && mobileMenuOpen && (
+          <div onClick={() => setMobileMenuOpen(false)} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.5)", zIndex: 1100, animation: "fadeIn 0.2s ease" }}>
+            <div onClick={e => e.stopPropagation()} style={{ width: 240, height: "100%", background: "#1A1A2E", display: "flex", flexDirection: "column", animation: "slideInLeft 0.25s ease" }}>
+              <HarmonIQLogo />
+              <div style={{ flex: 1, padding: "8px 10px", display: "flex", flexDirection: "column", gap: 2 }}>
+                {NAV_ITEMS.map(item => (
+                  <div key={item.id} onClick={() => { setPage(item.id); setSelectedTemplate(null); setExpandedAgent(null); if (item.id !== "canvas") setCanvasSelectedUseCase(null); setMobileMenuOpen(false); }}
+                    style={{ display: "flex", alignItems: "center", gap: 10, padding: "12px 14px", borderRadius: 10, cursor: "pointer", color: page === item.id ? "#A29BFE" : "#8888A8", background: page === item.id ? "#2D1B69" : "transparent", fontSize: 14, fontWeight: page === item.id ? 600 : 400 }}>
+                    <span style={{ flexShrink: 0, display: "flex" }}>{item.icon}</span>
+                    <span>{item.label}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {!isMobile && (
         <div style={{ width: sidebarCollapsed ? 56 : 200, minWidth: sidebarCollapsed ? 56 : 200, background: "#1A1A2E", display: "flex", flexDirection: "column", transition: "width 0.25s ease, min-width 0.25s ease", overflow: "hidden" }}>
           <HarmonIQLogo collapsed={sidebarCollapsed} />
           <div style={{ flex: 1, padding: sidebarCollapsed ? "8px 6px" : "8px 10px", display: "flex", flexDirection: "column", gap: 2 }}>
@@ -2822,18 +2870,26 @@ export default function HarmonIQApp() {
             )}
           </div>
         </div>
+        )}
 
         {/* ─── Main Area ─── */}
         <div style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden" }}>
           {/* Top Bar */}
-          <div style={{ height: 48, minHeight: 48, background: "#fff", borderBottom: "1px solid #E8E6F0", display: "flex", alignItems: "center", justifyContent: "space-between", padding: "0 20px" }}>
-            <div style={{ fontSize: 13, color: "#888" }}>
-              {page === "home" ? "HarmonIQ / Home" : page === "templates" ? "HarmonIQ / Templates" : page === "triggers" ? "HarmonIQ / Triggers" : page === "relics" ? "HarmonIQ / Relics" : page === "canvas" ? "HarmonIQ / Canvas" : page === "docs" ? "HarmonIQ / Documentation" : "HarmonIQ / Collaboration"}
+          <div style={{ height: 48, minHeight: 48, background: "#fff", borderBottom: "1px solid #E8E6F0", display: "flex", alignItems: "center", justifyContent: "space-between", padding: isMobile ? "0 12px" : "0 20px" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+              {isMobile && (
+                <div onClick={() => setMobileMenuOpen(true)} style={{ cursor: "pointer", padding: 4, display: "flex" }}>
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#555" strokeWidth="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+                </div>
+              )}
+              <div style={{ fontSize: 13, color: "#888" }}>
+                {page === "home" ? "HarmonIQ / Home" : page === "templates" ? "HarmonIQ / Templates" : page === "triggers" ? "HarmonIQ / Triggers" : page === "relics" ? "HarmonIQ / Relics" : page === "canvas" ? "HarmonIQ / Canvas" : page === "docs" ? "HarmonIQ / Documentation" : "HarmonIQ / Collaboration"}
+              </div>
             </div>
             <div style={{ display: "flex", alignItems: "center", gap: 12, position: "relative" }}>
               <NotificationBell notifications={notifications} onClick={() => setShowNotifications(!showNotifications)} />
               {showNotifications && (
-                <div style={{ position: "absolute", top: 36, right: 0, width: 360, background: "#fff", borderRadius: 14, border: "1px solid #E8E6F0", boxShadow: "0 12px 40px rgba(0,0,0,0.12)", zIndex: 999, maxHeight: 400, overflow: "auto" }}>
+                <div style={{ position: "absolute", top: 36, right: 0, width: isMobile ? "calc(100vw - 24px)" : 360, maxWidth: 360, background: "#fff", borderRadius: 14, border: "1px solid #E8E6F0", boxShadow: "0 12px 40px rgba(0,0,0,0.12)", zIndex: 999, maxHeight: 400, overflow: "auto" }}>
                   <div style={{ padding: "14px 18px", borderBottom: "1px solid #E8E6F0", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                     <span style={{ fontSize: 14, fontWeight: 700, color: "#1A1A2E" }}>Notifications</span>
                     <button onClick={() => setNotifications(prev => prev.map(n => ({ ...n, read: true })))} style={{ fontSize: 11, color: "#6C5CE7", background: "none", border: "none", cursor: "pointer", fontWeight: 600 }}>Mark all read</button>
