@@ -1500,8 +1500,10 @@ export default function HarmonIQApp() {
   const [agentThoughts, setAgentThoughts] = useState([]);
   const [activeAgents, setActiveAgents] = useState([]);
   const [connectors, setConnectors] = useState(CONNECTORS);
-  const [showAgentBrain, setShowAgentBrain] = useState(true);
+  const [showAgentBrain, setShowAgentBrain] = useState(!isMobile);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  // Close Agent Brain overlay when switching to mobile viewport
+  useEffect(() => { if (isMobile) setShowAgentBrain(false); }, [isMobile]);
   const [selectedWorkflowAgents, setSelectedWorkflowAgents] = useState([]);
 
   // Active use case tracking (for per-use-case data)
