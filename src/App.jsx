@@ -1878,14 +1878,14 @@ export default function HarmonIQApp() {
               <div style={{ display: "flex", alignItems: "flex-start", gap: 16, marginBottom: 32 }}>
                 <div style={{ width: 48, height: 48, borderRadius: "50%", background: "linear-gradient(135deg, #7C3AED, #2D1554)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 24, flexShrink: 0 }}>🧠</div>
                 <div style={{ flex: 1 }}>
-                  <div style={{ fontSize: 12, fontWeight: 600, color: "#7C3AED", marginBottom: 4, textTransform: "uppercase", letterSpacing: "0.5px" }}>HarmonIQ Mother Agent</div>
+                  <div style={{ fontSize: 12, fontWeight: 600, color: "#7C3AED", marginBottom: 4, textTransform: "uppercase", letterSpacing: "0.5px" }}>HarmonIQ Orchestrator</div>
                   <div style={{ background: "#F9F8FE", borderRadius: "4px 16px 16px 16px", padding: "18px 22px", border: "1px solid #E8E6F0" }}>
                     <div style={{ fontSize: 20, fontWeight: 700, color: "#1A1A2E", marginBottom: 8, animation: "fadeIn 0.5s ease" }}>Hello, Debonil! 👋</div>
                     <div style={{ fontSize: 15, color: "#555", lineHeight: 1.7, animation: "fadeIn 0.5s ease 0.15s both" }}>
-                      How are you doing today? I'm your Mother Agent — I orchestrate <span style={{ color: "#7C3AED", fontWeight: 600 }}>six specialised Super Agents</span> to turn your data into actionable intelligence.
+                      How are you doing today? I coordinate <span style={{ color: "#7C3AED", fontWeight: 600 }}>six specialised Super Agents</span> behind the scenes — from data ingestion to optimisation — so you can focus on the decision, not the pipeline.
                     </div>
                     <div style={{ fontSize: 14, color: "#666", lineHeight: 1.7, marginTop: 10, animation: "fadeIn 0.5s ease 0.3s both" }}>
-                      Tell me what you're working on and I'll decompose it into an execution plan, connect your data sources, and run the right agents. Let's build something smart. ✨
+                      Tell me what you're working on and I'll break it into an execution plan, wire up the right data sources, and run the agents end-to-end. Let's go. ✨
                     </div>
                   </div>
                 </div>
