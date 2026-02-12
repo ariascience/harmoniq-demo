@@ -855,8 +855,8 @@ function InputDataPreview({ useCaseId }) {
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
           <span style={{ fontSize: 15 }}>📊</span>
           <div>
-            <div style={{ fontSize: 13, fontWeight: 600, color: "#1A1A2E" }}>Input Data Preview</div>
-            <div style={{ fontSize: 11, color: "#888" }}>{inputFiles.length} files · {inputFiles.reduce((a, f) => a + parseInt(f.rows.replace(/,/g, "")), 0).toLocaleString()} total rows</div>
+            <div style={{ fontSize: 14, fontWeight: 600, color: "#1A1A2E" }}>Input Data Preview</div>
+            <div style={{ fontSize: 12, color: "#888" }}>{inputFiles.length} files · {inputFiles.reduce((a, f) => a + parseInt(f.rows.replace(/,/g, "")), 0).toLocaleString()} total rows</div>
           </div>
         </div>
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#888" strokeWidth="2" style={{ transform: expanded ? "rotate(180deg)" : "none", transition: "transform 0.2s" }}><polyline points="6 9 12 15 18 9"/></svg>
@@ -977,18 +977,57 @@ function ConnectorRow({ connector, onToggle }) {
       <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
         <ConnectorIcon id={connector.id} size={22} />
         <div>
-          <span style={{ fontSize: 13, fontWeight: 500, color: "#1A1A2E" }}>{connector.name}</span>
+          <span style={{ fontSize: 14, fontWeight: 500, color: "#1A1A2E" }}>{connector.name}</span>
           {isConnected && (fileCount > 0 || connector.tables) && (
-            <div style={{ fontSize: 10, color: "#888", marginTop: 1 }}>
+            <div style={{ fontSize: 11, color: "#888", marginTop: 1 }}>
               {fileCount > 0 ? `${fileCount} file${fileCount > 1 ? "s" : ""} attached` : `${connector.tables} tables · ${connector.db}`}
             </div>
           )}
         </div>
       </div>
       <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-        <span style={{ fontSize: 10, color: isConnected ? "#00B894" : "#999", fontWeight: 600 }}>{isConnected ? "Connected" : "Not connected"}</span>
+        <span style={{ fontSize: 11, color: isConnected ? "#00B894" : "#999", fontWeight: 600 }}>{isConnected ? "Connected" : "Not connected"}</span>
         <div style={{ width: 10, height: 10, borderRadius: "50%", background: isConnected ? "#00B894" : "#DDD" }} />
       </div>
+    </div>
+  );
+}
+
+function ConnectorsSection({ connectors, onToggle, onManage }) {
+  const [expanded, setExpanded] = useState(false);
+  const connectedCount = connectors.filter(c => c.status === "connected").length;
+  const totalFiles = connectors.reduce((sum, c) => sum + (c.files ? c.files.length : 0), 0);
+  return (
+    <div style={{ border: "1px solid #E8E6F0", borderRadius: 12, overflow: "hidden", background: "#fff", marginBottom: 20 }}>
+      <div onClick={() => setExpanded(!expanded)} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 16px", cursor: "pointer", background: expanded ? "#F9F8FE" : "#fff", transition: "background 0.2s" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+          <span style={{ fontSize: 16 }}>🔌</span>
+          <div>
+            <div style={{ fontSize: 14, fontWeight: 600, color: "#1A1A2E" }}>Connections</div>
+            <div style={{ fontSize: 12, color: "#888" }}>{connectedCount} connected · {totalFiles} files attached</div>
+          </div>
+        </div>
+        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+          <div style={{ display: "flex", gap: 4 }}>
+            {connectors.filter(c => c.status === "connected").slice(0, 4).map(c => (
+              <div key={c.id} style={{ width: 24, height: 24, borderRadius: 6, background: "#F0EDFF", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                <ConnectorIcon id={c.id} size={14} />
+              </div>
+            ))}
+          </div>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#888" strokeWidth="2" style={{ transform: expanded ? "rotate(180deg)" : "none", transition: "transform 0.2s" }}><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+      </div>
+      {expanded && (
+        <div style={{ padding: "0 12px 12px", borderTop: "1px solid #E8E6F0" }}>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "flex-end", padding: "8px 4px 4px" }}>
+            <button onClick={(e) => { e.stopPropagation(); onManage(); }} style={{ fontSize: 12, color: "#6C5CE7", background: "none", border: "none", cursor: "pointer", fontWeight: 600 }}>+ Manage</button>
+          </div>
+          <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+            {connectors.map(c => <ConnectorRow key={c.id} connector={c} onToggle={() => onToggle(c.id)} />)}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -1134,13 +1173,13 @@ function AgentBrainPanel({ thoughts, isRunning, activeAgents, connectors,
   };
 
   return (
-    <div style={{ width: 340, minWidth: 340, background: "#1E1E2E", display: "flex", flexDirection: "column", height: "100%", borderLeft: "1px solid #2A2A3C" }}>
+    <div style={{ width: 420, minWidth: 420, background: "#1E1E2E", display: "flex", flexDirection: "column", height: "100%", borderLeft: "1px solid #2A2A3C" }}>
       {/* Header */}
       <div style={{ padding: "16px 18px", borderBottom: "1px solid #2A2A3C" }}>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
             <span style={{ fontSize: 16 }}>🧠</span>
-            <span style={{ fontSize: 14, fontWeight: 700, color: "#E8E6F0" }}>Agent Brain</span>
+            <span style={{ fontSize: 15, fontWeight: 700, color: "#E8E6F0" }}>Agent Brain</span>
             <div style={{ width: 7, height: 7, borderRadius: "50%", background: isRunning ? "#C3E88D" : "#546E7A", animation: isRunning ? "pulse 1.5s infinite" : "none", marginLeft: 2 }} />
           </div>
           {(isRunning || elapsed > 0) && (
@@ -1181,7 +1220,7 @@ function AgentBrainPanel({ thoughts, isRunning, activeAgents, connectors,
             <div key={i} style={{ marginBottom: isHandoff ? 14 : 8, animation: "fadeIn 0.4s ease" }}>
               {isHandoff ? (
                 <div style={{ padding: "10px 14px", background: "#252536", borderRadius: 8, borderLeft: "3px solid #C792EA", margin: "6px 0" }}>
-                  <div style={{ fontSize: 11.5, color: "#C792EA", fontWeight: 600, lineHeight: 1.6, fontFamily: "'JetBrains Mono', 'Fira Code', monospace" }}>
+                  <div style={{ fontSize: 12.5, color: "#C792EA", fontWeight: 600, lineHeight: 1.6, fontFamily: "'JetBrains Mono', 'Fira Code', monospace" }}>
                     <span style={{ color: "#FFCB6B" }}>→</span> {t.text.replace("🧠 ", "")}
                   </div>
                 </div>
@@ -1189,8 +1228,8 @@ function AgentBrainPanel({ thoughts, isRunning, activeAgents, connectors,
                 <div style={{ display: "flex", alignItems: "flex-start", gap: 8, padding: "4px 8px", borderRadius: 6, background: isComplete ? "#C3E88D10" : "transparent" }}>
                   <div style={{ width: 5, height: 5, borderRadius: "50%", background: isComplete ? syntaxColors.success : (t.color || "#82AAFF"), marginTop: 7, flexShrink: 0, boxShadow: isComplete ? `0 0 6px ${syntaxColors.success}44` : "none" }} />
                   <div style={{ fontFamily: "'JetBrains Mono', 'Fira Code', monospace", minWidth: 0 }}>
-                    <div style={{ fontSize: 9.5, fontWeight: 700, color: t.color || "#82AAFF", marginBottom: 2, textTransform: "uppercase", letterSpacing: "0.5px", opacity: 0.9 }}>{t.agent}</div>
-                    <div style={{ fontSize: 11, color: isComplete ? syntaxColors.success : "#B8B5C8", lineHeight: 1.6, wordBreak: "break-word" }}>
+                    <div style={{ fontSize: 10.5, fontWeight: 700, color: t.color || "#82AAFF", marginBottom: 2, textTransform: "uppercase", letterSpacing: "0.5px", opacity: 0.9 }}>{t.agent}</div>
+                    <div style={{ fontSize: 12, color: isComplete ? syntaxColors.success : "#B8B5C8", lineHeight: 1.6, wordBreak: "break-word" }}>
                       {t.text}
                     </div>
                   </div>
@@ -1204,11 +1243,11 @@ function AgentBrainPanel({ thoughts, isRunning, activeAgents, connectors,
           <div style={{ margin: "8px 4px", padding: "14px", background: "#2A2A3C", borderRadius: 10, borderLeft: "4px solid #FFCB6B", animation: "fadeIn 0.4s ease" }}>
             <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 8 }}>
               <span style={{ fontSize: 14 }}>🔍</span>
-              <span style={{ fontSize: 12, fontWeight: 700, color: "#FFCB6B", fontFamily: "'JetBrains Mono', monospace" }}>HITL Checkpoint — {hitlCheckpoint.title}</span>
+              <span style={{ fontSize: 13, fontWeight: 700, color: "#FFCB6B", fontFamily: "'JetBrains Mono', monospace" }}>HITL Checkpoint — {hitlCheckpoint.title}</span>
             </div>
-            <div style={{ fontSize: 11, color: "#B8B5C8", lineHeight: 1.6, marginBottom: 8, fontFamily: "'JetBrains Mono', monospace" }}>{hitlCheckpoint.summary}</div>
+            <div style={{ fontSize: 12, color: "#B8B5C8", lineHeight: 1.6, marginBottom: 8, fontFamily: "'JetBrains Mono', monospace" }}>{hitlCheckpoint.summary}</div>
             {hitlCheckpoint.recommendation && (
-              <div style={{ fontSize: 11, color: "#C3E88D", fontStyle: "italic", marginBottom: 10, padding: "6px 10px", background: "#C3E88D10", borderRadius: 6, lineHeight: 1.5 }}>
+              <div style={{ fontSize: 12, color: "#C3E88D", fontStyle: "italic", marginBottom: 10, padding: "6px 10px", background: "#C3E88D10", borderRadius: 6, lineHeight: 1.5 }}>
                 💡 {hitlCheckpoint.recommendation}
               </div>
             )}
@@ -1227,8 +1266,8 @@ function AgentBrainPanel({ thoughts, isRunning, activeAgents, connectors,
               </div>
             ) : (
               <div style={{ display: "flex", gap: 6 }}>
-                <button onClick={onHitlApprove} style={{ padding: "6px 14px", borderRadius: 6, background: "#00B894", color: "#fff", border: "none", fontSize: 11, fontWeight: 600, cursor: "pointer" }}>✓ Approve & Continue</button>
-                <button onClick={onHitlStartAdjust} style={{ padding: "6px 14px", borderRadius: 6, background: "transparent", color: "#C792EA", border: "1px solid #C792EA40", fontSize: 11, fontWeight: 600, cursor: "pointer" }}>✏️ Adjust</button>
+                <button onClick={onHitlApprove} style={{ padding: "7px 14px", borderRadius: 6, background: "#00B894", color: "#fff", border: "none", fontSize: 12, fontWeight: 600, cursor: "pointer" }}>✓ Approve & Continue</button>
+                <button onClick={onHitlStartAdjust} style={{ padding: "7px 14px", borderRadius: 6, background: "transparent", color: "#C792EA", border: "1px solid #C792EA40", fontSize: 12, fontWeight: 600, cursor: "pointer" }}>✏️ Adjust</button>
               </div>
             )}
           </div>
@@ -1239,14 +1278,14 @@ function AgentBrainPanel({ thoughts, isRunning, activeAgents, connectors,
           <div style={{ margin: "8px 4px", padding: "14px", background: "#2A2A3C", borderRadius: 10, borderLeft: "4px solid #E74C3C", animation: "fadeIn 0.4s ease" }}>
             <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 8 }}>
               <span style={{ fontSize: 14 }}>⚠️</span>
-              <span style={{ fontSize: 12, fontWeight: 700, color: "#E74C3C", fontFamily: "'JetBrains Mono', monospace" }}>Constraint Violated: {constraintData.title}</span>
+              <span style={{ fontSize: 13, fontWeight: 700, color: "#E74C3C", fontFamily: "'JetBrains Mono', monospace" }}>Constraint Violated: {constraintData.title}</span>
             </div>
-            <div style={{ fontSize: 11, color: "#B8B5C8", lineHeight: 1.6, marginBottom: 6, fontFamily: "'JetBrains Mono', monospace" }}>{constraintData.message}</div>
-            <div style={{ fontSize: 10, color: "#F78C6C", marginBottom: 8, fontFamily: "'JetBrains Mono', monospace", padding: "4px 8px", background: "#F78C6C10", borderRadius: 4, display: "inline-block" }}>
+            <div style={{ fontSize: 12, color: "#B8B5C8", lineHeight: 1.6, marginBottom: 6, fontFamily: "'JetBrains Mono', monospace" }}>{constraintData.message}</div>
+            <div style={{ fontSize: 11, color: "#F78C6C", marginBottom: 8, fontFamily: "'JetBrains Mono', monospace", padding: "4px 8px", background: "#F78C6C10", borderRadius: 4, display: "inline-block" }}>
               Constraint: <span style={{ textDecoration: "line-through" }}>{constraintData.constraint}</span>
             </div>
             {constraintData.suggestion && (
-              <div style={{ fontSize: 11, color: "#C3E88D", fontStyle: "italic", marginBottom: 10, padding: "6px 10px", background: "#C3E88D10", borderRadius: 6, lineHeight: 1.5 }}>
+              <div style={{ fontSize: 12, color: "#C3E88D", fontStyle: "italic", marginBottom: 10, padding: "6px 10px", background: "#C3E88D10", borderRadius: 6, lineHeight: 1.5 }}>
                 💡 Suggestion: {constraintData.suggestion}
               </div>
             )}
@@ -1257,8 +1296,8 @@ function AgentBrainPanel({ thoughts, isRunning, activeAgents, connectors,
               style={{ width: "100%", minHeight: 50, padding: 10, borderRadius: 8, border: "1px solid #3A3A4C", background: "#1E1E2E", color: "#E8E6F0", fontSize: 11, fontFamily: "'JetBrains Mono', monospace", resize: "vertical", outline: "none", marginBottom: 8 }}
             />
             <div style={{ display: "flex", gap: 6 }}>
-              <button onClick={onConstraintApply} style={{ padding: "6px 14px", borderRadius: 6, background: "#00B894", color: "#fff", border: "none", fontSize: 11, fontWeight: 600, cursor: "pointer" }}>🔄 Apply & Re-run from {constraintData.agentName}</button>
-              <button onClick={onConstraintSkip} style={{ padding: "6px 14px", borderRadius: 6, background: "transparent", color: "#546E7A", border: "1px solid #3A3A4C", fontSize: 11, cursor: "pointer" }}>⏭ Skip</button>
+              <button onClick={onConstraintApply} style={{ padding: "7px 14px", borderRadius: 6, background: "#00B894", color: "#fff", border: "none", fontSize: 12, fontWeight: 600, cursor: "pointer" }}>🔄 Apply & Re-run from {constraintData.agentName}</button>
+              <button onClick={onConstraintSkip} style={{ padding: "7px 14px", borderRadius: 6, background: "transparent", color: "#546E7A", border: "1px solid #3A3A4C", fontSize: 12, cursor: "pointer" }}>⏭ Skip</button>
             </div>
           </div>
         )}
@@ -1487,6 +1526,18 @@ export default function HarmonIQApp() {
   const constraintResumeRef = useRef(null);
   const timelineRef = useRef([]);
   const timelineIndexRef = useRef(0);
+  const mainContentRef = useRef(null);
+
+  // Auto-scroll main content area to bottom when workflow progresses or results appear
+  useEffect(() => {
+    if (mainContentRef.current && workflowStep > 0) {
+      setTimeout(() => {
+        if (mainContentRef.current) {
+          mainContentRef.current.scrollTo({ top: mainContentRef.current.scrollHeight, behavior: "smooth" });
+        }
+      }, 100);
+    }
+  }, [workflowStep, runComplete]);
 
   const resetHome = useCallback(() => {
     if (runWorkflowRef.current) clearTimeout(runWorkflowRef.current);
@@ -1779,7 +1830,7 @@ export default function HarmonIQApp() {
                 }}>
                   {isComplete ? "✓" : stepNum}
                 </div>
-                <div style={{ fontSize: 9, fontWeight: 600, color: isComplete || isCurrent ? "#7C3AED" : "#999", whiteSpace: "nowrap", textTransform: "uppercase", letterSpacing: "0.5px" }}>{label}</div>
+                <div style={{ fontSize: 10, fontWeight: 600, color: isComplete || isCurrent ? "#7C3AED" : "#999", whiteSpace: "nowrap", textTransform: "uppercase", letterSpacing: "0.5px" }}>{label}</div>
               </div>
               {idx < STEP_LABELS.length - 1 && (
                 <div style={{ width: 48, height: 2, background: isComplete ? "#7C3AED" : "#E8E6F0", margin: "0 6px", marginBottom: 18, transition: "background 0.3s" }} />
@@ -1796,8 +1847,8 @@ export default function HarmonIQApp() {
       <div style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden" }}>
         <div style={{ padding: "20px 28px 12px", borderBottom: "1px solid #E8E6F0", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
           <div>
-            <div style={{ fontSize: 18, fontWeight: 700, color: "#1A1A2E" }}>{workflowCreated ? "Workflow Builder" : "What can I help you with?"}</div>
-            {!workflowCreated && <div style={{ fontSize: 13, color: "#888", marginTop: 2 }}>Let's align your goal with HarmonIQ better</div>}
+            <div style={{ fontSize: 20, fontWeight: 700, color: "#1A1A2E" }}>{workflowCreated ? "Workflow Builder" : "What can I help you with?"}</div>
+            {!workflowCreated && <div style={{ fontSize: 14, color: "#888", marginTop: 2 }}>Let's align your goal with HarmonIQ better</div>}
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
             {workflowCreated && <button onClick={() => setShowShareModal(true)} style={{ padding: "8px 14px", borderRadius: 8, border: "1px solid #DDD", background: "#fff", fontSize: 12, cursor: "pointer", display: "flex", alignItems: "center", gap: 4 }}>🔗 Share</button>}
@@ -1820,12 +1871,12 @@ export default function HarmonIQApp() {
           </div>
         )}
 
-        <div style={{ flex: 1, overflowY: "auto", padding: "20px 28px" }}>
+        <div ref={mainContentRef} style={{ flex: 1, overflowY: "auto", padding: "20px 28px" }}>
           {!workflowCreated ? (
             <div style={{ maxWidth: 640, margin: "60px auto", textAlign: "center" }}>
-              <div style={{ fontSize: 42, marginBottom: 16 }}>🤖</div>
-              <div style={{ fontSize: 22, fontWeight: 700, color: "#1A1A2E", marginBottom: 6 }}>Hello, Debonil</div>
-              <div style={{ fontSize: 14, color: "#888", marginBottom: 30 }}>Describe your analysis goal and I'll orchestrate the right Super Agents</div>
+              <div style={{ fontSize: 48, marginBottom: 16 }}>🤖</div>
+              <div style={{ fontSize: 26, fontWeight: 700, color: "#1A1A2E", marginBottom: 6 }}>Hello, Debonil</div>
+              <div style={{ fontSize: 15, color: "#888", marginBottom: 30 }}>Describe your analysis goal and I'll orchestrate the right Super Agents</div>
               <div style={{ display: "flex", gap: 10, justifyContent: "center", flexWrap: "wrap", marginBottom: 40 }}>
                 {[
                   { icon: "📁", label: "Connect Data", onClick: () => setShowConnectData(true) },
@@ -1841,18 +1892,18 @@ export default function HarmonIQApp() {
             <div>
               {/* User prompt display — always visible */}
               <div style={{ background: "#F9F8FE", borderRadius: 12, padding: "14px 18px", marginBottom: 20, border: "1px solid #E8E6F0" }}>
-                <div style={{ fontSize: 11, fontWeight: 600, color: "#6C5CE7", marginBottom: 4 }}>YOUR REQUEST</div>
-                <div style={{ fontSize: 13, color: "#333", lineHeight: 1.6 }}>{userPrompt}</div>
+                <div style={{ fontSize: 12, fontWeight: 600, color: "#6C5CE7", marginBottom: 4 }}>YOUR REQUEST</div>
+                <div style={{ fontSize: 14, color: "#333", lineHeight: 1.6 }}>{userPrompt}</div>
               </div>
 
               {/* ═══ STEP 1: Plan Review ═══ */}
               {workflowStep >= 1 && (
                 <div style={{ animation: "fadeIn 0.4s ease" }}>
                   <div style={{ marginBottom: 20 }}>
-                    <div style={{ fontSize: 13, fontWeight: 700, color: "#1A1A2E", marginBottom: 4 }}>📋 Goal Decomposition</div>
-                    <div style={{ fontSize: 12.5, color: "#555", marginBottom: 12, paddingLeft: 20, lineHeight: 1.6 }}>Mother Agent has decomposed your request into the following execution plan. Each task is assigned to a specialised Super Agent.</div>
+                    <div style={{ fontSize: 15, fontWeight: 700, color: "#1A1A2E", marginBottom: 4 }}>📋 Goal Decomposition</div>
+                    <div style={{ fontSize: 13.5, color: "#555", marginBottom: 12, paddingLeft: 20, lineHeight: 1.6 }}>Mother Agent has decomposed your request into the following execution plan. Each task is assigned to a specialised Super Agent.</div>
 
-                    <div style={{ fontSize: 13, fontWeight: 700, color: "#1A1A2E", marginBottom: 4 }}>🔧 Execution Plan</div>
+                    <div style={{ fontSize: 15, fontWeight: 700, color: "#1A1A2E", marginBottom: 4 }}>🔧 Execution Plan</div>
                     <div style={{ paddingLeft: 20, marginBottom: 12 }}>
                       {[
                         "Ingest and normalise uploaded sales data, inventory snapshots, and linked data sources",
@@ -1861,16 +1912,16 @@ export default function HarmonIQApp() {
                         "Formulate multi-objective optimisation: maximise units subject to margin ≥ 15% and budget constraints",
                         "Produce visual analytics — time-series decomposition, heatmap of at-risk SKUs, scenario comparison chart",
                       ].map((t, i) => (
-                        <div key={i} style={{ fontSize: 12.5, color: "#555", marginBottom: 4, display: "flex", alignItems: "flex-start", gap: 6 }}>
+                        <div key={i} style={{ fontSize: 13.5, color: "#555", marginBottom: 4, display: "flex", alignItems: "flex-start", gap: 6 }}>
                           <span style={{ color: "#6C5CE7", fontWeight: 600 }}>•</span> {t}
                         </div>
                       ))}
                     </div>
 
-                    <div style={{ fontSize: 13, fontWeight: 700, color: "#6C5CE7", marginBottom: 8 }}>✅ Success Criteria</div>
+                    <div style={{ fontSize: 15, fontWeight: 700, color: "#6C5CE7", marginBottom: 8 }}>✅ Success Criteria</div>
                     <div style={{ paddingLeft: 20, marginBottom: 12 }}>
                       {["Projected units ≥ 400,000 target", "Blended margin ≥ 15%", "At-risk SKU count reduced by ≥ 50%", "Generate downloadable recommendation report with executive summary"].map((s, i) => (
-                        <div key={i} style={{ fontSize: 12.5, color: "#555", marginBottom: 4, display: "flex", alignItems: "flex-start", gap: 6 }}>
+                        <div key={i} style={{ fontSize: 13.5, color: "#555", marginBottom: 4, display: "flex", alignItems: "flex-start", gap: 6 }}>
                           <span style={{ color: "#00B894" }}>✓</span> {s}
                         </div>
                       ))}
@@ -1886,20 +1937,14 @@ export default function HarmonIQApp() {
                   {activeUseCaseId && <InputDataPreview useCaseId={activeUseCaseId} />}
 
                   {/* Connectors */}
-                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 10 }}>
-                    <div style={{ fontSize: 13, fontWeight: 700, color: "#1A1A2E" }}>🔌 Connections</div>
-                    <button onClick={() => setShowConnectData(true)} style={{ fontSize: 11, color: "#6C5CE7", background: "none", border: "none", cursor: "pointer", fontWeight: 600 }}>+ Manage</button>
-                  </div>
-                  <div style={{ display: "flex", flexDirection: "column", gap: 6, marginBottom: 20 }}>
-                    {connectors.map(c => <ConnectorRow key={c.id} connector={c} onToggle={() => toggleConnector(c.id)} />)}
-                  </div>
+                  <ConnectorsSection connectors={connectors} onToggle={toggleConnector} onManage={() => setShowConnectData(true)} />
                 </div>
               )}
 
               {/* ═══ STEP 3: Configure Agents ═══ */}
               {workflowStep >= 3 && (
                 <div style={{ animation: "fadeIn 0.4s ease" }}>
-                  <div style={{ fontSize: 13, fontWeight: 700, color: "#1A1A2E", marginBottom: 10 }}>🤖 Super Agent Workflow</div>
+                  <div style={{ fontSize: 15, fontWeight: 700, color: "#1A1A2E", marginBottom: 10 }}>🤖 Super Agent Workflow</div>
                   <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 20 }}>
                     {selectedWorkflowAgents.map((agentId, idx) => {
                       const agent = SUPER_AGENTS.find(a => a.id === agentId);
@@ -1910,11 +1955,11 @@ export default function HarmonIQApp() {
                             <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
                               <div style={{ width: 24, height: 24, background: agent.color + "20", borderRadius: 6, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14 }}>{agent.icon}</div>
                               <div>
-                                <div style={{ fontSize: 13, fontWeight: 600, color: "#1A1A2E" }}>
-                                  <span style={{ fontSize: 11, color: "#999", marginRight: 6 }}>Step {idx + 1}</span>
+                                <div style={{ fontSize: 14, fontWeight: 600, color: "#1A1A2E" }}>
+                                  <span style={{ fontSize: 12, color: "#999", marginRight: 6 }}>Step {idx + 1}</span>
                                   {agent.name}
                                 </div>
-                                <div style={{ fontSize: 11, color: "#888" }}>{agent.desc}</div>
+                                <div style={{ fontSize: 12, color: "#888" }}>{agent.desc}</div>
                               </div>
                             </div>
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#888" strokeWidth="2" style={{ transform: isExpanded ? "rotate(180deg)" : "none", transition: "transform 0.2s" }}><polyline points="6 9 12 15 18 9"/></svg>
@@ -1942,21 +1987,21 @@ export default function HarmonIQApp() {
                 const outputData = (activeUseCaseId && USE_CASE_DATA[activeUseCaseId]?.output) || SIMULATED_OUTPUT;
                 return (
                   <div style={{ background: "#F0FFF4", border: "1px solid #C6F6D5", borderRadius: 12, padding: "18px 20px", marginBottom: 20, animation: "fadeIn 0.4s ease" }}>
-                    <div style={{ fontSize: 13, fontWeight: 700, color: "#1A1A2E", marginBottom: 8 }}>📋 Solution</div>
-                    <div style={{ fontSize: 12.5, color: "#333", lineHeight: 1.7, marginBottom: 14 }}>{outputData.summary}</div>
+                    <div style={{ fontSize: 16, fontWeight: 700, color: "#1A1A2E", marginBottom: 8 }}>📋 Solution</div>
+                    <div style={{ fontSize: 14, color: "#333", lineHeight: 1.7, marginBottom: 14 }}>{outputData.summary}</div>
                     <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginBottom: 14 }}>
                       {outputData.metrics.map(m => (
                         <div key={m.label} style={{ background: "#fff", borderRadius: 10, padding: "12px 14px", border: "1px solid #E8E6F0" }}>
-                          <div style={{ fontSize: 11, color: "#888" }}>{m.label}</div>
-                          <div style={{ fontSize: 18, fontWeight: 700, color: "#1A1A2E" }}>{m.value}</div>
-                          <div style={{ fontSize: 11, color: m.delta.startsWith("+") ? "#00B894" : m.delta.startsWith("-") ? "#E74C3C" : "#888", fontWeight: 600 }}>{m.delta}</div>
+                          <div style={{ fontSize: 12, color: "#888" }}>{m.label}</div>
+                          <div style={{ fontSize: 20, fontWeight: 700, color: "#1A1A2E" }}>{m.value}</div>
+                          <div style={{ fontSize: 12, color: m.delta.startsWith("+") ? "#00B894" : m.delta.startsWith("-") ? "#E74C3C" : "#888", fontWeight: 600 }}>{m.delta}</div>
                         </div>
                       ))}
                     </div>
-                    <div style={{ fontSize: 11, fontWeight: 600, color: "#555", marginBottom: 6 }}>Output Files</div>
+                    <div style={{ fontSize: 13, fontWeight: 600, color: "#555", marginBottom: 6 }}>Output Files</div>
                     <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 12 }}>
                       {outputData.files.map(f => (
-                        <div key={f} style={{ display: "flex", alignItems: "center", gap: 6, padding: "8px 14px", background: "#fff", borderRadius: 8, border: "1px solid #E8E6F0", fontSize: 12, cursor: "pointer" }}>
+                        <div key={f} style={{ display: "flex", alignItems: "center", gap: 6, padding: "8px 14px", background: "#fff", borderRadius: 8, border: "1px solid #E8E6F0", fontSize: 13, cursor: "pointer" }}>
                           📄 {f} <span style={{ color: "#6C5CE7", fontWeight: 600 }}>↓</span>
                         </div>
                       ))}
@@ -1982,9 +2027,9 @@ export default function HarmonIQApp() {
                 onChange={e => setUserPrompt(e.target.value)}
                 onKeyDown={e => e.key === "Enter" && createWorkflow()}
                 placeholder="What analysis are you looking for?"
-                style={{ flex: 1, padding: "12px 16px", borderRadius: 12, border: "1px solid #DDD", fontSize: 13, outline: "none", fontFamily: "'DM Sans', sans-serif" }}
+                style={{ flex: 1, padding: "14px 18px", borderRadius: 12, border: "1px solid #DDD", fontSize: 14, outline: "none", fontFamily: "'DM Sans', sans-serif" }}
               />
-              <button onClick={createWorkflow} disabled={!userPrompt.trim()} style={{ padding: "12px 24px", borderRadius: 12, background: userPrompt.trim() ? "#2D1B69" : "#CCC", color: "#fff", border: "none", fontSize: 13, fontWeight: 600, cursor: userPrompt.trim() ? "pointer" : "not-allowed", transition: "background 0.2s" }}>Send</button>
+              <button onClick={createWorkflow} disabled={!userPrompt.trim()} style={{ padding: "14px 28px", borderRadius: 12, background: userPrompt.trim() ? "#2D1B69" : "#CCC", color: "#fff", border: "none", fontSize: 14, fontWeight: 600, cursor: userPrompt.trim() ? "pointer" : "not-allowed", transition: "background 0.2s" }}>Send</button>
             </div>
           ) : (
             <div style={{ display: "flex", gap: 8, alignItems: "center", justifyContent: "space-between" }}>
@@ -1996,33 +2041,33 @@ export default function HarmonIQApp() {
                 {/* Step 1: Approve plan */}
                 {workflowStep === 1 && (
                   <>
-                    <button onClick={() => setWorkflowStep(2)} style={{ padding: "10px 20px", borderRadius: 10, background: "#7C3AED", color: "#fff", border: "none", fontSize: 12, fontWeight: 600, cursor: "pointer", display: "flex", alignItems: "center", gap: 6 }}>✓ Looks Good, Next</button>
-                    <button onClick={() => { resetHome(); }} style={{ padding: "10px 16px", borderRadius: 10, border: "1px solid #DDD", background: "#fff", fontSize: 12, cursor: "pointer", color: "#666" }}>✏️ Revise Plan</button>
+                    <button onClick={() => setWorkflowStep(2)} style={{ padding: "10px 22px", borderRadius: 10, background: "#7C3AED", color: "#fff", border: "none", fontSize: 13, fontWeight: 600, cursor: "pointer", display: "flex", alignItems: "center", gap: 6 }}>✓ Looks Good, Next</button>
+                    <button onClick={() => { resetHome(); }} style={{ padding: "10px 18px", borderRadius: 10, border: "1px solid #DDD", background: "#fff", fontSize: 13, cursor: "pointer", color: "#666" }}>✏️ Revise Plan</button>
                   </>
                 )}
                 {/* Step 2: Data ready */}
                 {workflowStep === 2 && (
-                  <button onClick={() => setWorkflowStep(3)} style={{ padding: "10px 20px", borderRadius: 10, background: "#7C3AED", color: "#fff", border: "none", fontSize: 12, fontWeight: 600, cursor: "pointer", display: "flex", alignItems: "center", gap: 6 }}>✓ Data Ready, Next</button>
+                  <button onClick={() => setWorkflowStep(3)} style={{ padding: "10px 22px", borderRadius: 10, background: "#7C3AED", color: "#fff", border: "none", fontSize: 13, fontWeight: 600, cursor: "pointer", display: "flex", alignItems: "center", gap: 6 }}>✓ Data Ready, Next</button>
                 )}
                 {/* Step 3: Approve & Run */}
                 {workflowStep === 3 && (
-                  <button onClick={runWorkflow} style={{ padding: "10px 20px", borderRadius: 10, background: "#00B894", color: "#fff", border: "none", fontSize: 12, fontWeight: 600, cursor: "pointer", display: "flex", alignItems: "center", gap: 6 }}>▶ Approve & Run</button>
+                  <button onClick={runWorkflow} style={{ padding: "10px 22px", borderRadius: 10, background: "#00B894", color: "#fff", border: "none", fontSize: 13, fontWeight: 600, cursor: "pointer", display: "flex", alignItems: "center", gap: 6 }}>▶ Approve & Run</button>
                 )}
                 {/* Step 4: Running / Complete */}
                 {workflowStep === 4 && (
                   <>
                     {runComplete && (
                       <>
-                        <button onClick={() => { if (runWorkflowRef.current) clearTimeout(runWorkflowRef.current); setRunComplete(false); setAgentThoughts([]); setActiveAgents([]); runWorkflow(); }} style={{ padding: "10px 16px", borderRadius: 10, border: "1px solid #00B894", background: "#F0FFF4", fontSize: 12, fontWeight: 600, cursor: "pointer", color: "#00B894" }}>🔄 Re-run</button>
-                        <button onClick={handleSaveAsTemplate} style={{ padding: "10px 16px", borderRadius: 10, background: "#6C5CE7", color: "#fff", border: "none", fontSize: 12, fontWeight: 600, cursor: "pointer" }}>💾 Save as Template</button>
-                        <button onClick={() => { setScheduleTarget("Custom Workflow"); setShowScheduleModal(true); }} style={{ padding: "10px 16px", borderRadius: 10, background: "#2D1B69", color: "#fff", border: "none", fontSize: 12, fontWeight: 600, cursor: "pointer" }}>⏰ Schedule</button>
+                        <button onClick={() => { if (runWorkflowRef.current) clearTimeout(runWorkflowRef.current); setRunComplete(false); setAgentThoughts([]); setActiveAgents([]); runWorkflow(); }} style={{ padding: "10px 18px", borderRadius: 10, border: "1px solid #00B894", background: "#F0FFF4", fontSize: 13, fontWeight: 600, cursor: "pointer", color: "#00B894" }}>🔄 Re-run</button>
+                        <button onClick={handleSaveAsTemplate} style={{ padding: "10px 18px", borderRadius: 10, background: "#6C5CE7", color: "#fff", border: "none", fontSize: 13, fontWeight: 600, cursor: "pointer" }}>💾 Save as Template</button>
+                        <button onClick={() => { setScheduleTarget("Custom Workflow"); setShowScheduleModal(true); }} style={{ padding: "10px 18px", borderRadius: 10, background: "#2D1B69", color: "#fff", border: "none", fontSize: 13, fontWeight: 600, cursor: "pointer" }}>⏰ Schedule</button>
                       </>
                     )}
                     {isRunning && !hitlPaused && !constraintPaused && (
-                      <div style={{ padding: "10px 20px", borderRadius: 10, background: "#F9F8FE", border: "1px solid #E8E6F0", fontSize: 12, color: "#6C5CE7", fontWeight: 600 }}>⏳ Running...</div>
+                      <div style={{ padding: "10px 20px", borderRadius: 10, background: "#F9F8FE", border: "1px solid #E8E6F0", fontSize: 13, color: "#6C5CE7", fontWeight: 600 }}>⏳ Running...</div>
                     )}
                     {isRunning && (hitlPaused || constraintPaused) && (
-                      <div style={{ padding: "10px 20px", borderRadius: 10, background: "#FFF8E1", border: "1px solid #FFE082", fontSize: 12, color: "#E65100", fontWeight: 600 }}>⏸ Waiting for your approval...</div>
+                      <div style={{ padding: "10px 20px", borderRadius: 10, background: "#FFF8E1", border: "1px solid #FFE082", fontSize: 13, color: "#E65100", fontWeight: 600 }}>⏸ Waiting for your approval...</div>
                     )}
                   </>
                 )}
@@ -2121,17 +2166,11 @@ export default function HarmonIQApp() {
               {selectedTemplate && <InputDataPreview useCaseId={selectedTemplate.id} />}
 
               {/* Connectors */}
-              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 10 }}>
-                <div style={{ fontSize: 13, fontWeight: 700, color: "#1A1A2E" }}>🔌 Connections</div>
-                <button onClick={() => setShowConnectData(true)} style={{ fontSize: 11, color: "#6C5CE7", background: "none", border: "none", cursor: "pointer", fontWeight: 600 }}>+ Manage</button>
-              </div>
-              <div style={{ display: "flex", flexDirection: "column", gap: 6, marginBottom: 20 }}>
-                {connectors.map(c => <ConnectorRow key={c.id} connector={c} onToggle={() => toggleConnector(c.id)} />)}
-              </div>
+              <ConnectorsSection connectors={connectors} onToggle={toggleConnector} onManage={() => setShowConnectData(true)} />
 
               <div style={{ display: "flex", gap: 8 }}>
-                <button onClick={() => { resetHome(); setActiveUseCaseId(selectedTemplate.id); setWorkflowCreated(true); setSelectedWorkflowAgents(selectedTemplate.agents); setUserPrompt(selectedTemplate.desc); setWorkflowStep(4); setPage("home"); setSelectedTemplate(null); setTimeout(() => runWorkflow(), 100); }} style={{ padding: "10px 20px", borderRadius: 10, background: "#00B894", color: "#fff", border: "none", fontSize: 12, fontWeight: 600, cursor: "pointer" }}>▶ Run Now</button>
-                <button onClick={() => { setScheduleTarget(selectedTemplate.name); setShowScheduleModal(true); }} style={{ padding: "10px 20px", borderRadius: 10, background: "#2D1B69", color: "#fff", border: "none", fontSize: 12, fontWeight: 600, cursor: "pointer" }}>⏰ Schedule</button>
+                <button onClick={() => { resetHome(); setActiveUseCaseId(selectedTemplate.id); setWorkflowCreated(true); setSelectedWorkflowAgents(selectedTemplate.agents); setUserPrompt(selectedTemplate.desc); setWorkflowStep(4); setPage("home"); setSelectedTemplate(null); setTimeout(() => runWorkflow(), 100); }} style={{ padding: "10px 20px", borderRadius: 10, background: "#00B894", color: "#fff", border: "none", fontSize: 13, fontWeight: 600, cursor: "pointer" }}>▶ Run Now</button>
+                <button onClick={() => { setScheduleTarget(selectedTemplate.name); setShowScheduleModal(true); }} style={{ padding: "10px 20px", borderRadius: 10, background: "#2D1B69", color: "#fff", border: "none", fontSize: 13, fontWeight: 600, cursor: "pointer" }}>⏰ Schedule</button>
                 {templateEditMode && <button onClick={() => { setNotifications(prev => [{ id: "tn" + Date.now(), type: "success", msg: `Saved your copy of "${selectedTemplate.name}"`, time: "Just now", read: false }, ...prev]); setTemplateEditMode(false); }} style={{ padding: "10px 20px", borderRadius: 10, background: "#6C5CE7", color: "#fff", border: "none", fontSize: 12, fontWeight: 600, cursor: "pointer" }}>💾 Save My Copy</button>}
               </div>
             </div>
