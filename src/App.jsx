@@ -1880,7 +1880,7 @@ export default function HarmonIQApp() {
                 <div style={{ flex: 1 }}>
                   <div style={{ fontSize: 12, fontWeight: 600, color: "#7C3AED", marginBottom: 4, textTransform: "uppercase", letterSpacing: "0.5px" }}>HarmonIQ Orchestrator</div>
                   <div style={{ background: "#F9F8FE", borderRadius: "4px 16px 16px 16px", padding: "18px 22px", border: "1px solid #E8E6F0" }}>
-                    <div style={{ fontSize: 20, fontWeight: 700, color: "#1A1A2E", marginBottom: 8, animation: "fadeIn 0.5s ease" }}>Hello, Debonil! 👋</div>
+                    <div style={{ fontSize: 20, fontWeight: 700, color: "#1A1A2E", marginBottom: 8, animation: "fadeIn 0.5s ease" }}>Hello! 👋</div>
                     <div style={{ fontSize: 15, color: "#555", lineHeight: 1.7, animation: "fadeIn 0.5s ease 0.15s both" }}>
                       How are you doing today? I coordinate <span style={{ color: "#7C3AED", fontWeight: 600 }}>six specialised Super Agents</span> behind the scenes — from data ingestion to optimisation — so you can focus on the decision, not the pipeline.
                     </div>
