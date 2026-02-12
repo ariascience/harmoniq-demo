@@ -1365,6 +1365,104 @@ function NotificationBell({ notifications, onClick }) {
   );
 }
 
+function ApprovalModal({
+  hitlPaused, hitlCheckpoint, hitlAdjustMode, hitlAdjustText,
+  onHitlApprove, onHitlStartAdjust, onHitlAdjustTextChange, onHitlAdjustSubmit,
+  constraintPaused, constraintData, constraintInput,
+  onConstraintInputChange, onConstraintApply, onConstraintSkip,
+}) {
+  const isHitl = hitlPaused && hitlCheckpoint;
+  const isConstraint = constraintPaused && constraintData;
+  if (!isHitl && !isConstraint) return null;
+
+  return (
+    <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.5)", zIndex: 2000, display: "flex", alignItems: "center", justifyContent: "center", padding: 16, animation: "fadeIn 0.25s ease" }}>
+      <div onClick={e => e.stopPropagation()} style={{ background: "#fff", borderRadius: 18, width: "100%", maxWidth: 500, maxHeight: "85vh", overflow: "auto", boxShadow: "0 24px 80px rgba(0,0,0,0.3)" }}>
+
+        {/* HITL Checkpoint */}
+        {isHitl && (
+          <>
+            <div style={{ padding: "22px 26px 16px", borderBottom: "1px solid #F0EDF5" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 6 }}>
+                <div style={{ width: 36, height: 36, borderRadius: 10, background: "linear-gradient(135deg, #FFCB6B, #FFB300)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18 }}>🔍</div>
+                <div>
+                  <div style={{ fontSize: 11, fontWeight: 600, color: "#7C3AED", textTransform: "uppercase", letterSpacing: "0.5px" }}>HITL Checkpoint</div>
+                  <div style={{ fontSize: 16, fontWeight: 700, color: "#1A1A2E" }}>{hitlCheckpoint.title}</div>
+                </div>
+              </div>
+            </div>
+            <div style={{ padding: "16px 26px 20px" }}>
+              <div style={{ fontSize: 14, color: "#444", lineHeight: 1.7, marginBottom: 12 }}>{hitlCheckpoint.summary}</div>
+              {hitlCheckpoint.recommendation && (
+                <div style={{ fontSize: 13, color: "#2E7D32", fontStyle: "italic", marginBottom: 14, padding: "10px 14px", background: "#E8F5E9", borderRadius: 10, lineHeight: 1.6, display: "flex", alignItems: "flex-start", gap: 8 }}>
+                  <span style={{ fontSize: 16, flexShrink: 0 }}>💡</span>
+                  <span>{hitlCheckpoint.recommendation}</span>
+                </div>
+              )}
+              {hitlAdjustMode ? (
+                <div>
+                  <textarea
+                    value={hitlAdjustText}
+                    onChange={e => onHitlAdjustTextChange(e.target.value)}
+                    placeholder="Type your adjustment note..."
+                    style={{ width: "100%", minHeight: 80, padding: 14, borderRadius: 10, border: "1px solid #DDD", background: "#FAFAFA", color: "#333", fontSize: 13, fontFamily: "'DM Sans', sans-serif", resize: "vertical", outline: "none", marginBottom: 12 }}
+                  />
+                  <div style={{ display: "flex", gap: 8 }}>
+                    <button onClick={onHitlAdjustSubmit} style={{ padding: "10px 20px", borderRadius: 10, background: "#7C3AED", color: "#fff", border: "none", fontSize: 13, fontWeight: 600, cursor: "pointer", flex: 1 }}>Submit Adjustment</button>
+                    <button onClick={() => { onHitlAdjustTextChange(""); onHitlApprove(); }} style={{ padding: "10px 20px", borderRadius: 10, background: "#F5F5F5", color: "#666", border: "1px solid #DDD", fontSize: 13, cursor: "pointer" }}>Cancel</button>
+                  </div>
+                </div>
+              ) : (
+                <div style={{ display: "flex", gap: 10 }}>
+                  <button onClick={onHitlApprove} style={{ padding: "12px 24px", borderRadius: 10, background: "#00B894", color: "#fff", border: "none", fontSize: 14, fontWeight: 600, cursor: "pointer", flex: 1, transition: "all 0.2s" }}>✓ Approve & Continue</button>
+                  <button onClick={onHitlStartAdjust} style={{ padding: "12px 24px", borderRadius: 10, background: "#F9F8FE", color: "#7C3AED", border: "1px solid #7C3AED40", fontSize: 14, fontWeight: 600, cursor: "pointer", transition: "all 0.2s" }}>✏️ Adjust</button>
+                </div>
+              )}
+            </div>
+          </>
+        )}
+
+        {/* Constraint Violation */}
+        {isConstraint && !isHitl && (
+          <>
+            <div style={{ padding: "22px 26px 16px", borderBottom: "1px solid #F0EDF5" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 6 }}>
+                <div style={{ width: 36, height: 36, borderRadius: 10, background: "linear-gradient(135deg, #E74C3C, #C0392B)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18 }}>⚠️</div>
+                <div>
+                  <div style={{ fontSize: 11, fontWeight: 600, color: "#E74C3C", textTransform: "uppercase", letterSpacing: "0.5px" }}>Constraint Violation</div>
+                  <div style={{ fontSize: 16, fontWeight: 700, color: "#1A1A2E" }}>{constraintData.title}</div>
+                </div>
+              </div>
+            </div>
+            <div style={{ padding: "16px 26px 20px" }}>
+              <div style={{ fontSize: 14, color: "#444", lineHeight: 1.7, marginBottom: 10 }}>{constraintData.message}</div>
+              <div style={{ fontSize: 12, color: "#BF360C", marginBottom: 12, padding: "8px 12px", background: "#FFF3E0", borderRadius: 8, display: "inline-block" }}>
+                Constraint: <span style={{ textDecoration: "line-through" }}>{constraintData.constraint}</span>
+              </div>
+              {constraintData.suggestion && (
+                <div style={{ fontSize: 13, color: "#2E7D32", fontStyle: "italic", marginBottom: 14, padding: "10px 14px", background: "#E8F5E9", borderRadius: 10, lineHeight: 1.6, display: "flex", alignItems: "flex-start", gap: 8 }}>
+                  <span style={{ fontSize: 16, flexShrink: 0 }}>💡</span>
+                  <span>Suggestion: {constraintData.suggestion}</span>
+                </div>
+              )}
+              <textarea
+                value={constraintInput}
+                onChange={e => onConstraintInputChange(e.target.value)}
+                placeholder="Type your adjustment (or leave blank to use suggestion)..."
+                style={{ width: "100%", minHeight: 70, padding: 14, borderRadius: 10, border: "1px solid #DDD", background: "#FAFAFA", color: "#333", fontSize: 13, fontFamily: "'DM Sans', sans-serif", resize: "vertical", outline: "none", marginBottom: 12 }}
+              />
+              <div style={{ display: "flex", gap: 10 }}>
+                <button onClick={onConstraintApply} style={{ padding: "12px 24px", borderRadius: 10, background: "#00B894", color: "#fff", border: "none", fontSize: 14, fontWeight: 600, cursor: "pointer", flex: 1, transition: "all 0.2s" }}>🔄 Apply & Re-run from {constraintData.agentName}</button>
+                <button onClick={onConstraintSkip} style={{ padding: "12px 24px", borderRadius: 10, background: "#F5F5F5", color: "#666", border: "1px solid #DDD", fontSize: 14, cursor: "pointer", transition: "all 0.2s" }}>⏭ Skip</button>
+              </div>
+            </div>
+          </>
+        )}
+      </div>
+    </div>
+  );
+}
+
 function ShareModal({ onClose }) {
   const [shareEmail, setShareEmail] = useState("");
   const [shareRole, setShareRole] = useState("Viewer");
@@ -2922,6 +3020,14 @@ export default function HarmonIQApp() {
       )}
 
       {/* Modals */}
+      {isLoggedIn && (
+        <ApprovalModal
+          hitlPaused={hitlPaused} hitlCheckpoint={hitlCheckpoint} hitlAdjustMode={hitlAdjustMode} hitlAdjustText={hitlAdjustText}
+          onHitlApprove={handleHitlApprove} onHitlStartAdjust={() => setHitlAdjustMode(true)} onHitlAdjustTextChange={setHitlAdjustText} onHitlAdjustSubmit={handleHitlAdjust}
+          constraintPaused={constraintPaused} constraintData={constraintData} constraintInput={constraintInput}
+          onConstraintInputChange={setConstraintInput} onConstraintApply={handleConstraintApply} onConstraintSkip={handleConstraintSkip}
+        />
+      )}
       {isLoggedIn && showShareModal && <ShareModal onClose={() => setShowShareModal(false)} />}
       {isLoggedIn && showScheduleModal && (
         <ScheduleModal
