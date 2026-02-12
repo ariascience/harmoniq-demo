@@ -1873,16 +1873,31 @@ export default function HarmonIQApp() {
 
         <div ref={mainContentRef} style={{ flex: 1, overflowY: "auto", padding: "20px 28px" }}>
           {!workflowCreated ? (
-            <div style={{ maxWidth: 640, margin: "60px auto", textAlign: "center" }}>
-              <div style={{ fontSize: 48, marginBottom: 16 }}>🤖</div>
-              <div style={{ fontSize: 26, fontWeight: 700, color: "#1A1A2E", marginBottom: 6 }}>Hello, Debonil</div>
-              <div style={{ fontSize: 15, color: "#888", marginBottom: 30 }}>Describe your analysis goal and I'll orchestrate the right Super Agents</div>
-              <div style={{ display: "flex", gap: 10, justifyContent: "center", flexWrap: "wrap", marginBottom: 40 }}>
+            <div style={{ maxWidth: 680, margin: "50px auto", textAlign: "left" }}>
+              {/* Mother Agent greeting — conversational */}
+              <div style={{ display: "flex", alignItems: "flex-start", gap: 16, marginBottom: 32 }}>
+                <div style={{ width: 48, height: 48, borderRadius: "50%", background: "linear-gradient(135deg, #7C3AED, #2D1554)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 24, flexShrink: 0 }}>🧠</div>
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontSize: 12, fontWeight: 600, color: "#7C3AED", marginBottom: 4, textTransform: "uppercase", letterSpacing: "0.5px" }}>HarmonIQ Mother Agent</div>
+                  <div style={{ background: "#F9F8FE", borderRadius: "4px 16px 16px 16px", padding: "18px 22px", border: "1px solid #E8E6F0" }}>
+                    <div style={{ fontSize: 20, fontWeight: 700, color: "#1A1A2E", marginBottom: 8, animation: "fadeIn 0.5s ease" }}>Hello, Debonil! 👋</div>
+                    <div style={{ fontSize: 15, color: "#555", lineHeight: 1.7, animation: "fadeIn 0.5s ease 0.15s both" }}>
+                      How are you doing today? I'm your Mother Agent — I orchestrate <span style={{ color: "#7C3AED", fontWeight: 600 }}>six specialised Super Agents</span> to turn your data into actionable intelligence.
+                    </div>
+                    <div style={{ fontSize: 14, color: "#666", lineHeight: 1.7, marginTop: 10, animation: "fadeIn 0.5s ease 0.3s both" }}>
+                      Tell me what you're working on and I'll decompose it into an execution plan, connect your data sources, and run the right agents. Let's build something smart. ✨
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Quick action chips */}
+              <div style={{ display: "flex", gap: 10, justifyContent: "center", flexWrap: "wrap", marginBottom: 40, animation: "fadeIn 0.5s ease 0.45s both" }}>
                 {[
                   { icon: "📁", label: "Connect Data", onClick: () => setShowConnectData(true) },
                   { icon: "📊", label: "Use Template", onClick: () => setPage("templates") },
                 ].map(b => (
-                  <button key={b.label} onClick={b.onClick} style={{ padding: "10px 20px", borderRadius: 12, border: "1px solid #E0DFF0", background: "#FAFAFE", fontSize: 13, cursor: "pointer", display: "flex", alignItems: "center", gap: 6, fontWeight: 500, color: "#444", transition: "all 0.2s" }} onMouseEnter={e => e.target.style.background = "#F0EDFF"} onMouseLeave={e => e.target.style.background = "#FAFAFE"}>
+                  <button key={b.label} onClick={b.onClick} style={{ padding: "10px 22px", borderRadius: 12, border: "1px solid #E0DFF0", background: "#FAFAFE", fontSize: 14, cursor: "pointer", display: "flex", alignItems: "center", gap: 6, fontWeight: 500, color: "#444", transition: "all 0.2s" }} onMouseEnter={e => e.target.style.background = "#F0EDFF"} onMouseLeave={e => e.target.style.background = "#FAFAFE"}>
                     {b.icon} {b.label}
                   </button>
                 ))}
