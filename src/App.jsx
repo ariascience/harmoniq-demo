@@ -64,6 +64,84 @@ const SAMPLE_NOTIFICATIONS = [
   { id: "n5", type: "warning", msg: "Competitor Price Monitor completed with warnings — 3 SKUs missing data", time: "3 days ago", read: true },
 ];
 
+const SKILLSETS = [
+  {
+    id: "sk1", name: "CPG Demand Forecasting", icon: "\u{1F4C8}", color: "#FDCB6E",
+    description: "Domain expertise for consumer packaged goods demand planning \u2014 seasonality patterns, promotional lift modelling, and safety stock calculations specific to FMCG supply chains.",
+    category: "Domain Knowledge", author: "Debonil Chowdhury", created: "Jan 15, 2026",
+    tags: ["forecasting", "demand-planning", "FMCG", "seasonality"], isActive: true,
+    components: [
+      { id: "c1", type: "rule", title: "Promotional Lift Multipliers", content: "When a SKU is on promotion, apply a baseline lift multiplier of 1.8x for price-cut promotions and 2.2x for BOGOF. Adjust by category: Spirits 1.5x, RTD 2.5x, Beer 2.0x. Always decay the lift by 15% per week post-promo (pantry loading effect)." },
+      { id: "c2", type: "context", title: "UK Retail Calendar", content: "Key demand peaks: Easter (W13-W15), Summer BBQ (W22-W30), Back to School (W35-W37), Christmas Build (W45-W52), January Detox dip (W1-W4). Bank holidays cause +20% volume spikes in Off-Trade. Always include holiday regressors in any time-series model." },
+      { id: "c3", type: "constraint", title: "Forecast Accuracy Thresholds", content: "SKU-level weekly MAPE must be < 25%. If MAPE > 25% for any SKU, flag for manual review. Category-level MAPE target: < 12%. Ensemble blending weights must not exceed 0.6 for any single model." },
+      { id: "c4", type: "example", title: "Spirits Seasonality Decomposition", content: "Example: Johnnie Walker Black Label shows dual-peak seasonality \u2014 minor peak in W15 (Easter gifting, +35% vs baseline) and major peak in W48-W52 (Christmas, +180% vs baseline). STL decomposition with period=52 captures this cleanly. Always apply log-transform before decomposition for multiplicative series." },
+      { id: "c5", type: "glossary", title: "Key Metrics Glossary", content: "RSV = Retail Sales Value (sell-out at register). NSV = Net Sales Value (manufacturer sell-in minus trade spend). Rate of Sale (ROS) = Units sold per store per week. Days of Supply (DOS) = Current stock / average daily demand. Forward Weeks Cover (FWC) = Stock-on-hand / forecast weekly demand." },
+    ],
+  },
+  {
+    id: "sk2", name: "Trade Promotion Optimisation", icon: "\u{1F4B0}", color: "#E17055",
+    description: "Best practices for evaluating and optimising trade promotional spend \u2014 ROI calculation frameworks, baseline/incremental decomposition, and spend allocation decision rules.",
+    category: "Best Practices", author: "Keith Taylor", created: "Jan 22, 2026",
+    tags: ["trade-spend", "promotion", "ROI", "optimisation"], isActive: true,
+    components: [
+      { id: "c1", type: "rule", title: "ROI Calculation Standard", content: "Promotion ROI = (Incremental NSV - Total Trade Spend) / Total Trade Spend. Incremental volume = Actual volume - Counterfactual baseline. Baseline must be estimated using at least 8 weeks of non-promo history. Minimum ROI threshold for re-investment: 1.2x." },
+      { id: "c2", type: "rule", title: "Cannibalisation Adjustment", content: "When calculating true incremental lift, deduct cross-SKU cannibalisation within the same sub-category (typically 10-15% of observed lift in Spirits, 20-25% in Beer). Also deduct pull-forward effect estimated as the negative delta in the 2 weeks post-promotion." },
+      { id: "c3", type: "context", title: "Retailer Promotional Windows", content: "Tesco: Promotional slots run Thu-Wed, 3-week minimum commitment. Sainsbury's: Runs Mon-Sun, price-lock for 2 weeks minimum. ASDA: Rollback promotions last 4 weeks. Morrisons: Flexible 1-week slots. Each retailer charges a flat participation fee (typically GBP 2-5K per SKU per slot)." },
+      { id: "c4", type: "constraint", title: "Spend Guard Rails", content: "Maximum trade spend per SKU per quarter: 18% of NSV. No single promotion should exceed 30% discount from RRP. Year-over-year trade spend growth must not exceed volume growth by more than 3pp." },
+      { id: "c5", type: "example", title: "Successful Promo Case Study", content: "Tanqueray 70cl, Tesco W38-W40 2025: 25% price cut (GBP 20 to GBP 15). Actual units: 4,200. Baseline estimate: 1,400 units. Incremental: 2,800 units. After cannibalisation (-12%) and pull-forward (-8%): Net incremental 2,240 units. ROI: 2.8x." },
+    ],
+  },
+  {
+    id: "sk3", name: "Planogram Compliance Standards", icon: "\u{1F3EA}", color: "#00B894",
+    description: "Compliance rules and benchmarks for shelf space auditing \u2014 planogram adherence scoring, share-of-shelf targets, and shelf image analysis guidelines for VisionIQ+.",
+    category: "Compliance", author: "Neha Kapoor", created: "Feb 1, 2026",
+    tags: ["planogram", "shelf-audit", "compliance", "vision"], isActive: false,
+    components: [
+      { id: "c1", type: "rule", title: "Compliance Scoring Formula", content: "Planogram Compliance Score = (Correct Facings / Total Authorised Facings) * 100. Target: >= 85% across all audited stores. Critical non-compliance: any SKU in the wrong shelf position (height deviation > 1 shelf). Minor non-compliance: facing count off by 1." },
+      { id: "c2", type: "rule", title: "Share-of-Shelf Targets", content: "Spirits: target 28% SoS (min 24%). Beer: target 22% SoS (min 18%). RTD: target 12% SoS (min 10%). If actual SoS drops below minimum, trigger an alert to the category management team." },
+      { id: "c3", type: "context", title: "Retailer Planogram Specifications", content: "Tesco Express: 4-bay spirits section, eye-level = shelf 3 (120-150cm). Sainsbury's Local: 3-bay, eye-level = shelf 2 (110-140cm). Standard shelf depth: 40cm for spirits, 35cm for RTD. Each facing = 1 bottle face-forward on shelf edge." },
+      { id: "c4", type: "constraint", title: "Image Quality Requirements", content: "Shelf images must be minimum 1920x1080 resolution. Images taken at > 45-degree angle should be rejected. Lighting must be sufficient for barcode readability (> 200 lux). Maximum 2 shelf sections per image to maintain detection accuracy > 90%." },
+    ],
+  },
+  {
+    id: "sk4", name: "Pricing & Elasticity Framework", icon: "\u{1F3F7}\uFE0F", color: "#0984E3",
+    description: "Price elasticity modelling conventions, competitive pricing rules, and price architecture guidelines specific to the UK spirits and beer categories.",
+    category: "Domain Knowledge", author: "Archana Menon", created: "Feb 5, 2026",
+    tags: ["pricing", "elasticity", "competitive-intel", "price-architecture"], isActive: true,
+    components: [
+      { id: "c1", type: "rule", title: "Elasticity Classification", content: "Price elastic: |e| > 1.5 (sensitive to price changes, typically value brands). Unit elastic: 0.8 < |e| < 1.5 (moderate sensitivity, most mainstream brands). Price inelastic: |e| < 0.8 (premium/super-premium brands). Always estimate elasticities using log-log regression on at least 52 weeks of price-volume data." },
+      { id: "c2", type: "rule", title: "Price Index Monitoring", content: "Compute Brand Price Index = (Our price / Category weighted average price) * 100. Alert thresholds: if BPI exceeds 110 for a mainstream brand or drops below 90 for a premium brand. Monitor weekly." },
+      { id: "c3", type: "context", title: "UK Spirits Price Architecture", content: "Value tier: GBP 12-16 (70cl). Standard tier: GBP 16-22. Premium tier: GBP 22-30. Super-premium: GBP 30+. Minimum Unit Pricing (MUP) applies in Scotland: 65p per unit of alcohol. Price gaps between tiers should be maintained at 15-25%." },
+      { id: "c4", type: "constraint", title: "Pricing Guardrails", content: "Never recommend prices below cost + 10% minimum margin. RRP deviations > 15% require category director approval. Price reductions on premium brands must not reduce them into the standard tier price band. Maximum recommended price increase per quarter: 5%." },
+      { id: "c5", type: "glossary", title: "Pricing Terminology", content: "RRP = Recommended Retail Price. RSP = Retail Selling Price (actual shelf price). PED = Price Elasticity of Demand. EDLP = Everyday Low Price strategy. Hi-Lo = High-Low promotional pricing strategy." },
+    ],
+  },
+  {
+    id: "sk5", name: "Data Quality & Governance", icon: "\u{1F6E1}\uFE0F", color: "#A29BFE",
+    description: "Data quality rules, validation checks, and governance policies that IngestIQ should apply during data ingestion \u2014 null handling, outlier detection, and schema enforcement.",
+    category: "Best Practices", author: "Subir Gupta", created: "Feb 8, 2026",
+    tags: ["data-quality", "governance", "validation", "ingestion"], isActive: true,
+    components: [
+      { id: "c1", type: "rule", title: "Null Value Policy", content: "Maximum allowable null rate per column: 5%. If exceeded, reject the file and request a re-upload. For time-series numeric columns, impute using forward-fill. For categorical columns, impute using mode. Never impute primary key or date columns \u2014 flag as errors." },
+      { id: "c2", type: "rule", title: "Outlier Detection", content: "Apply IQR-based outlier detection on all numeric columns. Flag values below Q1 - 3*IQR or above Q3 + 3*IQR. For sales volumes, also apply domain check: weekly unit sales > 10x the 52-week median should be flagged. Do not auto-remove \u2014 flag for human review." },
+      { id: "c3", type: "constraint", title: "Schema Enforcement", content: "All input files must contain a date column parseable to ISO 8601. SKU identifiers must match the pattern SKU-[0-9]{5}. Store identifiers must match STR-[0-9]{4}. Numeric columns must not contain currency symbols or commas (clean on ingest)." },
+      { id: "c4", type: "context", title: "Known Data Quirks", content: "The Diageo data warehouse exports dates in DD/MM/YYYY format (UK). Nielsen syndicated data uses MM/DD/YYYY (US). Always auto-detect and normalise to YYYY-MM-DD. SharePoint Excel exports sometimes include merged cells \u2014 flatten on ingest. CSV exports from SAP use semicolon delimiters." },
+    ],
+  },
+  {
+    id: "sk6", name: "Regulatory & Compliance Rules", icon: "\u{1F4DC}", color: "#6C5CE7",
+    description: "Regulatory constraints and compliance rules for alcohol brand marketing, pricing, and distribution in the UK market \u2014 mandatory checks before any recommendation is finalised.",
+    category: "Compliance", author: "Debonil Chowdhury", created: "Feb 10, 2026",
+    tags: ["regulatory", "compliance", "UK-market", "alcohol"], isActive: false,
+    components: [
+      { id: "c1", type: "rule", title: "Minimum Unit Pricing (Scotland)", content: "All pricing recommendations for Scotland must respect MUP: 65p per unit of alcohol. For a 70cl bottle at 40% ABV = 28 units, minimum price = GBP 18.20. Any recommendation below this must be automatically rejected." },
+      { id: "c2", type: "rule", title: "Advertising Standards", content: "Promotional materials must not target or appeal to under-18s. No health claims may be made about alcoholic beverages. All marketing output must include the Drinkaware.co.uk reference. Social media promotions must have age-gating enabled." },
+      { id: "c3", type: "constraint", title: "Distribution Restrictions", content: "No promotional pricing may coincide with school holiday periods in the store's region (within 500m of schools). Alcohol delivery services restricted to hours: 10:00-22:00. Maximum display units per store governed by local licensing conditions." },
+      { id: "c4", type: "context", title: "UK Licensing Framework", content: "Premises Licence governs retail sale. Personal Licence required for the Designated Premises Supervisor. Temporary Event Notices for pop-up activations (max 499 attendees). Challenge 25 policy: request ID from anyone appearing under 25." },
+    ],
+  },
+];
+
 const COLLABORATORS = [
   { id: "u1", name: "Debonil Chowdhury", email: "debonil.chowdhury@aria-is.com", avatar: "DC", role: "Owner" },
   { id: "u2", name: "Archana Menon", email: "archana.menon@aria-is.com", avatar: "AM", role: "Editor" },
@@ -1137,6 +1215,7 @@ function AgentBrainPanel({ thoughts, isRunning, activeAgents, connectors,
   onHitlApprove, onHitlStartAdjust, onHitlAdjustTextChange, onHitlAdjustSubmit,
   constraintPaused, constraintData, constraintInput,
   onConstraintInputChange, onConstraintApply, onConstraintSkip,
+  workflowSkillsets, allSkillsets,
 }) {
   const panelRef = useRef(null);
   const [elapsed, setElapsed] = useState(0);
@@ -1322,6 +1401,21 @@ function AgentBrainPanel({ thoughts, isRunning, activeAgents, connectors,
                 return ag ? (
                   <span key={a} style={{ display: "inline-flex", alignItems: "center", gap: 3, background: ag.color + "20", color: ag.color, padding: "2px 8px", borderRadius: 4, fontSize: 10, fontWeight: 600, fontFamily: "'JetBrains Mono', 'Fira Code', monospace" }}>
                     {ag.icon} {ag.name}
+                  </span>
+                ) : null;
+              })}
+            </div>
+          </div>
+        )}
+        {workflowSkillsets && workflowSkillsets.length > 0 && (
+          <div style={{ padding: "10px 14px", borderBottom: "1px solid #2A2A3C" }}>
+            <div style={{ fontSize: 10, fontWeight: 600, color: "#546E7A", marginBottom: 6, textTransform: "uppercase", letterSpacing: "0.8px" }}>Skillsets Active · {workflowSkillsets.length}</div>
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 4 }}>
+              {workflowSkillsets.map(skId => {
+                const sk = (allSkillsets || SKILLSETS).find(s => s.id === skId);
+                return sk ? (
+                  <span key={skId} style={{ display: "inline-flex", alignItems: "center", gap: 3, background: sk.color + "20", color: sk.color, padding: "2px 8px", borderRadius: 4, fontSize: 10, fontWeight: 600, fontFamily: "'JetBrains Mono', 'Fira Code', monospace" }}>
+                    {sk.icon} {sk.name}
                   </span>
                 ) : null;
               })}
@@ -1559,6 +1653,167 @@ function ScheduleModal({ onClose, onSave, templateName }) {
 
 // ─── Main App ───
 // Mobile detection hook
+const COMPONENT_TYPE_COLORS = { rule: "#7C3AED", context: "#0984E3", example: "#00B894", constraint: "#E17055", glossary: "#8888A8" };
+const COMPONENT_TYPE_LABELS = { rule: "Rule", context: "Context", example: "Example", constraint: "Constraint", glossary: "Glossary" };
+const SKILLSET_ICON_OPTIONS = ["\u{1F4C8}", "\u{1F4CA}", "\u{1F4B0}", "\u{1F3EA}", "\u{1F3F7}\uFE0F", "\u{1F6E1}\uFE0F", "\u{1F4DC}", "\u{1F4DA}", "\u{1F52C}", "\u26A1", "\u{1F9E0}", "\u{1F3AF}"];
+
+function SkillsetModal({ onClose, onSave, existing }) {
+  const [name, setName] = useState(existing?.name || "");
+  const [description, setDescription] = useState(existing?.description || "");
+  const [category, setCategory] = useState(existing?.category || "Domain Knowledge");
+  const [icon, setIcon] = useState(existing?.icon || "\u{1F4DA}");
+  const [color, setColor] = useState(existing?.color || "#7C3AED");
+  const [tags, setTags] = useState(existing?.tags?.join(", ") || "");
+  const [author, setAuthor] = useState(existing?.author || "");
+  const [components, setComponents] = useState(existing?.components ? existing.components.map(c => ({ ...c })) : []);
+  const [expandedComp, setExpandedComp] = useState(null);
+  const [newCompType, setNewCompType] = useState("rule");
+  const [newCompTitle, setNewCompTitle] = useState("");
+  const [newCompContent, setNewCompContent] = useState("");
+  const [showAddComp, setShowAddComp] = useState(false);
+
+  const addComponent = () => {
+    if (!newCompTitle.trim() || !newCompContent.trim()) return;
+    setComponents(prev => [...prev, { id: "c_" + Date.now(), type: newCompType, title: newCompTitle.trim(), content: newCompContent.trim() }]);
+    setNewCompTitle(""); setNewCompContent(""); setNewCompType("rule"); setShowAddComp(false);
+  };
+
+  const removeComponent = (idx) => setComponents(prev => prev.filter((_, i) => i !== idx));
+
+  const updateComponent = (idx, field, value) => {
+    setComponents(prev => prev.map((c, i) => i === idx ? { ...c, [field]: value } : c));
+  };
+
+  const handleSave = () => {
+    if (!name.trim()) return;
+    onSave({
+      ...(existing || {}),
+      name: name.trim(), description: description.trim(), category, icon, color,
+      tags: tags.split(",").map(t => t.trim()).filter(Boolean),
+      author: author.trim() || "Anonymous",
+      components,
+    });
+  };
+
+  const inputStyle = { width: "100%", padding: "10px 14px", borderRadius: 10, border: "1px solid #DDD", fontSize: 13, outline: "none", fontFamily: "'DM Sans', sans-serif" };
+  const labelStyle = { fontSize: 11, fontWeight: 600, color: "#555", marginBottom: 4, display: "block", textTransform: "uppercase", letterSpacing: "0.5px" };
+
+  return (
+    <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.45)", zIndex: 1000, display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }} onClick={onClose}>
+      <div onClick={e => e.stopPropagation()} style={{ background: "#fff", borderRadius: 18, width: "100%", maxWidth: 620, maxHeight: "90vh", display: "flex", flexDirection: "column", boxShadow: "0 20px 60px rgba(0,0,0,0.2)" }}>
+        {/* Header */}
+        <div style={{ padding: "20px 24px", borderBottom: "1px solid #EEE", display: "flex", justifyContent: "space-between", alignItems: "center", flexShrink: 0 }}>
+          <div>
+            <div style={{ fontSize: 16, fontWeight: 700, color: "#1A1A2E" }}>{existing ? "Edit Skillset" : "Create New Skillset"}</div>
+            <div style={{ fontSize: 12, color: "#888", marginTop: 2 }}>{existing ? "Modify the skillset configuration" : "Define domain knowledge to guide agent behaviour"}</div>
+          </div>
+          <div onClick={onClose} style={{ cursor: "pointer", fontSize: 18, color: "#999", padding: 4 }}>&times;</div>
+        </div>
+
+        {/* Body — scrollable */}
+        <div style={{ flex: 1, overflowY: "auto", padding: "16px 24px" }}>
+          {/* Basic fields */}
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14, marginBottom: 16 }}>
+            <div style={{ gridColumn: "1 / -1" }}>
+              <label style={labelStyle}>Name</label>
+              <input value={name} onChange={e => setName(e.target.value)} placeholder="e.g. CPG Demand Forecasting" style={inputStyle} />
+            </div>
+            <div style={{ gridColumn: "1 / -1" }}>
+              <label style={labelStyle}>Description</label>
+              <textarea value={description} onChange={e => setDescription(e.target.value)} placeholder="What domain knowledge does this skillset encode?" style={{ ...inputStyle, minHeight: 60, resize: "vertical" }} />
+            </div>
+            <div>
+              <label style={labelStyle}>Category</label>
+              <select value={category} onChange={e => setCategory(e.target.value)} style={{ ...inputStyle, background: "#fff" }}>
+                <option>Domain Knowledge</option>
+                <option>Best Practices</option>
+                <option>Compliance</option>
+              </select>
+            </div>
+            <div>
+              <label style={labelStyle}>Author</label>
+              <input value={author} onChange={e => setAuthor(e.target.value)} placeholder="Your name" style={inputStyle} />
+            </div>
+            <div>
+              <label style={labelStyle}>Icon</label>
+              <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
+                {SKILLSET_ICON_OPTIONS.map(ic => (
+                  <div key={ic} onClick={() => setIcon(ic)} style={{ width: 34, height: 34, borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, cursor: "pointer", border: icon === ic ? "2px solid #7C3AED" : "2px solid #EEE", background: icon === ic ? "#F0EDFF" : "#FAFAFA" }}>{ic}</div>
+                ))}
+              </div>
+            </div>
+            <div>
+              <label style={labelStyle}>Tags (comma-separated)</label>
+              <input value={tags} onChange={e => setTags(e.target.value)} placeholder="e.g. forecasting, FMCG" style={inputStyle} />
+            </div>
+          </div>
+
+          {/* Components section */}
+          <div style={{ marginBottom: 16 }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
+              <div style={{ fontSize: 13, fontWeight: 700, color: "#1A1A2E" }}>Knowledge Components ({components.length})</div>
+              <button onClick={() => setShowAddComp(true)} style={{ padding: "5px 12px", borderRadius: 8, background: "#F0EDFF", color: "#7C3AED", border: "none", fontSize: 11, fontWeight: 600, cursor: "pointer" }}>+ Add Component</button>
+            </div>
+
+            {/* Existing components */}
+            {components.map((comp, idx) => (
+              <div key={comp.id || idx} style={{ border: "1px solid #E8E6F0", borderRadius: 10, marginBottom: 8, overflow: "hidden" }}>
+                <div onClick={() => setExpandedComp(expandedComp === idx ? null : idx)} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "10px 14px", cursor: "pointer", background: expandedComp === idx ? "#FAFAFE" : "#fff" }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                    <span style={{ display: "inline-block", padding: "2px 8px", borderRadius: 4, fontSize: 9, fontWeight: 700, color: "#fff", background: COMPONENT_TYPE_COLORS[comp.type] || "#888", textTransform: "uppercase" }}>{COMPONENT_TYPE_LABELS[comp.type] || comp.type}</span>
+                    <span style={{ fontSize: 13, fontWeight: 600, color: "#333" }}>{comp.title}</span>
+                  </div>
+                  <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                    <span onClick={(e) => { e.stopPropagation(); removeComponent(idx); }} style={{ cursor: "pointer", fontSize: 14, color: "#CCC", padding: "0 4px" }}>&times;</span>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#888" strokeWidth="2" style={{ transform: expandedComp === idx ? "rotate(180deg)" : "none", transition: "transform 0.2s" }}><polyline points="6 9 12 15 18 9"/></svg>
+                  </div>
+                </div>
+                {expandedComp === idx && (
+                  <div style={{ padding: "10px 14px", borderTop: "1px solid #E8E6F0", background: "#FAFAFE" }}>
+                    <input value={comp.title} onChange={e => updateComponent(idx, "title", e.target.value)} style={{ ...inputStyle, marginBottom: 8 }} />
+                    <textarea value={comp.content} onChange={e => updateComponent(idx, "content", e.target.value)} style={{ ...inputStyle, minHeight: 80, resize: "vertical" }} />
+                  </div>
+                )}
+              </div>
+            ))}
+
+            {components.length === 0 && !showAddComp && (
+              <div style={{ padding: 20, textAlign: "center", border: "2px dashed #E0DEF0", borderRadius: 12, color: "#999", fontSize: 13 }}>No components yet. Click "+ Add Component" to start building your skillset.</div>
+            )}
+
+            {/* Add new component form */}
+            {showAddComp && (
+              <div style={{ border: "2px dashed #C4B5FD", borderRadius: 12, padding: 14, background: "#FAFAFE" }}>
+                <div style={{ display: "flex", gap: 8, marginBottom: 8 }}>
+                  <select value={newCompType} onChange={e => setNewCompType(e.target.value)} style={{ ...inputStyle, width: "auto", flex: "0 0 140px" }}>
+                    <option value="rule">Rule</option>
+                    <option value="context">Context</option>
+                    <option value="example">Example</option>
+                    <option value="constraint">Constraint</option>
+                    <option value="glossary">Glossary</option>
+                  </select>
+                  <input value={newCompTitle} onChange={e => setNewCompTitle(e.target.value)} placeholder="Component title" style={{ ...inputStyle, flex: 1 }} />
+                </div>
+                <textarea value={newCompContent} onChange={e => setNewCompContent(e.target.value)} placeholder="Component content — the knowledge, rule, or context..." style={{ ...inputStyle, minHeight: 70, resize: "vertical", marginBottom: 8 }} />
+                <div style={{ display: "flex", gap: 8 }}>
+                  <button onClick={addComponent} style={{ padding: "7px 16px", borderRadius: 8, background: "#7C3AED", color: "#fff", border: "none", fontSize: 12, fontWeight: 600, cursor: "pointer" }}>Add</button>
+                  <button onClick={() => { setShowAddComp(false); setNewCompTitle(""); setNewCompContent(""); }} style={{ padding: "7px 16px", borderRadius: 8, background: "#F5F5F5", color: "#666", border: "1px solid #DDD", fontSize: 12, cursor: "pointer" }}>Cancel</button>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Footer */}
+        <div style={{ padding: "14px 24px", borderTop: "1px solid #EEE", display: "flex", justifyContent: "flex-end", gap: 10, flexShrink: 0 }}>
+          <button onClick={onClose} style={{ padding: "10px 20px", borderRadius: 10, background: "#F5F5F5", color: "#666", border: "1px solid #DDD", fontSize: 13, cursor: "pointer" }}>Cancel</button>
+          <button onClick={handleSave} disabled={!name.trim()} style={{ padding: "10px 24px", borderRadius: 10, background: name.trim() ? "#7C3AED" : "#CCC", color: "#fff", border: "none", fontSize: 13, fontWeight: 600, cursor: name.trim() ? "pointer" : "default", opacity: name.trim() ? 1 : 0.6 }}>{existing ? "Save Changes" : "Create Skillset"}</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function useIsMobile(breakpoint = 768) {
   const [isMobile, setIsMobile] = useState(() => typeof window !== "undefined" && window.innerWidth < breakpoint);
   useEffect(() => {
@@ -1636,6 +1891,15 @@ export default function HarmonIQApp() {
   const [constraintData, setConstraintData] = useState(null);
   const [constraintInput, setConstraintInput] = useState("");
 
+  // Knowledge Base / Skillsets state
+  const [skillsets, setSkillsets] = useState(SKILLSETS);
+  const [selectedSkillset, setSelectedSkillset] = useState(null);
+  const [showSkillsetModal, setShowSkillsetModal] = useState(false);
+  const [editingSkillset, setEditingSkillset] = useState(null);
+  const [workflowSkillsets, setWorkflowSkillsets] = useState([]);
+  const [skillsetSearch, setSkillsetSearch] = useState("");
+  const [skillsetCategoryFilter, setSkillsetCategoryFilter] = useState("All");
+
   // Refs for resume callbacks (stored as refs to avoid stale closures)
   const hitlResumeRef = useRef(null);
   const constraintResumeRef = useRef(null);
@@ -1674,6 +1938,7 @@ export default function HarmonIQApp() {
     setConstraintPaused(false);
     setConstraintData(null);
     setConstraintInput("");
+    setWorkflowSkillsets([]);
     hitlResumeRef.current = null;
     constraintResumeRef.current = null;
     timelineRef.current = [];
@@ -1708,7 +1973,9 @@ export default function HarmonIQApp() {
     setAgentInstructions(instructions);
     setWorkflowCreated(true);
     setWorkflowStep(1);
-  }, [userPrompt]);
+    // Auto-attach active skillsets
+    setWorkflowSkillsets(skillsets.filter(sk => sk.isActive).map(sk => sk.id));
+  }, [userPrompt, skillsets]);
 
   const runWorkflowRef = useRef(null);
 
@@ -1765,6 +2032,12 @@ export default function HarmonIQApp() {
       }
     });
 
+    // Inject skillsets-loaded thought at the beginning of timeline
+    if (workflowSkillsets.length > 0) {
+      const skNames = workflowSkillsets.map(id => skillsets.find(s => s.id === id)?.name).filter(Boolean).join(", ");
+      timeline.unshift({ type: "thought", agent: "HarmonIQ", text: `📚 Loading ${workflowSkillsets.length} skillset(s): ${skNames}. Agent behaviour will be guided by attached knowledge packs.`, color: "#2D1B69", delay: 600, agentId: null });
+    }
+
     timelineRef.current = timeline;
     timelineIndexRef.current = 0;
 
@@ -1812,7 +2085,7 @@ export default function HarmonIQApp() {
     };
     // Kick off with the first entry's delay
     runWorkflowRef.current = setTimeout(step, timeline[0]?.delay || 500);
-  }, [selectedWorkflowAgents, activeUseCaseId]);
+  }, [selectedWorkflowAgents, activeUseCaseId, workflowSkillsets, skillsets]);
 
   // HITL: Approve & Continue
   const handleHitlApprove = useCallback(() => {
@@ -1909,11 +2182,38 @@ export default function HarmonIQApp() {
     setConnectors(prev => prev.map(c => c.id === id ? { ...c, status: c.status === "connected" ? "disconnected" : "connected" } : c));
   };
 
+  const toggleSkillsetActive = (id) => {
+    setSkillsets(prev => {
+      const updated = prev.map(sk => sk.id === id ? { ...sk, isActive: !sk.isActive } : sk);
+      // Sync selectedSkillset if viewing this one
+      if (selectedSkillset && selectedSkillset.id === id) {
+        const live = updated.find(sk => sk.id === id);
+        if (live) setSelectedSkillset(live);
+      }
+      return updated;
+    });
+  };
+
+  const handleSaveSkillset = (skillset) => {
+    if (editingSkillset) {
+      setSkillsets(prev => prev.map(sk => sk.id === skillset.id ? skillset : sk));
+      setSelectedSkillset(skillset);
+      setNotifications(prev => [{ id: "sk_upd_" + Date.now(), type: "success", msg: `Skillset "${skillset.name}" updated`, time: "Just now", read: false }, ...prev]);
+    } else {
+      const newSkillset = { ...skillset, id: "sk_" + Date.now(), created: new Date().toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }), isActive: true };
+      setSkillsets(prev => [...prev, newSkillset]);
+      setNotifications(prev => [{ id: "sk_new_" + Date.now(), type: "success", msg: `Skillset "${skillset.name}" created`, time: "Just now", read: false }, ...prev]);
+    }
+    setShowSkillsetModal(false);
+    setEditingSkillset(null);
+  };
+
   const NAV_ITEMS = [
     { id: "home", label: "Home", icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg> },
     { id: "templates", label: "Templates", icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg> },
     { id: "triggers", label: "Triggers", icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> },
     { id: "relics", label: "Relics", icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg> },
+    { id: "knowledgebase", label: "Knowledge Base", icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg> },
     { id: "canvas", label: "Canvas", icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg> },
     { id: "collaboration", label: "Collaboration", icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg> },
     { id: "docs", label: "Documentation", icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg> },
@@ -2071,6 +2371,38 @@ export default function HarmonIQApp() {
                 </div>
               )}
 
+              {/* ═══ STEP 3: Attached Skillsets ═══ */}
+              {workflowStep >= 3 && (
+                <div style={{ animation: "fadeIn 0.4s ease", marginBottom: 16 }}>
+                  <div style={{ fontSize: 15, fontWeight: 700, color: "#1A1A2E", marginBottom: 4 }}>📚 Attached Skillsets</div>
+                  <div style={{ fontSize: 12, color: "#888", marginBottom: 10 }}>Knowledge packs that guide agent behaviour during execution</div>
+                  {/* Currently attached */}
+                  <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 10 }}>
+                    {workflowSkillsets.map(skId => {
+                      const sk = skillsets.find(s => s.id === skId);
+                      if (!sk) return null;
+                      return (
+                        <div key={skId} style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "6px 12px", borderRadius: 20, background: sk.color + "15", border: `1px solid ${sk.color}40`, fontSize: 12, fontWeight: 600, color: sk.color }}>
+                          <span>{sk.icon}</span> {sk.name}
+                          <span onClick={() => setWorkflowSkillsets(prev => prev.filter(id => id !== skId))} style={{ cursor: "pointer", opacity: 0.6, marginLeft: 2, fontSize: 14, lineHeight: 1 }}>&times;</span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                  {/* Available to add */}
+                  <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
+                    {skillsets.filter(sk => sk.isActive && !workflowSkillsets.includes(sk.id)).map(sk => (
+                      <button key={sk.id} onClick={() => setWorkflowSkillsets(prev => [...prev, sk.id])} style={{ display: "inline-flex", alignItems: "center", gap: 4, padding: "5px 12px", borderRadius: 20, border: "1px dashed #D0CEE0", background: "#FAFAFE", fontSize: 11, color: "#666", cursor: "pointer" }}>
+                        {sk.icon} + {sk.name}
+                      </button>
+                    ))}
+                  </div>
+                  {workflowSkillsets.length === 0 && (
+                    <div style={{ fontSize: 12, color: "#BBB", fontStyle: "italic", marginTop: 4 }}>No skillsets attached. Agents will use default behaviour.</div>
+                  )}
+                </div>
+              )}
+
               {/* ═══ STEP 3: Configure Agents ═══ */}
               {workflowStep >= 3 && (
                 <div style={{ animation: "fadeIn 0.4s ease" }}>
@@ -2217,6 +2549,7 @@ export default function HarmonIQApp() {
               onHitlApprove={handleHitlApprove} onHitlStartAdjust={() => setHitlAdjustMode(true)} onHitlAdjustTextChange={setHitlAdjustText} onHitlAdjustSubmit={handleHitlAdjust}
               constraintPaused={constraintPaused} constraintData={constraintData} constraintInput={constraintInput}
               onConstraintInputChange={setConstraintInput} onConstraintApply={handleConstraintApply} onConstraintSkip={handleConstraintSkip}
+              workflowSkillsets={workflowSkillsets} allSkillsets={skillsets}
             />
           </div>
         </div>
@@ -2228,6 +2561,7 @@ export default function HarmonIQApp() {
           onHitlApprove={handleHitlApprove} onHitlStartAdjust={() => setHitlAdjustMode(true)} onHitlAdjustTextChange={setHitlAdjustText} onHitlAdjustSubmit={handleHitlAdjust}
           constraintPaused={constraintPaused} constraintData={constraintData} constraintInput={constraintInput}
           onConstraintInputChange={setConstraintInput} onConstraintApply={handleConstraintApply} onConstraintSkip={handleConstraintSkip}
+          workflowSkillsets={workflowSkillsets} allSkillsets={skillsets}
         />
       )}
     </div>
@@ -2320,7 +2654,7 @@ export default function HarmonIQApp() {
           )}
         </div>
       </div>
-      {showAgentBrain && !isMobile && <AgentBrainPanel thoughts={agentThoughts} isRunning={isRunning} activeAgents={activeAgents} connectors={connectors} />}
+      {showAgentBrain && !isMobile && <AgentBrainPanel thoughts={agentThoughts} isRunning={isRunning} activeAgents={activeAgents} connectors={connectors} workflowSkillsets={workflowSkillsets} allSkillsets={skillsets} />}
     </div>
   );
 
@@ -2638,6 +2972,145 @@ export default function HarmonIQApp() {
     );
   };
 
+  // ─── Knowledge Base Page ───
+  const filteredSkillsets = skillsets.filter(sk => {
+    const matchesSearch = !skillsetSearch || sk.name.toLowerCase().includes(skillsetSearch.toLowerCase()) || sk.description.toLowerCase().includes(skillsetSearch.toLowerCase()) || sk.tags.some(t => t.toLowerCase().includes(skillsetSearch.toLowerCase()));
+    const matchesCategory = skillsetCategoryFilter === "All" || sk.category === skillsetCategoryFilter;
+    return matchesSearch && matchesCategory;
+  });
+
+  const [kbExpandedComp, setKbExpandedComp] = useState(null);
+
+  const renderKnowledgeBase = () => (
+    <div style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden" }}>
+      {/* Header */}
+      <div style={{ padding: isMobile ? "14px 16px 10px" : "20px 28px 12px", borderBottom: "1px solid #E8E6F0", display: "flex", justifyContent: "space-between", alignItems: isMobile ? "flex-start" : "center", flexDirection: isMobile ? "column" : "row", gap: 10 }}>
+        <div>
+          <div style={{ fontSize: isMobile ? 17 : 18, fontWeight: 700, color: "#1A1A2E" }}>📚 Knowledge Base</div>
+          <div style={{ fontSize: 13, color: "#888", marginTop: 2 }}>Domain skillsets and rules that guide agent behaviour</div>
+        </div>
+        <button onClick={() => { setEditingSkillset(null); setShowSkillsetModal(true); }} style={{ padding: "9px 18px", borderRadius: 10, background: "#7C3AED", color: "#fff", border: "none", fontSize: 13, fontWeight: 600, cursor: "pointer", whiteSpace: "nowrap", display: "flex", alignItems: "center", gap: 6 }}>+ Create Skillset</button>
+      </div>
+
+      {/* Filter bar */}
+      {!selectedSkillset && (
+        <div style={{ padding: isMobile ? "10px 16px" : "12px 28px", borderBottom: "1px solid #E8E6F0", display: "flex", gap: 10, flexWrap: "wrap" }}>
+          <input value={skillsetSearch} onChange={e => setSkillsetSearch(e.target.value)} placeholder="Search skillsets..." style={{ flex: 1, minWidth: 180, padding: "9px 14px", borderRadius: 10, border: "1px solid #DDD", fontSize: 13, outline: "none" }} />
+          <select value={skillsetCategoryFilter} onChange={e => setSkillsetCategoryFilter(e.target.value)} style={{ padding: "9px 14px", borderRadius: 10, border: "1px solid #DDD", fontSize: 13, background: "#fff" }}>
+            <option value="All">All Categories</option>
+            <option value="Domain Knowledge">Domain Knowledge</option>
+            <option value="Best Practices">Best Practices</option>
+            <option value="Compliance">Compliance</option>
+          </select>
+        </div>
+      )}
+
+      {/* Content */}
+      <div style={{ flex: 1, overflowY: "auto", padding: isMobile ? "14px 14px" : "20px 28px" }}>
+        {!selectedSkillset ? (
+          /* ─── Grid View ─── */
+          <>
+            {filteredSkillsets.length === 0 && (
+              <div style={{ textAlign: "center", padding: 40, color: "#999" }}>
+                <div style={{ fontSize: 36, marginBottom: 10 }}>📚</div>
+                <div style={{ fontSize: 14 }}>No skillsets match your search</div>
+              </div>
+            )}
+            <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(auto-fill, minmax(300px, 1fr))", gap: 14 }}>
+              {filteredSkillsets.map(sk => (
+                <div key={sk.id} onClick={() => { setSelectedSkillset(sk); setKbExpandedComp(null); }} style={{ border: "1px solid #E8E6F0", borderRadius: 14, padding: "18px 20px", cursor: "pointer", background: "#fff", transition: "all 0.2s", position: "relative" }} onMouseEnter={e => e.currentTarget.style.borderColor = sk.color} onMouseLeave={e => e.currentTarget.style.borderColor = "#E8E6F0"}>
+                  {/* Active toggle */}
+                  <div onClick={e => { e.stopPropagation(); toggleSkillsetActive(sk.id); }} style={{ position: "absolute", top: 14, right: 14, padding: "3px 10px", borderRadius: 20, fontSize: 10, fontWeight: 600, cursor: "pointer", background: sk.isActive ? "#E8F5E9" : "#F5F5F5", color: sk.isActive ? "#2E7D32" : "#999", border: `1px solid ${sk.isActive ? "#C8E6C9" : "#E0E0E0"}` }}>
+                    {sk.isActive ? "Active" : "Inactive"}
+                  </div>
+                  {/* Icon + name */}
+                  <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 10 }}>
+                    <div style={{ width: 40, height: 40, borderRadius: 10, background: sk.color + "15", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20 }}>{sk.icon}</div>
+                    <div style={{ flex: 1 }}>
+                      <div style={{ fontSize: 15, fontWeight: 700, color: "#1A1A2E", paddingRight: 60 }}>{sk.name}</div>
+                      <div style={{ display: "flex", gap: 6, marginTop: 3 }}>
+                        <span style={{ fontSize: 10, padding: "2px 8px", borderRadius: 4, background: sk.color + "15", color: sk.color, fontWeight: 600 }}>{sk.category}</span>
+                        <span style={{ fontSize: 10, padding: "2px 8px", borderRadius: 4, background: "#F5F5F5", color: "#888" }}>{sk.components.length} components</span>
+                      </div>
+                    </div>
+                  </div>
+                  {/* Description */}
+                  <div style={{ fontSize: 12.5, color: "#666", lineHeight: 1.6, marginBottom: 10, display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>{sk.description}</div>
+                  {/* Tags */}
+                  <div style={{ display: "flex", gap: 4, flexWrap: "wrap", marginBottom: 8 }}>
+                    {sk.tags.slice(0, 4).map(t => <span key={t} style={{ fontSize: 9, padding: "2px 6px", borderRadius: 4, background: "#F0F0F0", color: "#888" }}>{t}</span>)}
+                  </div>
+                  {/* Footer */}
+                  <div style={{ fontSize: 11, color: "#AAA" }}>{sk.author} &middot; {sk.created}</div>
+                </div>
+              ))}
+            </div>
+          </>
+        ) : (
+          /* ─── Detail View ─── */
+          <div>
+            {/* Back button */}
+            <button onClick={() => { setSelectedSkillset(null); setKbExpandedComp(null); }} style={{ display: "flex", alignItems: "center", gap: 4, background: "none", border: "none", color: "#7C3AED", fontSize: 13, fontWeight: 600, cursor: "pointer", marginBottom: 16, padding: 0 }}>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#7C3AED" strokeWidth="2"><polyline points="15 18 9 12 15 6"/></svg>
+              Back to Knowledge Base
+            </button>
+            {/* Header */}
+            <div style={{ display: "flex", alignItems: isMobile ? "flex-start" : "center", justifyContent: "space-between", marginBottom: 16, flexDirection: isMobile ? "column" : "row", gap: 12 }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
+                <div style={{ width: 52, height: 52, borderRadius: 14, background: selectedSkillset.color + "15", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 26 }}>{selectedSkillset.icon}</div>
+                <div>
+                  <div style={{ fontSize: 20, fontWeight: 700, color: "#1A1A2E" }}>{selectedSkillset.name}</div>
+                  <div style={{ display: "flex", gap: 6, marginTop: 4, alignItems: "center" }}>
+                    <span style={{ fontSize: 11, padding: "3px 10px", borderRadius: 6, background: selectedSkillset.color + "15", color: selectedSkillset.color, fontWeight: 600 }}>{selectedSkillset.category}</span>
+                    <span onClick={() => toggleSkillsetActive(selectedSkillset.id)} style={{ fontSize: 11, padding: "3px 10px", borderRadius: 6, cursor: "pointer", background: selectedSkillset.isActive ? "#E8F5E9" : "#F5F5F5", color: selectedSkillset.isActive ? "#2E7D32" : "#999", fontWeight: 600, border: `1px solid ${selectedSkillset.isActive ? "#C8E6C9" : "#E0E0E0"}` }}>
+                      {selectedSkillset.isActive ? "Active" : "Inactive"}
+                    </span>
+                  </div>
+                </div>
+              </div>
+              <button onClick={() => { setEditingSkillset(selectedSkillset); setShowSkillsetModal(true); }} style={{ padding: "9px 18px", borderRadius: 10, background: "#F0EDFF", color: "#7C3AED", border: "1px solid #C4B5FD40", fontSize: 13, fontWeight: 600, cursor: "pointer", display: "flex", alignItems: "center", gap: 6 }}>✏️ Edit Skillset</button>
+            </div>
+            {/* Description */}
+            <div style={{ fontSize: 14, color: "#555", lineHeight: 1.7, marginBottom: 16 }}>{selectedSkillset.description}</div>
+            {/* Metadata */}
+            <div style={{ display: "flex", gap: 16, flexWrap: "wrap", marginBottom: 16, fontSize: 12, color: "#888" }}>
+              <span>👤 {selectedSkillset.author}</span>
+              <span>📅 {selectedSkillset.created}</span>
+              <span>📦 {selectedSkillset.components.length} components</span>
+            </div>
+            {/* Tags */}
+            <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 20 }}>
+              {selectedSkillset.tags.map(t => <span key={t} style={{ fontSize: 11, padding: "4px 10px", borderRadius: 6, background: "#F0F0F0", color: "#666", fontWeight: 500 }}>{t}</span>)}
+            </div>
+            {/* Components */}
+            <div style={{ fontSize: 14, fontWeight: 700, color: "#1A1A2E", marginBottom: 12 }}>Knowledge Components</div>
+            <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+              {selectedSkillset.components.map((comp, idx) => {
+                const isExp = kbExpandedComp === idx;
+                return (
+                  <div key={comp.id || idx} style={{ border: "1px solid #E8E6F0", borderRadius: 12, overflow: "hidden", background: "#fff" }}>
+                    <div onClick={() => setKbExpandedComp(isExp ? null : idx)} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 16px", cursor: "pointer", background: isExp ? "#FAFAFE" : "#fff" }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                        <span style={{ display: "inline-block", padding: "3px 10px", borderRadius: 6, fontSize: 10, fontWeight: 700, color: "#fff", background: COMPONENT_TYPE_COLORS[comp.type] || "#888", textTransform: "uppercase", letterSpacing: "0.3px" }}>{COMPONENT_TYPE_LABELS[comp.type] || comp.type}</span>
+                        <span style={{ fontSize: 14, fontWeight: 600, color: "#333" }}>{comp.title}</span>
+                      </div>
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#888" strokeWidth="2" style={{ transform: isExp ? "rotate(180deg)" : "none", transition: "transform 0.2s", flexShrink: 0 }}><polyline points="6 9 12 15 18 9"/></svg>
+                    </div>
+                    {isExp && (
+                      <div style={{ padding: "12px 16px", borderTop: "1px solid #E8E6F0", background: "#FAFAFE" }}>
+                        <div style={{ fontSize: 13, color: "#444", lineHeight: 1.7 }}>{comp.content}</div>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+
   const renderCanvas = () => (
     <div style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden" }}>
       <div style={{ padding: isMobile ? "14px 16px 10px" : "20px 28px 12px", borderBottom: "1px solid #E8E6F0" }}>
@@ -2703,7 +3176,7 @@ export default function HarmonIQApp() {
     </div>
   );
 
-  const pageRenderer = { home: renderHome, templates: renderTemplates, triggers: renderTriggers, relics: renderRelics, canvas: renderCanvas, collaboration: renderCollaboration, docs: renderDocs };
+  const pageRenderer = { home: renderHome, templates: renderTemplates, triggers: renderTriggers, relics: renderRelics, knowledgebase: renderKnowledgeBase, canvas: renderCanvas, collaboration: renderCollaboration, docs: renderDocs };
 
   const handleLogin = () => {
     if (!loginEmail.trim()) { setLoginError("Please enter your email"); return; }
@@ -2983,7 +3456,7 @@ export default function HarmonIQApp() {
                 </div>
               )}
               <div style={{ fontSize: 13, color: "#888" }}>
-                {page === "home" ? "HarmonIQ / Home" : page === "templates" ? "HarmonIQ / Templates" : page === "triggers" ? "HarmonIQ / Triggers" : page === "relics" ? "HarmonIQ / Relics" : page === "canvas" ? "HarmonIQ / Canvas" : page === "docs" ? "HarmonIQ / Documentation" : "HarmonIQ / Collaboration"}
+                {page === "home" ? "HarmonIQ / Home" : page === "templates" ? "HarmonIQ / Templates" : page === "triggers" ? "HarmonIQ / Triggers" : page === "relics" ? "HarmonIQ / Relics" : page === "knowledgebase" ? "HarmonIQ / Knowledge Base" : page === "canvas" ? "HarmonIQ / Canvas" : page === "docs" ? "HarmonIQ / Documentation" : "HarmonIQ / Collaboration"}
               </div>
             </div>
             <div style={{ display: "flex", alignItems: "center", gap: 12, position: "relative" }}>
@@ -3044,6 +3517,13 @@ export default function HarmonIQApp() {
           connectors={connectors}
           onToggle={toggleConnector}
           onClose={() => setShowConnectData(false)}
+        />
+      )}
+      {isLoggedIn && showSkillsetModal && (
+        <SkillsetModal
+          existing={editingSkillset}
+          onClose={() => { setShowSkillsetModal(false); setEditingSkillset(null); }}
+          onSave={handleSaveSkillset}
         />
       )}
     </>
