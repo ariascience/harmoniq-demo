@@ -1943,6 +1943,7 @@ export default function HarmonIQApp() {
   const [editingKnowledgeItem, setEditingKnowledgeItem] = useState(null);
   const [knowledgeModalType, setKnowledgeModalType] = useState("knowledge");
   const [knowledgeManageTab, setKnowledgeManageTab] = useState("knowledge");
+  const [expandedKnowledgeItem, setExpandedKnowledgeItem] = useState(null);
   // Workflow knowledge attachments
   const [workflowKnowledge, setWorkflowKnowledge] = useState([]);
   const [workflowTerminology, setWorkflowTerminology] = useState([]);
@@ -3065,7 +3066,6 @@ export default function HarmonIQApp() {
       { id: "skills", label: "\u26A1 Core Skills", items: coreSkills, setter: setCoreSkills, color: "#7C3AED", type: "skill" },
     ];
     const activeTab = tabs.find(t => t.id === knowledgeManageTab) || tabs[0];
-    const [expandedItem, setExpandedItem] = useState(null);
     return (
     <div style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden" }}>
       <div style={{ padding: isMobile ? "14px 16px 10px" : "20px 28px 12px", borderBottom: "1px solid #E8E6F0" }}>
@@ -3078,7 +3078,7 @@ export default function HarmonIQApp() {
         </div>
         <div style={{ display: "flex", gap: 0, borderBottom: "none" }}>
           {tabs.map(tab => (
-            <button key={tab.id} onClick={() => { setKnowledgeManageTab(tab.id); setExpandedItem(null); }} style={{ flex: 1, padding: "10px 8px", fontSize: 12, fontWeight: 600, cursor: "pointer", background: "none", border: "none", borderBottom: knowledgeManageTab === tab.id ? `2px solid ${tab.color}` : "2px solid transparent", color: knowledgeManageTab === tab.id ? tab.color : "#888", transition: "all 0.2s" }}>{tab.label} ({tab.items.filter(i => i.isActive).length})</button>
+            <button key={tab.id} onClick={() => { setKnowledgeManageTab(tab.id); setExpandedKnowledgeItem(null); }} style={{ flex: 1, padding: "10px 8px", fontSize: 12, fontWeight: 600, cursor: "pointer", background: "none", border: "none", borderBottom: knowledgeManageTab === tab.id ? `2px solid ${tab.color}` : "2px solid transparent", color: knowledgeManageTab === tab.id ? tab.color : "#888", transition: "all 0.2s" }}>{tab.label} ({tab.items.filter(i => i.isActive).length})</button>
           ))}
         </div>
       </div>
@@ -3093,10 +3093,10 @@ export default function HarmonIQApp() {
         ) : (
           <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
             {activeTab.items.map((item, idx) => {
-              const isExp = expandedItem === item.id;
+              const isExp = expandedKnowledgeItem === item.id;
               return (
                 <div key={item.id} style={{ border: "1px solid #E8E6F0", borderRadius: 14, overflow: "hidden", background: "#fff", borderLeft: `4px solid ${item.color || activeTab.color}` }}>
-                  <div onClick={() => setExpandedItem(isExp ? null : item.id)} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "14px 18px", cursor: "pointer", background: isExp ? "#FAFAFE" : "#fff" }}>
+                  <div onClick={() => setExpandedKnowledgeItem(isExp ? null : item.id)} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "14px 18px", cursor: "pointer", background: isExp ? "#FAFAFE" : "#fff" }}>
                     <div style={{ display: "flex", alignItems: "center", gap: 12, flex: 1, minWidth: 0 }}>
                       <div style={{ width: 36, height: 36, borderRadius: 10, background: (item.color || activeTab.color) + "15", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, flexShrink: 0 }}>{item.icon}</div>
                       <div style={{ flex: 1, minWidth: 0 }}>
