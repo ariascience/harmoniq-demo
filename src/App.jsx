@@ -91,6 +91,65 @@ const CORE_SKILLS = [
   { id: "cs5", name: "Anomaly Detection Pipeline", icon: "\u{1F6E1}\uFE0F", color: "#A29BFE", description: "Multi-method anomaly detection for automated data quality monitoring and alerting.", author: "Subir Gupta", created: "Feb 10, 2026", isActive: true, methodology: "Ensemble of IQR-based statistical detection and Isolation Forest machine learning model. Apply domain-specific bounds per metric type (sales, price, inventory). All detected anomalies are flagged for human review \u2014 never auto-removed. Priority scoring based on business impact (high-volume SKUs weighted higher).", applicability: "Any numeric time-series or cross-sectional data feed. Runs automatically on all IngestIQ ingestion pipelines. Particularly effective for catching data entry errors, system glitches, and feed corruption.", parameters: "IQR multiplier: 3.0. Isolation Forest contamination: 0.01. Domain check: weekly units > 10\u00d7 52-week median. Auto-remove: NEVER. Alert threshold: High (top 100 SKUs by RSV), Medium (others)." },
 ];
 
+// ─── Memory System Data ───
+const MEMORY_SESSION = [
+  { id: "ms1", type: "session", label: "IngestIQ found 3 data quality issues in current run", agent: "IngestIQ", agentColor: "#6C5CE7", timestamp: "12s ago", detail: "Null values in Stock_On_Hand (0.17%), forward-filled. Quality score: 99.1%. 249,666 rows staged.", confidence: 0.99, tags: ["data_quality", "ingestion"] },
+  { id: "ms2", type: "session", label: "DemandIQ ensemble weights: ARIMA 0.15, Prophet 0.30, XGBoost 0.55", agent: "DemandIQ", agentColor: "#FDCB6E", timestamp: "8s ago", detail: "Cross-validation MAPE — ARIMA: 9.4%, Prophet: 8.1%, XGBoost: 7.2%. Ensemble ceiling not breached.", confidence: 0.94, tags: ["model_weights", "forecasting"] },
+  { id: "ms3", type: "session", label: "MarketIQ detected competitor price drop: Brand X SKU-441 by 8.5%", agent: "MarketIQ", agentColor: "#E17055", timestamp: "5s ago", detail: "Price drop effective Feb 8. Cross-price elasticity impact estimated at +2.1% volume shift to Brand X in spirits category.", confidence: 0.87, tags: ["competitor", "pricing"] },
+  { id: "ms4", type: "session", label: "OptimaIQ optimal discount: 7% on 18 SKUs preserves 15.2% margin", agent: "OptimaIQ", agentColor: "#A29BFE", timestamp: "3s ago", detail: "MILP converged at iteration 8. Gap < 0.01%. Estimated impact: +41,000 units recovery, £410K incremental.", confidence: 0.96, tags: ["optimization", "pricing"] },
+  { id: "ms5", type: "session", label: "47 SKU×store combinations flagged as high-risk stockout", agent: "DemandIQ", agentColor: "#FDCB6E", timestamp: "6s ago", detail: "Concentrated in Spirits and RTD categories across Southern region stores. >70% stockout probability threshold.", confidence: 0.91, tags: ["stockout", "risk"] },
+];
+
+const MEMORY_USER = [
+  { id: "mu1", type: "user", label: "Prefers SKU-level granularity over category-level", scope: "preference", learnedFrom: "3 workflow adjustments", lastUsed: "Today", usageCount: 12, detail: "User consistently adjusts DemandIQ output to show SKU-level breakdowns. Applied automatically since Jan 28.", confidence: 0.95, tags: ["granularity", "preference"] },
+  { id: "mu2", type: "user", label: "Always requests 13-week forecast horizon", scope: "preference", learnedFrom: "5 demand workflows", lastUsed: "Yesterday", usageCount: 8, detail: "Standard forecast window preference. User never changed the default 13-week horizon across 5 separate runs.", confidence: 0.98, tags: ["forecasting", "horizon"] },
+  { id: "mu3", type: "user", label: "Frequently uses OOS Impact and Sales Gap templates", scope: "behaviour", learnedFrom: "Usage analytics", lastUsed: "2 hours ago", usageCount: 23, detail: "Top 2 templates by frequency: OOS Impact (14 runs), Sales Gap (9 runs). Demand Forecast third at 7 runs.", confidence: 0.99, tags: ["templates", "usage"] },
+  { id: "mu4", type: "user", label: "Prefers GBP currency with month-end average FX rates", scope: "preference", learnedFrom: "Manual setting", lastUsed: "Today", usageCount: 6, detail: "Explicitly set in first session. Consistent with company knowledge rule ck1 (Sales Reporting Standards).", confidence: 1.0, tags: ["currency", "reporting"] },
+  { id: "mu5", type: "user", label: "Custom dashboard layout: 3-column view with metrics first", scope: "ui_preference", learnedFrom: "Layout adjustments", lastUsed: "1 day ago", usageCount: 4, detail: "Rearranged canvas dashboard to show KPI metrics at top, charts middle, recommendations bottom.", confidence: 0.88, tags: ["layout", "dashboard"] },
+  { id: "mu6", type: "user", label: "Adjusted DemandIQ baseline +8% after Jan forecast under-predicted", scope: "correction", learnedFrom: "HITL adjustment", lastUsed: "Jan 28, 2026", usageCount: 2, detail: "Jan forecast was 12% under actual due to unexpected promo overlap. User added +8% correction. Applied to subsequent runs.", confidence: 0.92, tags: ["forecasting", "correction", "hitl"] },
+];
+
+const MEMORY_GROUP = [
+  { id: "mg1", type: "group", group: "Analytics Team", label: "Standard promo contamination window: 2 weeks pre, 3 weeks post", scope: "shared_rule", author: "Keith Taylor", lastUsed: "Today", usageCount: 34, detail: "Team convention for baseline calculations. BOGOF gets 4-week post lag. Christmas W48-W52 flagged but included.", confidence: 0.97, tags: ["promo", "baseline", "convention"] },
+  { id: "mg2", type: "group", group: "Analytics Team", label: "Ensemble model ceiling: no single model weight > 0.6", scope: "shared_rule", author: "Debonil Chowdhury", lastUsed: "Yesterday", usageCount: 18, detail: "Prevents over-reliance on any single forecasting model. If XGBoost exceeds 0.6, redistribute to Prophet.", confidence: 0.95, tags: ["model", "ensemble", "constraint"] },
+  { id: "mg3", type: "group", group: "Analytics Team", label: "On-Trade underperforming by -4.2% vs market growth +1.8%", scope: "shared_insight", author: "Archana Menon", lastUsed: "3 days ago", usageCount: 7, detail: "Identified in Sales Gap workflow. Team agreed to focus promotional activity on On-Trade channel for Q1.", confidence: 0.89, tags: ["channel", "performance", "insight"] },
+  { id: "mg4", type: "group", group: "Category Managers", label: "Spirits category growth +3.2% YoY, share stable at 23.1%", scope: "shared_insight", author: "MarketIQ", lastUsed: "1 week ago", usageCount: 11, detail: "Category benchmark from syndicated data. Updated weekly. Beer +1.1%, Liqueurs +5.8%, RTD +4.6%.", confidence: 0.93, tags: ["category", "benchmark", "market"] },
+  { id: "mg5", type: "group", group: "Category Managers", label: "Tier-A stores: weekly turnover > £50k — priority for new launches", scope: "shared_playbook", author: "Subir Gupta", lastUsed: "Today", usageCount: 28, detail: "~800 stores (top 15%). Always weight analysis by tier. Refresh quarterly based on trailing 13-week RSV.", confidence: 0.97, tags: ["store_tier", "distribution", "playbook"] },
+];
+
+const MEMORY_ORG = [
+  { id: "mo1", type: "org", label: "Q3 baseline growth: +4.2% YoY is normal seasonal range", scope: "baseline", department: "Commercial", lastUpdated: "Feb 10, 2026", version: 3, detail: "Updated quarterly by commercial team. Q1: +2.1%, Q2: +3.5%, Q3: +4.2%, Q4: +6.8% (Christmas uplift). Used as benchmark for anomaly detection.", confidence: 0.96, tags: ["baseline", "seasonality", "benchmark"], accessLevel: "all_users" },
+  { id: "mo2", type: "org", label: "EPoS sell-out data is the primary source of truth", scope: "data_governance", department: "Data", lastUpdated: "Jan 15, 2026", version: 1, detail: "When EPoS and sell-in data conflict, EPoS takes precedence. Syndicated data (Nielsen/IRI) is tertiary. New launches (<8 weeks): fall back to sell-in.", confidence: 1.0, tags: ["data_source", "governance", "priority"], accessLevel: "all_users" },
+  { id: "mo3", type: "org", label: "Fiscal year: April–March. Nielsen 4-4-5 calendar. Weekly reset Thursday.", scope: "fiscal", department: "Finance", lastUpdated: "Jan 5, 2026", version: 1, detail: "Q1=Apr-Jun, Q2=Jul-Sep, Q3=Oct-Dec, Q4=Jan-Mar. Period 1 starts first Thursday of April. Always align time-series to fiscal weeks.", confidence: 1.0, tags: ["fiscal", "calendar", "reporting"], accessLevel: "all_users" },
+  { id: "mo4", type: "org", label: "Historical demand forecast accuracy: MAPE 8.2% national, 14.1% store-level", scope: "performance", department: "Analytics", lastUpdated: "Feb 1, 2026", version: 5, detail: "Rolling 52-week average. Improving trend: was 9.8% national 6 months ago. Store-level target: <15%. Category-level target: <12%.", confidence: 0.94, tags: ["forecast", "accuracy", "performance"], accessLevel: "analytics_team" },
+  { id: "mo5", type: "org", label: "Product delists tracked: 47 SKUs delisted in last 12 months", scope: "entity", department: "Supply Chain", lastUpdated: "Feb 12, 2026", version: 12, detail: "Largest delist: SKU-4481 (Organic Muesli 500g) in W42. Always exclude delisted SKUs from forward forecasting. Check delist register before running DemandIQ.", confidence: 0.98, tags: ["delist", "product", "entity"], accessLevel: "all_users" },
+  { id: "mo6", type: "org", label: "Approved promotional mechanics: Price-Cut, BOGOF, X-for-Y, Multibuy", scope: "policy", department: "Trade Marketing", lastUpdated: "Jan 20, 2026", version: 2, detail: "All promo events must use one of these 4 mechanics. Custom mechanics require VP approval. Mechanic affects post-promo lag calculation.", confidence: 1.0, tags: ["promo", "mechanic", "policy"], accessLevel: "all_users" },
+  { id: "mo7", type: "org", label: "Data retention policy: raw data 24 months, aggregated 60 months", scope: "compliance", department: "Legal/IT", lastUpdated: "Dec 1, 2025", version: 1, detail: "Raw POS data retained 24 months then archived. Aggregated reports retained 60 months. Personal data anonymised after 12 months per GDPR.", confidence: 1.0, tags: ["retention", "compliance", "gdpr"], accessLevel: "admin_only" },
+];
+
+// Memory events that get injected into workflow timeline
+const MEMORY_WORKFLOW_EVENTS = [
+  { position: "start", type: "memory_recall", agent: "HarmonIQ", text: "💾 Recalling org memory: \"Q3 baseline growth +4.2% YoY is normal seasonal range\"", color: "#9B59B6", delay: 400 },
+  { position: "start", type: "memory_recall", agent: "HarmonIQ", text: "💾 Recalling user pref: \"SKU-level granularity preferred over category-level\"", color: "#9B59B6", delay: 350 },
+  { position: "start", type: "memory_recall", agent: "HarmonIQ", text: "💾 Loading group rule: \"Ensemble model ceiling — no single model weight > 0.6\"", color: "#9B59B6", delay: 300 },
+  { position: "after_ingest", type: "memory_write", agent: "IngestIQ", text: "💾 Writing session memory: \"3 quality issues found, score 99.1%, 249K rows staged\"", color: "#8E44AD", delay: 300 },
+  { position: "after_ingest", type: "memory_write", agent: "IngestIQ", text: "💾 Updating entity memory: Store 1205 latest turnover £64.2k (Tier-A confirmed)", color: "#8E44AD", delay: 250 },
+  { position: "after_demand", type: "memory_recall", agent: "DemandIQ", text: "💾 Recalling episodic: \"Jan forecast was 12% under — user applied +8% baseline correction\"", color: "#9B59B6", delay: 350 },
+  { position: "after_demand", type: "memory_write", agent: "DemandIQ", text: "💾 Writing session memory: \"Ensemble weights — ARIMA 0.15, Prophet 0.30, XGBoost 0.55\"", color: "#8E44AD", delay: 300 },
+  { position: "after_demand", type: "memory_write", agent: "DemandIQ", text: "💾 Persisting to org memory: \"Feb forecast confidence 87%, methodology: adaptive ensemble\"", color: "#8E44AD", delay: 250 },
+  { position: "after_market", type: "memory_write", agent: "MarketIQ", text: "💾 Writing session memory: \"Competitor Brand X dropped SKU-441 by 8.5%\"", color: "#8E44AD", delay: 300 },
+  { position: "after_market", type: "memory_write", agent: "MarketIQ", text: "💾 Updating group insight: \"On-Trade gap widened to -4.2% vs market +1.8%\"", color: "#8E44AD", delay: 250 },
+  { position: "after_optima", type: "memory_write", agent: "OptimaIQ", text: "💾 Writing session memory: \"Optimal 7% discount on 18 SKUs, 15.2% margin preserved\"", color: "#8E44AD", delay: 300 },
+  { position: "end", type: "memory_write", agent: "HarmonIQ", text: "💾 Persisting workflow summary to org memory — available for future runs", color: "#8E44AD", delay: 400 },
+];
+
+const MEMORY_USER_ACCESS = {
+  session: { canRead: true, canWrite: true, icon: "🔴", color: "#E74C3C", label: "Session Memory", desc: "Temporary working memory for the current workflow run. Cleared on completion." },
+  user: { canRead: true, canWrite: true, icon: "👤", color: "#3498DB", label: "User Memory", desc: "Personal preferences, past corrections, and learned behaviours. Persists across sessions." },
+  group: { canRead: true, canWrite: true, icon: "👥", color: "#2ECC71", label: "Group Memory", desc: "Shared team knowledge, playbooks, and collaborative insights. Visible to team members." },
+  org: { canRead: true, canWrite: false, icon: "🏢", color: "#F39C12", label: "Organisation Memory", desc: "Company-wide baselines, policies, and governance rules. Read-only for most users." },
+};
+
 const COLLABORATORS = [
   { id: "u1", name: "Debonil Chowdhury", email: "debonil.chowdhury@aria-is.com", avatar: "DC", role: "Owner" },
   { id: "u2", name: "Archana Menon", email: "archana.menon@aria-is.com", avatar: "AM", role: "Editor" },
@@ -1166,6 +1225,7 @@ function AgentBrainPanel({ thoughts, isRunning, activeAgents, connectors,
   onConstraintInputChange, onConstraintApply, onConstraintSkip,
   workflowKnowledge, workflowTerminology, workflowSkills,
   companyKnowledge, terminologyDefs, coreSkills,
+  agentBrainTab, setAgentBrainTab, sessionMemories, userMemories, groupMemories, orgMemories,
 }) {
   const panelRef = useRef(null);
   const [elapsed, setElapsed] = useState(0);
@@ -1228,6 +1288,98 @@ function AgentBrainPanel({ thoughts, isRunning, activeAgents, connectors,
         )}
       </div>
 
+      {/* Tab Switcher */}
+      <div style={{ display: "flex", borderBottom: "1px solid #2A2A3C" }}>
+        {[{ id: "thinking", label: "🧠 Thinking", icon: "" }, { id: "memory", label: "💾 Memory", icon: "" }].map(tab => (
+          <div key={tab.id} onClick={() => setAgentBrainTab(tab.id)} style={{ flex: 1, padding: "10px 14px", textAlign: "center", fontSize: 11.5, fontWeight: agentBrainTab === tab.id ? 700 : 500, color: agentBrainTab === tab.id ? "#E8E6F0" : "#546E7A", borderBottom: agentBrainTab === tab.id ? "2px solid #A29BFE" : "2px solid transparent", cursor: "pointer", transition: "all 0.2s", fontFamily: "'JetBrains Mono', monospace" }}>
+            {tab.label}
+            {tab.id === "memory" && sessionMemories && sessionMemories.length > 0 && (
+              <span style={{ marginLeft: 6, background: "#9B59B6", color: "#fff", fontSize: 9, padding: "1px 5px", borderRadius: 8, fontWeight: 700 }}>{sessionMemories.length}</span>
+            )}
+          </div>
+        ))}
+      </div>
+
+      {agentBrainTab === "memory" ? (
+        /* Memory Panel View */
+        <div style={{ flex: 1, overflowY: "auto", padding: "8px 12px" }}>
+          {/* Session Memories - Live */}
+          <div style={{ marginBottom: 14 }}>
+            <div style={{ fontSize: 10, fontWeight: 600, color: "#E74C3C", textTransform: "uppercase", letterSpacing: "0.8px", padding: "6px 4px", display: "flex", alignItems: "center", gap: 6 }}>
+              <span>🔴</span> Session Memory
+              <span style={{ color: "#546E7A", fontWeight: 400 }}>· {sessionMemories?.length || 0}</span>
+              {isRunning && <span style={{ width: 6, height: 6, borderRadius: "50%", background: "#C3E88D", animation: "pulse 1s infinite" }} />}
+            </div>
+            {(!sessionMemories || sessionMemories.length === 0) ? (
+              <div style={{ fontSize: 11, color: "#546E7A", fontStyle: "italic", padding: "8px 4px", fontFamily: "'JetBrains Mono', monospace" }}>No session memories yet — run a workflow</div>
+            ) : (
+              sessionMemories.map((m, i) => (
+                <div key={m.id || i} style={{ padding: "8px 10px", background: "#252536", borderRadius: 8, marginBottom: 4, borderLeft: `3px solid ${m.agentColor || "#E74C3C"}`, animation: "fadeIn 0.4s ease" }}>
+                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 3 }}>
+                    <span style={{ fontSize: 10, fontWeight: 700, color: m.agentColor || "#E74C3C", textTransform: "uppercase", fontFamily: "'JetBrains Mono', monospace" }}>{m.agent}</span>
+                    <span style={{ fontSize: 9, color: "#546E7A" }}>{m.timestamp}</span>
+                  </div>
+                  <div style={{ fontSize: 11.5, color: "#B8B5C8", lineHeight: 1.5, fontFamily: "'JetBrains Mono', monospace" }}>{m.label}</div>
+                  {m.confidence && (
+                    <div style={{ marginTop: 4, display: "flex", alignItems: "center", gap: 6 }}>
+                      <div style={{ flex: 1, height: 3, background: "#2A2A3C", borderRadius: 2, overflow: "hidden" }}>
+                        <div style={{ width: `${Math.round(m.confidence * 100)}%`, height: "100%", background: m.confidence > 0.9 ? "#C3E88D" : m.confidence > 0.7 ? "#FFCB6B" : "#F78C6C", borderRadius: 2 }} />
+                      </div>
+                      <span style={{ fontSize: 9, color: "#546E7A", fontFamily: "'JetBrains Mono', monospace" }}>{Math.round(m.confidence * 100)}%</span>
+                    </div>
+                  )}
+                </div>
+              ))
+            )}
+          </div>
+
+          {/* Recalled Memories */}
+          <div style={{ marginBottom: 14 }}>
+            <div style={{ fontSize: 10, fontWeight: 600, color: "#9B59B6", textTransform: "uppercase", letterSpacing: "0.8px", padding: "6px 4px", display: "flex", alignItems: "center", gap: 6 }}>
+              <span>🔮</span> Recalled Memories
+            </div>
+            {[
+              { icon: "👤", color: "#3498DB", scope: "User Pref", text: "SKU-level granularity preferred over category-level", source: "Learned from 3 workflow adjustments" },
+              { icon: "👤", color: "#3498DB", scope: "User Correction", text: "Jan forecast +8% baseline correction (was 12% under)", source: "HITL adjustment, Jan 28" },
+              { icon: "👥", color: "#2ECC71", scope: "Group Rule", text: "Ensemble ceiling: no single model weight > 0.6", source: "Analytics Team convention" },
+              { icon: "🏢", color: "#F39C12", scope: "Org Baseline", text: "Q3 baseline growth +4.2% YoY — normal range", source: "Commercial team, updated quarterly" },
+              { icon: "🏢", color: "#F39C12", scope: "Org Policy", text: "EPoS sell-out data is primary source of truth", source: "Data governance rule" },
+            ].map((rm, i) => (
+              <div key={i} style={{ padding: "8px 10px", background: "#252536", borderRadius: 8, marginBottom: 4, borderLeft: `3px solid ${rm.color}` }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 4, marginBottom: 3 }}>
+                  <span style={{ fontSize: 11 }}>{rm.icon}</span>
+                  <span style={{ fontSize: 10, fontWeight: 600, color: rm.color, fontFamily: "'JetBrains Mono', monospace" }}>{rm.scope}</span>
+                </div>
+                <div style={{ fontSize: 11.5, color: "#B8B5C8", lineHeight: 1.4, fontFamily: "'JetBrains Mono', monospace" }}>{rm.text}</div>
+                <div style={{ fontSize: 9, color: "#546E7A", marginTop: 3 }}>{rm.source}</div>
+              </div>
+            ))}
+          </div>
+
+          {/* Memory Access Levels */}
+          <div>
+            <div style={{ fontSize: 10, fontWeight: 600, color: "#546E7A", textTransform: "uppercase", letterSpacing: "0.8px", padding: "6px 4px", display: "flex", alignItems: "center", gap: 6 }}>
+              <span>🔐</span> Your Access Levels
+            </div>
+            {Object.entries(MEMORY_USER_ACCESS).map(([key, acc]) => (
+              <div key={key} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "6px 10px", background: "#252536", borderRadius: 6, marginBottom: 3 }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                  <span style={{ fontSize: 13 }}>{acc.icon}</span>
+                  <div>
+                    <div style={{ fontSize: 11, color: acc.color, fontWeight: 600, fontFamily: "'JetBrains Mono', monospace" }}>{acc.label}</div>
+                    <div style={{ fontSize: 9, color: "#546E7A" }}>{acc.desc}</div>
+                  </div>
+                </div>
+                <div style={{ display: "flex", gap: 4 }}>
+                  <span style={{ fontSize: 9, padding: "2px 6px", borderRadius: 4, background: acc.canRead ? "#C3E88D20" : "#F78C6C20", color: acc.canRead ? "#C3E88D" : "#F78C6C", fontWeight: 600 }}>{acc.canRead ? "R" : "—"}</span>
+                  <span style={{ fontSize: 9, padding: "2px 6px", borderRadius: 4, background: acc.canWrite ? "#C3E88D20" : "#F78C6C20", color: acc.canWrite ? "#C3E88D" : "#F78C6C", fontWeight: 600 }}>{acc.canWrite ? "W" : "—"}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      ) : (
+      <>
       {/* Activity Label */}
       <div style={{ padding: "10px 18px 0", fontSize: 10, fontWeight: 600, color: "#546E7A", textTransform: "uppercase", letterSpacing: "1px" }}>
         Activity
@@ -1243,11 +1395,19 @@ function AgentBrainPanel({ thoughts, isRunning, activeAgents, connectors,
           </div>
         )}
         {thoughts.map((t, i) => {
-          const isHandoff = t.agent === "HarmonIQ";
+          const isHandoff = t.agent === "HarmonIQ" && !t.isMemoryEvent;
           const isComplete = t.text.startsWith("✅");
+          const isMemory = t.isMemoryEvent || t.text.startsWith("💾");
           return (
             <div key={i} style={{ marginBottom: isHandoff ? 14 : 8, animation: "fadeIn 0.4s ease" }}>
-              {isHandoff ? (
+              {isMemory ? (
+                <div style={{ padding: "8px 12px", background: "#2A1F3D", borderRadius: 8, borderLeft: "3px solid #9B59B6", margin: "4px 0" }}>
+                  <div style={{ fontSize: 12, color: "#D2B4DE", fontWeight: 500, lineHeight: 1.5, fontFamily: "'JetBrains Mono', 'Fira Code', monospace" }}>
+                    {t.text}
+                  </div>
+                  <div style={{ fontSize: 9, color: "#7D3C98", marginTop: 3, fontFamily: "'JetBrains Mono', monospace" }}>{t.agent} · memory {t.text.includes("Recalling") || t.text.includes("Loading") ? "recall" : "write"}</div>
+                </div>
+              ) : isHandoff ? (
                 <div style={{ padding: "10px 14px", background: "#252536", borderRadius: 8, borderLeft: "3px solid #C792EA", margin: "6px 0" }}>
                   <div style={{ fontSize: 12.5, color: "#C792EA", fontWeight: 600, lineHeight: 1.6, fontFamily: "'JetBrains Mono', 'Fira Code', monospace" }}>
                     <span style={{ color: "#FFCB6B" }}>→</span> {t.text.replace("🧠 ", "")}
@@ -1393,6 +1553,8 @@ function AgentBrainPanel({ thoughts, isRunning, activeAgents, connectors,
           )}
         </div>
       </div>
+      </>
+      )}
     </div>
   );
 }
@@ -1949,6 +2111,17 @@ export default function HarmonIQApp() {
   const [workflowTerminology, setWorkflowTerminology] = useState([]);
   const [workflowSkills, setWorkflowSkills] = useState([]);
 
+  // Memory system state
+  const [sessionMemories, setSessionMemories] = useState([]);
+  const [userMemories, setUserMemories] = useState(MEMORY_USER);
+  const [groupMemories, setGroupMemories] = useState(MEMORY_GROUP);
+  const [orgMemories, setOrgMemories] = useState(MEMORY_ORG);
+  const [memoryExpandedSection, setMemoryExpandedSection] = useState(false);
+  const [memoryExplorerTab, setMemoryExplorerTab] = useState("session");
+  const [memorySearchQuery, setMemorySearchQuery] = useState("");
+  const [expandedMemoryItem, setExpandedMemoryItem] = useState(null);
+  const [agentBrainTab, setAgentBrainTab] = useState("thinking"); // "thinking" | "memory"
+
   // Refs for resume callbacks (stored as refs to avoid stale closures)
   const hitlResumeRef = useRef(null);
   const constraintResumeRef = useRef(null);
@@ -1990,6 +2163,8 @@ export default function HarmonIQApp() {
     setWorkflowKnowledge([]);
     setWorkflowTerminology([]);
     setWorkflowSkills([]);
+    setSessionMemories([]);
+    setAgentBrainTab("thinking");
     hitlResumeRef.current = null;
     constraintResumeRef.current = null;
     timelineRef.current = [];
@@ -2085,16 +2260,56 @@ export default function HarmonIQApp() {
       }
     });
 
+    // Inject memory write events after each agent block
+    const memEventsAfterAgent = { "IngestIQ": "after_ingest", "VisionIQ": "after_vision", "VisionIQ_plus": "after_vision", "MarketIQ": "after_market", "DemandIQ": "after_demand", "OptimaIQ": "after_optima" };
+    // Insert memory write events after each agent's HITL checkpoint (or last thought)
+    const enrichedTimeline = [];
+    let lastAgentName = null;
+    for (let i = 0; i < timeline.length; i++) {
+      const entry = timeline[i];
+      const nextEntry = timeline[i + 1];
+      enrichedTimeline.push(entry);
+      // Detect agent transition: current is thought/hitl for agent A, next is handoff/thought for different agent or end
+      const currentAgent = entry.agent || entry.agentName;
+      const nextAgent = nextEntry ? (nextEntry.agent || nextEntry.agentName) : null;
+      if (currentAgent && currentAgent !== "HarmonIQ" && (!nextAgent || nextAgent === "HarmonIQ" || nextAgent !== currentAgent)) {
+        const cleanName = currentAgent.replace(/\+/g, "_plus");
+        const posKey = memEventsAfterAgent[cleanName];
+        if (posKey) {
+          MEMORY_WORKFLOW_EVENTS.filter(me => me.position === posKey).forEach(me => {
+            enrichedTimeline.push({ type: "thought", agent: me.agent, text: me.text, color: me.color, delay: me.delay, agentId: null, isMemoryEvent: true, memoryType: me.type });
+          });
+        }
+        lastAgentName = currentAgent;
+      }
+    }
+
     // Inject knowledge-loading thoughts at the beginning of timeline
     const knNames = workflowKnowledge.map(id => companyKnowledge.find(k => k.id === id)?.name).filter(Boolean);
     const termNames = workflowTerminology.map(id => terminologyDefs.find(t => t.id === id)?.name).filter(Boolean);
     const skillNames = workflowSkills.map(id => coreSkills.find(s => s.id === id)?.name).filter(Boolean);
-    if (skillNames.length > 0) timeline.unshift({ type: "thought", agent: "HarmonIQ", text: `\u26A1 Applying Core Skills: ${skillNames.join(", ")}`, color: "#7C3AED", delay: 500, agentId: null });
-    if (termNames.length > 0) timeline.unshift({ type: "thought", agent: "HarmonIQ", text: `\u{1F4DD} Loading Terminology: ${termNames.join(", ")}`, color: "#F39C12", delay: 500, agentId: null });
-    if (knNames.length > 0) timeline.unshift({ type: "thought", agent: "HarmonIQ", text: `\u{1F4D6} Applying Company Knowledge: ${knNames.join(", ")}`, color: "#0984E3", delay: 500, agentId: null });
+    if (skillNames.length > 0) enrichedTimeline.unshift({ type: "thought", agent: "HarmonIQ", text: `\u26A1 Applying Core Skills: ${skillNames.join(", ")}`, color: "#7C3AED", delay: 500, agentId: null });
+    if (termNames.length > 0) enrichedTimeline.unshift({ type: "thought", agent: "HarmonIQ", text: `\u{1F4DD} Loading Terminology: ${termNames.join(", ")}`, color: "#F39C12", delay: 500, agentId: null });
+    if (knNames.length > 0) enrichedTimeline.unshift({ type: "thought", agent: "HarmonIQ", text: `\u{1F4D6} Applying Company Knowledge: ${knNames.join(", ")}`, color: "#0984E3", delay: 500, agentId: null });
 
-    timelineRef.current = timeline;
+    // Inject memory recall events at the very start
+    const startMemEvents = MEMORY_WORKFLOW_EVENTS.filter(me => me.position === "start");
+    for (let i = startMemEvents.length - 1; i >= 0; i--) {
+      const me = startMemEvents[i];
+      enrichedTimeline.unshift({ type: "thought", agent: me.agent, text: me.text, color: me.color, delay: me.delay, agentId: null, isMemoryEvent: true, memoryType: me.type });
+    }
+
+    // Add final memory persist event
+    const endMemEvents = MEMORY_WORKFLOW_EVENTS.filter(me => me.position === "end");
+    endMemEvents.forEach(me => {
+      enrichedTimeline.push({ type: "thought", agent: me.agent, text: me.text, color: me.color, delay: me.delay, agentId: null, isMemoryEvent: true, memoryType: me.type });
+    });
+
+    timelineRef.current = enrichedTimeline;
     timelineIndexRef.current = 0;
+
+    // Memory event counter for generating session memories
+    let memWriteCount = 0;
 
     // Step function that processes timeline entries
     const step = () => {
@@ -2105,29 +2320,39 @@ export default function HarmonIQApp() {
         const entry = tl[idx];
 
         if (entry.type === "hitl_checkpoint") {
-          // Pause for HITL approval
           setHitlPaused(true);
           setHitlCheckpoint(entry);
           timelineIndexRef.current = idx + 1;
           hitlResumeRef.current = step;
-          return; // Stop — user must click approve
+          return;
         }
 
         if (entry.type === "constraint_alert") {
-          // Pause for constraint violation
           setConstraintPaused(true);
           setConstraintData(entry);
           setConstraintInput("");
           timelineIndexRef.current = idx + 1;
           constraintResumeRef.current = step;
-          return; // Stop — user must act
+          return;
         }
 
-        // Normal thought entry
-        setAgentThoughts(prev => [...prev, { agent: entry.agent, text: entry.text, color: entry.color }]);
+        // Normal thought entry (including memory events shown as thoughts)
+        setAgentThoughts(prev => [...prev, { agent: entry.agent, text: entry.text, color: entry.color, isMemoryEvent: entry.isMemoryEvent }]);
         if (entry.agentId) {
           setActiveAgents(prev => prev.includes(entry.agentId) ? prev : [...prev, entry.agentId]);
         }
+
+        // If this is a memory_write event, add to session memories
+        if (entry.isMemoryEvent && entry.memoryType === "memory_write") {
+          memWriteCount++;
+          const memId = "ms_live_" + memWriteCount;
+          setSessionMemories(prev => [...prev, {
+            id: memId, type: "session", label: entry.text.replace(/^💾\s*(Writing session memory|Updating entity memory|Persisting to org memory|Updating group insight|Persisting workflow summary to org memory):\s*"?/i, "").replace(/"$/, "").replace(/^💾\s*/, ""),
+            agent: entry.agent, agentColor: entry.color, timestamp: "Just now",
+            detail: `Captured during workflow execution by ${entry.agent}.`, confidence: 0.9 + Math.random() * 0.1, tags: ["live", "workflow"]
+          }]);
+        }
+
         timelineIndexRef.current = idx + 1;
         const nextIdx = timelineIndexRef.current;
         const nextDelay = nextIdx < tl.length ? (tl[nextIdx].delay || 500) : 500;
@@ -2138,8 +2363,7 @@ export default function HarmonIQApp() {
         setAgentThoughts(prev => [...prev, { agent: "HarmonIQ", text: "✅ Workflow complete. All agents have finished processing. Output report ready for download.", color: "#2D1B69" }]);
       }
     };
-    // Kick off with the first entry's delay
-    runWorkflowRef.current = setTimeout(step, timeline[0]?.delay || 500);
+    runWorkflowRef.current = setTimeout(step, enrichedTimeline[0]?.delay || 500);
   }, [selectedWorkflowAgents, activeUseCaseId, workflowKnowledge, workflowTerminology, workflowSkills, companyKnowledge, terminologyDefs, coreSkills]);
 
   // HITL: Approve & Continue
@@ -2269,6 +2493,7 @@ export default function HarmonIQApp() {
     { id: "templates", label: "Templates", icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg> },
     { id: "triggers", label: "Triggers", icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> },
     { id: "relics", label: "Relics", icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg> },
+    { id: "memory", label: "Memory", icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/><path d="M8 12h8"/></svg> },
     { id: "canvas", label: "Canvas", icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg> },
     { id: "collaboration", label: "Collaboration", icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg> },
     { id: "docs", label: "Documentation", icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg> },
@@ -2610,6 +2835,7 @@ export default function HarmonIQApp() {
               constraintPaused={constraintPaused} constraintData={constraintData} constraintInput={constraintInput}
               onConstraintInputChange={setConstraintInput} onConstraintApply={handleConstraintApply} onConstraintSkip={handleConstraintSkip}
               workflowKnowledge={workflowKnowledge} workflowTerminology={workflowTerminology} workflowSkills={workflowSkills} companyKnowledge={companyKnowledge} terminologyDefs={terminologyDefs} coreSkills={coreSkills}
+              agentBrainTab={agentBrainTab} setAgentBrainTab={setAgentBrainTab} sessionMemories={sessionMemories} userMemories={userMemories} groupMemories={groupMemories} orgMemories={orgMemories}
             />
           </div>
         </div>
@@ -2622,6 +2848,7 @@ export default function HarmonIQApp() {
           constraintPaused={constraintPaused} constraintData={constraintData} constraintInput={constraintInput}
           onConstraintInputChange={setConstraintInput} onConstraintApply={handleConstraintApply} onConstraintSkip={handleConstraintSkip}
           workflowKnowledge={workflowKnowledge} workflowTerminology={workflowTerminology} workflowSkills={workflowSkills} companyKnowledge={companyKnowledge} terminologyDefs={terminologyDefs} coreSkills={coreSkills}
+          agentBrainTab={agentBrainTab} setAgentBrainTab={setAgentBrainTab} sessionMemories={sessionMemories} userMemories={userMemories} groupMemories={groupMemories} orgMemories={orgMemories}
         />
       )}
     </div>
@@ -2714,7 +2941,7 @@ export default function HarmonIQApp() {
           )}
         </div>
       </div>
-      {showAgentBrain && !isMobile && <AgentBrainPanel thoughts={agentThoughts} isRunning={isRunning} activeAgents={activeAgents} connectors={connectors} workflowKnowledge={workflowKnowledge} workflowTerminology={workflowTerminology} workflowSkills={workflowSkills} companyKnowledge={companyKnowledge} terminologyDefs={terminologyDefs} coreSkills={coreSkills} />}
+      {showAgentBrain && !isMobile && <AgentBrainPanel thoughts={agentThoughts} isRunning={isRunning} activeAgents={activeAgents} connectors={connectors} workflowKnowledge={workflowKnowledge} workflowTerminology={workflowTerminology} workflowSkills={workflowSkills} companyKnowledge={companyKnowledge} terminologyDefs={terminologyDefs} coreSkills={coreSkills} agentBrainTab={agentBrainTab} setAgentBrainTab={setAgentBrainTab} sessionMemories={sessionMemories} userMemories={userMemories} groupMemories={groupMemories} orgMemories={orgMemories} />}
     </div>
   );
 
@@ -3143,6 +3370,173 @@ export default function HarmonIQApp() {
   );
   };
 
+  const renderMemoryExplorer = () => {
+    const tabs = [
+      { id: "session", icon: "🔴", label: "Session", color: "#E74C3C", data: sessionMemories, count: sessionMemories.length },
+      { id: "user", icon: "👤", label: "User", color: "#3498DB", data: userMemories, count: userMemories.length },
+      { id: "group", icon: "👥", label: "Group", color: "#2ECC71", data: groupMemories, count: groupMemories.length },
+      { id: "org", icon: "🏢", label: "Organisation", color: "#F39C12", data: orgMemories, count: orgMemories.length },
+    ];
+    const activeTab = tabs.find(t => t.id === memoryExplorerTab) || tabs[0];
+    const filteredData = activeTab.data.filter(m => {
+      if (!memorySearchQuery.trim()) return true;
+      const q = memorySearchQuery.toLowerCase();
+      return (m.label || "").toLowerCase().includes(q) || (m.detail || "").toLowerCase().includes(q) || (m.tags || []).some(t => t.toLowerCase().includes(q));
+    });
+
+    const totalMemories = tabs.reduce((sum, t) => sum + t.count, 0);
+    const accessInfo = MEMORY_USER_ACCESS[memoryExplorerTab];
+
+    return (
+      <div style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden" }}>
+        <div style={{ padding: isMobile ? "14px 16px 10px" : "20px 28px 12px", borderBottom: "1px solid #E8E6F0" }}>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+            <div>
+              <div style={{ fontSize: isMobile ? 17 : 18, fontWeight: 700, color: "#1A1A2E" }}>💾 Memory Explorer</div>
+              <div style={{ fontSize: 13, color: "#888", marginTop: 2 }}>Multi-tenant, multi-level memory management — {totalMemories} total memories</div>
+            </div>
+            {accessInfo && (
+              <div style={{ display: "flex", alignItems: "center", gap: 6, padding: "6px 12px", background: accessInfo.color + "10", borderRadius: 8 }}>
+                <span style={{ fontSize: 14 }}>{accessInfo.icon}</span>
+                <div style={{ fontSize: 11, color: accessInfo.color, fontWeight: 600 }}>{accessInfo.label}</div>
+                <div style={{ display: "flex", gap: 3, marginLeft: 4 }}>
+                  <span style={{ fontSize: 9, padding: "2px 5px", borderRadius: 3, background: accessInfo.canRead ? "#00B89420" : "#E7405020", color: accessInfo.canRead ? "#00B894" : "#E74050", fontWeight: 700 }}>R</span>
+                  <span style={{ fontSize: 9, padding: "2px 5px", borderRadius: 3, background: accessInfo.canWrite ? "#00B89420" : "#E7405020", color: accessInfo.canWrite ? "#00B894" : "#E74050", fontWeight: 700 }}>W</span>
+                </div>
+              </div>
+            )}
+          </div>
+          {/* Tab bar */}
+          <div style={{ display: "flex", gap: 4, marginTop: 14 }}>
+            {tabs.map(tab => (
+              <div key={tab.id} onClick={() => { setMemoryExplorerTab(tab.id); setExpandedMemoryItem(null); }} style={{ display: "flex", alignItems: "center", gap: 6, padding: "8px 14px", borderRadius: 8, cursor: "pointer", background: memoryExplorerTab === tab.id ? tab.color + "15" : "transparent", border: memoryExplorerTab === tab.id ? `1px solid ${tab.color}40` : "1px solid transparent", transition: "all 0.2s" }}>
+                <span style={{ fontSize: 14 }}>{tab.icon}</span>
+                {!isMobile && <span style={{ fontSize: 12, fontWeight: memoryExplorerTab === tab.id ? 700 : 500, color: memoryExplorerTab === tab.id ? tab.color : "#777" }}>{tab.label}</span>}
+                <span style={{ fontSize: 10, padding: "1px 6px", borderRadius: 10, background: memoryExplorerTab === tab.id ? tab.color + "25" : "#E8E6F0", color: memoryExplorerTab === tab.id ? tab.color : "#888", fontWeight: 700 }}>{tab.count}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div style={{ flex: 1, overflowY: "auto", padding: isMobile ? "14px 14px" : "20px 28px" }}>
+          {/* Search bar */}
+          <div style={{ marginBottom: 16, position: "relative" }}>
+            <input value={memorySearchQuery} onChange={e => setMemorySearchQuery(e.target.value)} placeholder={`Search ${activeTab.label.toLowerCase()} memories...`} style={{ width: "100%", padding: "10px 14px 10px 36px", borderRadius: 10, border: "1px solid #E8E6F0", fontSize: 13, outline: "none", background: "#FAFAFE" }} />
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#999" strokeWidth="2" style={{ position: "absolute", left: 12, top: 12 }}><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          </div>
+
+          {/* Memory Stats Banner */}
+          <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr 1fr" : "repeat(4, 1fr)", gap: 10, marginBottom: 20 }}>
+            {memoryExplorerTab === "session" && [
+              { label: "Live Memories", value: sessionMemories.length, icon: "🔴", bg: "#E74C3C" },
+              { label: "Avg Confidence", value: sessionMemories.length > 0 ? Math.round(sessionMemories.reduce((s, m) => s + (m.confidence || 0), 0) / sessionMemories.length * 100) + "%" : "—", icon: "📊", bg: "#6C5CE7" },
+              { label: "Agents Contributing", value: [...new Set(sessionMemories.map(m => m.agent))].length, icon: "🤖", bg: "#00B894" },
+              { label: "Status", value: sessionMemories.length > 0 ? "Active" : "Empty", icon: "⚡", bg: "#FDCB6E" },
+            ].map((stat, i) => (
+              <div key={i} style={{ padding: "14px 16px", borderRadius: 12, background: stat.bg + "08", border: `1px solid ${stat.bg}20` }}>
+                <div style={{ fontSize: 11, color: "#888", marginBottom: 4 }}>{stat.icon} {stat.label}</div>
+                <div style={{ fontSize: 18, fontWeight: 700, color: "#1A1A2E" }}>{stat.value}</div>
+              </div>
+            ))}
+            {memoryExplorerTab === "user" && [
+              { label: "Total Memories", value: userMemories.length, icon: "👤", bg: "#3498DB" },
+              { label: "Preferences", value: userMemories.filter(m => m.scope === "preference").length, icon: "⚙️", bg: "#6C5CE7" },
+              { label: "Corrections", value: userMemories.filter(m => m.scope === "correction").length, icon: "✏️", bg: "#E17055" },
+              { label: "Behaviours", value: userMemories.filter(m => m.scope === "behaviour").length, icon: "📈", bg: "#00B894" },
+            ].map((stat, i) => (
+              <div key={i} style={{ padding: "14px 16px", borderRadius: 12, background: stat.bg + "08", border: `1px solid ${stat.bg}20` }}>
+                <div style={{ fontSize: 11, color: "#888", marginBottom: 4 }}>{stat.icon} {stat.label}</div>
+                <div style={{ fontSize: 18, fontWeight: 700, color: "#1A1A2E" }}>{stat.value}</div>
+              </div>
+            ))}
+            {memoryExplorerTab === "group" && [
+              { label: "Total Memories", value: groupMemories.length, icon: "👥", bg: "#2ECC71" },
+              { label: "Shared Rules", value: groupMemories.filter(m => m.scope === "shared_rule").length, icon: "📜", bg: "#6C5CE7" },
+              { label: "Insights", value: groupMemories.filter(m => m.scope === "shared_insight").length, icon: "💡", bg: "#FDCB6E" },
+              { label: "Groups", value: [...new Set(groupMemories.map(m => m.group))].length, icon: "🏷", bg: "#0984E3" },
+            ].map((stat, i) => (
+              <div key={i} style={{ padding: "14px 16px", borderRadius: 12, background: stat.bg + "08", border: `1px solid ${stat.bg}20` }}>
+                <div style={{ fontSize: 11, color: "#888", marginBottom: 4 }}>{stat.icon} {stat.label}</div>
+                <div style={{ fontSize: 18, fontWeight: 700, color: "#1A1A2E" }}>{stat.value}</div>
+              </div>
+            ))}
+            {memoryExplorerTab === "org" && [
+              { label: "Total Memories", value: orgMemories.length, icon: "🏢", bg: "#F39C12" },
+              { label: "Policies", value: orgMemories.filter(m => m.scope === "policy" || m.scope === "compliance" || m.scope === "data_governance").length, icon: "🛡", bg: "#E74C3C" },
+              { label: "Baselines", value: orgMemories.filter(m => m.scope === "baseline" || m.scope === "performance").length, icon: "📊", bg: "#6C5CE7" },
+              { label: "Departments", value: [...new Set(orgMemories.map(m => m.department))].length, icon: "🏷", bg: "#0984E3" },
+            ].map((stat, i) => (
+              <div key={i} style={{ padding: "14px 16px", borderRadius: 12, background: stat.bg + "08", border: `1px solid ${stat.bg}20` }}>
+                <div style={{ fontSize: 11, color: "#888", marginBottom: 4 }}>{stat.icon} {stat.label}</div>
+                <div style={{ fontSize: 18, fontWeight: 700, color: "#1A1A2E" }}>{stat.value}</div>
+              </div>
+            ))}
+          </div>
+
+          {/* Memory Items */}
+          {filteredData.length === 0 ? (
+            <div style={{ textAlign: "center", padding: 40, color: "#888" }}>
+              <div style={{ fontSize: 32, marginBottom: 8, opacity: 0.3 }}>💾</div>
+              <div style={{ fontSize: 14 }}>{memorySearchQuery ? "No memories match your search" : memoryExplorerTab === "session" ? "No session memories yet — run a workflow to see live memory" : "No memories in this tier"}</div>
+            </div>
+          ) : (
+            <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+              {filteredData.map(m => {
+                const isExpanded = expandedMemoryItem === m.id;
+                return (
+                  <div key={m.id} onClick={() => setExpandedMemoryItem(isExpanded ? null : m.id)} style={{ border: "1px solid #E8E6F0", borderRadius: 14, padding: "16px 20px", background: "#fff", cursor: "pointer", borderLeft: `4px solid ${activeTab.color}`, transition: "all 0.2s" }} onMouseEnter={e => e.currentTarget.style.borderColor = activeTab.color + "60"} onMouseLeave={e => e.currentTarget.style.borderColor = "#E8E6F0"}>
+                    <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between" }}>
+                      <div style={{ flex: 1 }}>
+                        <div style={{ fontSize: 14, fontWeight: 600, color: "#1A1A2E", lineHeight: 1.4, marginBottom: 4 }}>{m.label}</div>
+                        <div style={{ display: "flex", flexWrap: "wrap", gap: 4, marginBottom: 6 }}>
+                          {m.scope && <span style={{ fontSize: 10, padding: "2px 8px", borderRadius: 20, background: activeTab.color + "15", color: activeTab.color, fontWeight: 600 }}>{m.scope}</span>}
+                          {m.agent && <span style={{ fontSize: 10, padding: "2px 8px", borderRadius: 20, background: (m.agentColor || "#6C5CE7") + "15", color: m.agentColor || "#6C5CE7", fontWeight: 600 }}>{m.agent}</span>}
+                          {m.group && <span style={{ fontSize: 10, padding: "2px 8px", borderRadius: 20, background: "#2ECC7115", color: "#2ECC71", fontWeight: 600 }}>{m.group}</span>}
+                          {m.department && <span style={{ fontSize: 10, padding: "2px 8px", borderRadius: 20, background: "#F39C1215", color: "#F39C12", fontWeight: 600 }}>{m.department}</span>}
+                        </div>
+                        <div style={{ display: "flex", alignItems: "center", gap: 12, fontSize: 11, color: "#999" }}>
+                          {m.timestamp && <span>{m.timestamp}</span>}
+                          {m.lastUsed && <span>Last used: {m.lastUsed}</span>}
+                          {m.lastUpdated && <span>Updated: {m.lastUpdated}</span>}
+                          {m.usageCount && <span>Used {m.usageCount}x</span>}
+                          {m.version && <span>v{m.version}</span>}
+                        </div>
+                      </div>
+                      <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 6, flexShrink: 0, marginLeft: 12 }}>
+                        {m.confidence && (
+                          <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                            <div style={{ width: 50, height: 4, background: "#E8E6F0", borderRadius: 2, overflow: "hidden" }}>
+                              <div style={{ width: `${Math.round(m.confidence * 100)}%`, height: "100%", background: m.confidence > 0.9 ? "#00B894" : m.confidence > 0.7 ? "#FDCB6E" : "#E17055", borderRadius: 2 }} />
+                            </div>
+                            <span style={{ fontSize: 10, fontWeight: 700, color: m.confidence > 0.9 ? "#00B894" : m.confidence > 0.7 ? "#FDCB6E" : "#E17055" }}>{Math.round(m.confidence * 100)}%</span>
+                          </div>
+                        )}
+                        {m.accessLevel && <span style={{ fontSize: 9, padding: "2px 6px", borderRadius: 4, background: m.accessLevel === "admin_only" ? "#E7405015" : "#00B89415", color: m.accessLevel === "admin_only" ? "#E74050" : "#00B894", fontWeight: 600 }}>{m.accessLevel === "all_users" ? "🔓 All users" : m.accessLevel === "analytics_team" ? "🔒 Team only" : "🔐 Admin only"}</span>}
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#999" strokeWidth="2" style={{ transform: isExpanded ? "rotate(180deg)" : "none", transition: "transform 0.2s" }}><polyline points="6 9 12 15 18 9"/></svg>
+                      </div>
+                    </div>
+                    {isExpanded && (
+                      <div style={{ marginTop: 12, paddingTop: 12, borderTop: "1px solid #E8E6F0" }}>
+                        <div style={{ fontSize: 12.5, color: "#555", lineHeight: 1.7, marginBottom: 10 }}>{m.detail}</div>
+                        {m.learnedFrom && <div style={{ fontSize: 11, color: "#888", marginBottom: 4 }}>📚 Learned from: {m.learnedFrom}</div>}
+                        {m.author && <div style={{ fontSize: 11, color: "#888", marginBottom: 4 }}>✍️ Author: {m.author}</div>}
+                        {m.tags && m.tags.length > 0 && (
+                          <div style={{ display: "flex", flexWrap: "wrap", gap: 4, marginTop: 8 }}>
+                            {m.tags.map((tag, ti) => <span key={ti} style={{ fontSize: 10, padding: "2px 8px", borderRadius: 20, background: "#F0EDFF", color: "#6C5CE7", fontWeight: 500 }}>#{tag}</span>)}
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  };
+
   const renderCanvas = () => (
     <div style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden" }}>
       <div style={{ padding: isMobile ? "14px 16px 10px" : "20px 28px 12px", borderBottom: "1px solid #E8E6F0" }}>
@@ -3208,7 +3602,7 @@ export default function HarmonIQApp() {
     </div>
   );
 
-  const pageRenderer = { home: renderHome, templates: renderTemplates, triggers: renderTriggers, relics: renderRelics, knowledgemanage: renderKnowledgeManage, canvas: renderCanvas, collaboration: renderCollaboration, docs: renderDocs };
+  const pageRenderer = { home: renderHome, templates: renderTemplates, triggers: renderTriggers, relics: renderRelics, memory: renderMemoryExplorer, knowledgemanage: renderKnowledgeManage, canvas: renderCanvas, collaboration: renderCollaboration, docs: renderDocs };
 
   const handleLogin = () => {
     if (!loginEmail.trim()) { setLoginError("Please enter your email"); return; }
@@ -3453,6 +3847,23 @@ export default function HarmonIQApp() {
                     </div>
                   ))}
                 </div>
+                {/* Mobile Memory System */}
+                <div style={{ borderTop: "1px solid #2D1B69", marginTop: 8, paddingTop: 8 }}>
+                  <div onClick={() => setMemoryExpandedSection(!memoryExpandedSection)} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 14px", borderRadius: 10, cursor: "pointer", color: "#8888A8", fontSize: 14 }}>
+                    <span style={{ display: "flex", alignItems: "center", gap: 10 }}><span>{"\u{1F4BE}"}</span> Memory System</span>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ transform: memoryExpandedSection ? "rotate(180deg)" : "none" }}><polyline points="6 9 12 15 18 9"/></svg>
+                  </div>
+                  {memoryExpandedSection && [
+                    { id: "session", icon: "\u{1F534}", label: "Session", count: sessionMemories.length },
+                    { id: "user", icon: "\u{1F464}", label: "User", count: userMemories.length },
+                    { id: "group", icon: "\u{1F465}", label: "Group", count: groupMemories.length },
+                    { id: "org", icon: "\u{1F3E2}", label: "Organisation", count: orgMemories.length },
+                  ].map(sub => (
+                    <div key={sub.id} onClick={() => { setMemoryExplorerTab(sub.id); setPage("memory"); setMobileMenuOpen(false); }} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "10px 14px 10px 38px", cursor: "pointer", color: "#8888A8", fontSize: 13 }}>
+                      <span>{sub.icon} {sub.label}</span><span style={{ fontSize: 10, opacity: 0.7 }}>{sub.count}</span>
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
           </div>
@@ -3502,6 +3913,34 @@ export default function HarmonIQApp() {
               </div>
             )}
           </div>
+          {/* Memory System section */}
+          <div style={{ borderTop: "1px solid #2D1B69", padding: sidebarCollapsed ? "8px 6px" : "8px 10px" }}>
+            <div onClick={() => { if (sidebarCollapsed) { setSidebarCollapsed(false); setMemoryExpandedSection(true); } else setMemoryExpandedSection(!memoryExpandedSection); }} style={{ display: "flex", alignItems: "center", gap: 10, padding: sidebarCollapsed ? "10px 0" : "10px 12px", borderRadius: 10, cursor: "pointer", color: memoryExpandedSection ? "#A29BFE" : "#8888A8", justifyContent: sidebarCollapsed ? "center" : "space-between", transition: "all 0.2s" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                <span style={{ fontSize: 16, flexShrink: 0 }}>{"\u{1F4BE}"}</span>
+                {!sidebarCollapsed && <span style={{ fontSize: 13, fontWeight: 600 }}>Memory System</span>}
+              </div>
+              {!sidebarCollapsed && <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ transform: memoryExpandedSection ? "rotate(180deg)" : "none", transition: "transform 0.2s" }}><polyline points="6 9 12 15 18 9"/></svg>}
+            </div>
+            {memoryExpandedSection && !sidebarCollapsed && (
+              <div style={{ display: "flex", flexDirection: "column", gap: 1, paddingLeft: 8, marginTop: 2 }}>
+                {[
+                  { id: "session", icon: "\u{1F534}", label: "Session", color: "#E74C3C", count: sessionMemories.length },
+                  { id: "user", icon: "\u{1F464}", label: "User", color: "#3498DB", count: userMemories.length },
+                  { id: "group", icon: "\u{1F465}", label: "Group", color: "#2ECC71", count: groupMemories.length },
+                  { id: "org", icon: "\u{1F3E2}", label: "Organisation", color: "#F39C12", count: orgMemories.length },
+                ].map(sub => (
+                  <div key={sub.id} onClick={() => { setMemoryExplorerTab(sub.id); setPage("memory"); }} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "7px 12px", borderRadius: 8, cursor: "pointer", color: page === "memory" && memoryExplorerTab === sub.id ? "#A29BFE" : "#8888A8", background: page === "memory" && memoryExplorerTab === sub.id ? "#2D1B6940" : "transparent", fontSize: 12, transition: "all 0.15s" }}>
+                    <span style={{ display: "flex", alignItems: "center", gap: 6 }}><span style={{ fontSize: 11 }}>{sub.icon}</span> {sub.label}</span>
+                    <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
+                      <span style={{ fontSize: 10, opacity: 0.7 }}>{sub.count}</span>
+                      <span style={{ width: 5, height: 5, borderRadius: "50%", background: sub.color, opacity: 0.6 }} />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
           <div style={{ padding: "12px", borderTop: "1px solid #2D1B69", display: "flex", justifyContent: sidebarCollapsed ? "center" : "space-between", alignItems: "center" }}>
             <div onClick={() => setSidebarCollapsed(!sidebarCollapsed)} style={{ cursor: "pointer", color: "#8888A8", display: "flex", padding: 4 }}>
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -3528,7 +3967,7 @@ export default function HarmonIQApp() {
                 </div>
               )}
               <div style={{ fontSize: 13, color: "#888" }}>
-                {page === "home" ? "HarmonIQ / Home" : page === "templates" ? "HarmonIQ / Templates" : page === "triggers" ? "HarmonIQ / Triggers" : page === "relics" ? "HarmonIQ / Relics" : page === "knowledgemanage" ? "HarmonIQ / Knowledge Config" : page === "canvas" ? "HarmonIQ / Canvas" : page === "docs" ? "HarmonIQ / Documentation" : "HarmonIQ / Collaboration"}
+                {page === "home" ? "HarmonIQ / Home" : page === "templates" ? "HarmonIQ / Templates" : page === "triggers" ? "HarmonIQ / Triggers" : page === "relics" ? "HarmonIQ / Relics" : page === "memory" ? "HarmonIQ / Memory Explorer" : page === "knowledgemanage" ? "HarmonIQ / Knowledge Config" : page === "canvas" ? "HarmonIQ / Canvas" : page === "docs" ? "HarmonIQ / Documentation" : "HarmonIQ / Collaboration"}
               </div>
             </div>
             <div style={{ display: "flex", alignItems: "center", gap: 12, position: "relative" }}>
