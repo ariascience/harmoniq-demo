@@ -36,6 +36,7 @@ const SAMPLE_TEMPLATES = [
   { id: "t4", name: "Demand Forecast Weekly Digest", desc: "Fits ensemble models (ARIMA + Prophet + XGBoost) on 52-week rolling history at SKU level, generates 13-week forward projections with P10/P50/P90 intervals, and flags SKUs with >15% forecast error.", lastRun: "6 hours ago", author: "Debonil Chowdhury", shared: true, status: "active", agents: ["ingestiq", "demandiq", "visioniq"] },
   { id: "t5", name: "Shelf Image Compliance Audit", desc: "Processes store shelf photographs via vision transformers, maps detected facings to the authorised planogram, computes share-of-shelf and compliance scores, and generates a visual exception report.", lastRun: "5 days ago", author: "Neha Kapoor", shared: true, status: "active", agents: ["ingestiq", "visioniq_plus", "marketiq"] },
   { id: "t6", name: "Promotional ROI Analyzer", desc: "Evaluates completed promotional campaigns by isolating incremental lift from baseline demand, calculates ROI per £ of trade spend, and recommends optimisation levers for the next promotional window.", lastRun: "2 days ago", author: "Keith Taylor", shared: false, status: "active", agents: ["ingestiq", "marketiq", "demandiq", "optimaiq", "visioniq"] },
+  { id: "t7", name: "Pharma Content Compliance Audit", desc: "Ingests pharmaceutical content assets (SmPCs, marketing materials, clinical data, adverse event reports) from the content repository, cross-validates claims against regulatory standards, detects off-label language, and generates a comprehensive compliance audit report with risk scores.", lastRun: "1 day ago", author: "Dr. Priya Sharma", shared: true, status: "active", agents: ["ingestiq", "visioniq_plus", "visioniq", "marketiq", "optimaiq"] },
 ];
 
 const SAMPLE_TRIGGERS = [
@@ -46,6 +47,8 @@ const SAMPLE_TRIGGERS = [
   { id: "tr5", template: "Out-of-Stock Impact Trends Report", triggerType: "event", eventSource: "Data Event", eventDetail: "New file uploaded to Local File Upload", status: "active", lastStatus: "success" },
   { id: "tr6", template: "Sales Gap Optimization", triggerType: "event", eventSource: "Workflow Event", eventDetail: "Demand Forecast Weekly Digest completed successfully", status: "active", lastStatus: "success" },
   { id: "tr7", template: "Competitor Price Monitor", triggerType: "event", eventSource: "Threshold Event", eventDetail: "Price Index > 110 for any mainstream SKU", status: "paused", lastStatus: "warning" },
+  { id: "tr8", template: "Pharma Content Compliance Audit", triggerType: "time-recurring", schedule: "Every Monday 7:00 AM", nextRun: "Mon, Feb 16 07:00", status: "active", lastStatus: "success" },
+  { id: "tr9", template: "Pharma Content Compliance Audit", triggerType: "event", eventSource: "Data Event", eventDetail: "New document uploaded to Pharma Content Repository", status: "active", lastStatus: "success" },
 ];
 
 const SAMPLE_RELICS = [
@@ -57,6 +60,7 @@ const SAMPLE_RELICS = [
   { id: "r6", name: "Competitor Price Tracker — Spirits Category", date: "Feb 9, 2026 22:05 PM", size: "0.9 MB", type: "pdf", status: "ready", shared: true, sharedBy: "Neha Kapoor" },
   { id: "r7", name: "Shelf Compliance Audit — Tesco Metro", date: "Feb 8, 2026 11:40 AM", size: "5.7 MB", type: "pdf", status: "ready", shared: false, sharedBy: null },
   { id: "r8", name: "Promo ROI Analysis — Q4 Campaign", date: "Feb 6, 2026 09:15 AM", size: "1.4 MB", type: "csv", status: "ready", shared: true, sharedBy: "Keith Taylor" },
+  { id: "r9", name: "NeuroCalm 50mg Content Compliance Audit", date: "Feb 14, 2026 07:15 AM", size: "3.8 MB", type: "pdf", status: "ready", shared: true, sharedBy: "Dr. Priya Sharma" },
 ];
 
 const SAMPLE_NOTIFICATIONS = [
@@ -880,6 +884,128 @@ const USE_CASE_DATA = {
           { text: "Revised pull-forward for Smirnoff: 21% (down from 28%). Net incremental maintained.", delay: 2200 },
           { text: "Portfolio pull-forward: 16% (down from 18%). All within 25% threshold.", delay: 1800 },
           { text: "✅ Revised incremental analysis complete. All campaigns within pull-forward constraint.", delay: 600 },
+        ],
+      },
+    ],
+  },
+  t7: {
+    inputFiles: [
+      { name: "NeuroCalm_SmPC_v3.2.pdf", size: "4.8 MB", rows: "186 pages", uploaded: "6 hours ago" },
+      { name: "NC50_Marketing_Brochure_FINAL.pdf", size: "12.4 MB", rows: "24 pages", uploaded: "1 day ago" },
+      { name: "NC50_Phase3_ClinicalTrial_Results.xlsx", size: "8.6 MB", rows: "12,480", uploaded: "2 days ago" },
+      { name: "adverse_event_reports_NC50_2024.csv", size: "2.1 MB", rows: "3,842", uploaded: "3 days ago" },
+      { name: "NC50_PatientInfo_Leaflet_EN.docx", size: "1.2 MB", rows: "8 pages", uploaded: "4 days ago" },
+    ],
+    inputPreview: {
+      headers: ["Document_ID", "Content_Type", "Title", "Version", "Status", "Regulatory_Body", "Last_Review"],
+      rows: [
+        ["DOC-4201", "SmPC", "NeuroCalm 50mg SmPC", "v3.2", "Under Review", "EMA/MHRA", "2026-01-28"],
+        ["DOC-4202", "Marketing", "NeuroCalm Launch Brochure", "FINAL", "Pending Approval", "Internal MLR", "2026-02-01"],
+        ["DOC-4203", "Clinical Data", "Phase III Trial — NCT-2024-0847", "Final", "Approved", "EMA", "2026-01-15"],
+        ["DOC-4204", "Safety Data", "Adverse Event Reports (2024)", "—", "Active Monitoring", "MHRA PV", "2026-02-10"],
+        ["DOC-4205", "Patient Info", "PIL — English", "v2.1", "Under Review", "EMA", "2026-01-20"],
+        ["DOC-4206", "Visual Asset", "Mechanism of Action Diagram", "v1.0", "Draft", "Internal MLR", "2026-02-05"],
+        ["DOC-4207", "Email", "HCP Communication Template", "v1.2", "Pending Approval", "ABPI Code", "2026-02-08"],
+      ],
+    },
+    agentThoughts: {
+      ingestiq: [
+        { text: "Scanning pharmaceutical content repository: 5 assets detected — SmPC (PDF, 186pp), Marketing Brochure (PDF, 24pp), Clinical Trial Data (XLSX, 12,480 rows), Adverse Event Reports (CSV, 3,842 rows), Patient Info Leaflet (DOCX, 8pp)", delay: 500 },
+        { text: "Detecting document types: 2× PDF, 1× XLSX, 1× CSV, 1× DOCX. Initializing multi-format extraction pipeline...", delay: 900 },
+        { text: "Extracting SmPC text via OCR + NLP — 186 pages across 12 regulatory sections (4.1 Indications through 5.3 Preclinical safety)...", delay: 2200 },
+        { text: "Parsing Phase III clinical trial structured data: 12,480 patient records × 24 endpoints. Primary endpoint: HAM-A reduction at Week 8.", delay: 1800 },
+        { text: "Cross-referencing document version control — SmPC v3.2 (Jan 28), PIL v2.1 (Jan 20), Brochure FINAL (Feb 1). Version consistency: confirmed.", delay: 1200 },
+        { text: "✅ Content pipeline complete. Quality score: 97.8%. 186 PDF pages extracted, 12,480 clinical rows staged, 3,842 AE records loaded.", delay: 500 },
+      ],
+      visioniq_plus: [
+        { text: "Loading medical document understanding model — BioMedViT-Large (2.4 GB, fine-tuned on EMA/FDA regulatory corpus)...", delay: 3200 },
+        { text: "Processing SmPC (186 pages): extracting structured sections — §4.1 Therapeutic indications, §4.2 Posology, §4.3 Contraindications, §4.4 Special warnings, §4.8 Undesirable effects...", delay: 3800 },
+        { text: "Scanning marketing brochure for efficacy claims — NLP claim extraction pipeline active...", delay: 2400 },
+        { text: "14 efficacy claims identified in marketing brochure. Cross-validating against SmPC Section 5.1 (Clinical efficacy)...", delay: 2800 },
+        { text: "⚠️ 2 claims flagged as UNSUPPORTED: (1) 'Reduces anxiety-related insomnia by 40%' — insomnia NOT in §4.1 approved indications; (2) 'Superior efficacy vs. SSRIs' — no head-to-head trial data in §5.1.", delay: 1800 },
+        { text: "Off-label language scan: 1 instance detected on page 8 — 'anxiety-related insomnia' is outside approved indication scope (GAD only).", delay: 1400 },
+        { text: "Analyzing Mechanism of Action diagram for scientific accuracy... GABA-A receptor binding pathway confirmed against §5.1 pharmacodynamic data.", delay: 2200 },
+        { text: "✅ Document understanding complete. 14 claims extracted, 2 unsupported, 1 off-label instance. Adverse event frequency tables parsed from §4.8.", delay: 500 },
+      ],
+      visioniq: [
+        { text: "Receiving compliance analysis outputs from VisionIQ+...", delay: 350 },
+        { text: "Generating compliance score dashboard — 6 documents scored on 0-100 scale with color-coded risk bands...", delay: 2200 },
+        { text: "Creating adverse event frequency waterfall chart — 18 AE categories from Phase III data, sorted by incidence rate...", delay: 2800 },
+        { text: "Producing claim-to-evidence traceability matrix — 14 claims × 4 evidence columns (SmPC ref, trial data, p-value, status)...", delay: 2400 },
+        { text: "✅ 4 compliance visualizations generated and embedded in audit report.", delay: 400 },
+      ],
+      marketiq: [
+        { text: "Benchmarking NeuroCalm 50mg against 4 competitor anxiolytics in the GAD market...", delay: 1200 },
+        { text: "Competitor landscape: Serenazen (BrandX, 3 indications), CalmPro (BrandY, 2 indications), AnxiRelief (BrandZ, 2 indications), TranquiLex (BrandW, 4 indications).", delay: 2400 },
+        { text: "Indication breadth comparison: NeuroCalm has 1 approved indication (GAD) vs. competitor average of 2.75. Narrowest in class.", delay: 1800 },
+        { text: "Regulatory risk scan: 0 EMA warning letters for NeuroCalm drug class in past 24 months. Competitor BrandZ received 1 warning for off-label promotion.", delay: 2200 },
+        { text: "ABPI Code of Practice audit on HCP communication template — 2 minor gaps identified: missing prescribing information link, incomplete adverse event summary.", delay: 1600 },
+        { text: "✅ Competitive and regulatory intelligence compiled. Label extension opportunity identified for 'GAD with sleep disturbance'.", delay: 500 },
+      ],
+      optimaiq: [
+        { text: "Ingesting compliance scores, claim validation results, and competitive intelligence...", delay: 500 },
+        { text: "Scoring documents on 0-100 compliance scale: SmPC 94/100, Marketing Brochure 71/100, Clinical Data 96/100, AE Reports 88/100, PIL 84/100, Visual Assets 78/100.", delay: 1800 },
+        { text: "Prioritizing 6 remediation actions by risk × impact matrix...", delay: 1400 },
+        { text: "Action 1 (Critical): Remove off-label insomnia claim from marketing brochure — risk score 9.2/10, est. 2 days.", delay: 1200 },
+        { text: "Action 2 (Critical): Add missing superiority disclaimer for SSRI comparison claim — risk score 8.8/10, est. 1 day.", delay: 1000 },
+        { text: "Estimating fastest path to compliance: sequential remediation = 22 business days; parallel optimized = 12 business days. Launch window preserved.", delay: 2200 },
+        { text: "✅ Remediation plan complete. 6 actions, 12-day optimized timeline. Average compliance projected to rise from 82/100 to 95/100 post-remediation.", delay: 500 },
+      ],
+    },
+    motherHandoffs: {
+      ingestiq: { text: "🧠 HarmonIQ routing task to IngestIQ — parsing pharmaceutical content repository (SmPC, marketing materials, clinical data, AE reports)...", delay: 700 },
+      visioniq_plus: { text: "🧠 HarmonIQ engaging VisionIQ+ — deep document understanding: extracting claims, validating against clinical evidence, detecting off-label language...", delay: 600 },
+      visioniq: { text: "🧠 HarmonIQ handing off to VisionIQ — generating compliance dashboards and risk visualizations...", delay: 500 },
+      marketiq: { text: "🧠 HarmonIQ delegating to MarketIQ — benchmarking against competitor regulatory profiles and ABPI compliance...", delay: 600 },
+      optimaiq: { text: "🧠 HarmonIQ invoking OptimaIQ — generating risk-scored remediation plan and launch readiness assessment...", delay: 700 },
+    },
+    output: {
+      summary: "Comprehensive compliance audit of 5 NeuroCalm 50mg content assets identified 2 unsupported efficacy claims in the marketing brochure, 1 off-label language instance ('anxiety-related insomnia' not in approved indications), and 3 adverse event reporting gaps. SmPC scores 94/100 compliance; marketing brochure scores 71/100 (requires remediation before launch). Competitive benchmarking shows NeuroCalm's indication profile is narrower than 2 of 4 competitors — potential for label extension. Estimated 12 business days to full compliance with prioritized remediation plan.",
+      metrics: [
+        { label: "Content Assets Audited", value: "5", delta: "186 pages + 16K data rows" },
+        { label: "Compliance Score (Avg)", value: "82/100", delta: "SmPC 94, Brochure 71" },
+        { label: "Flagged Issues", value: "6", delta: "2 critical, 3 major, 1 minor" },
+        { label: "Days to Compliance", value: "12", delta: "Optimized from 22 days" },
+      ],
+      files: ["NC50_Compliance_Audit_Report.pdf", "Claim_Evidence_Traceability.xlsx", "Remediation_Plan_Prioritized.pdf", "Regulatory_Risk_Dashboard.html"],
+    },
+    hitlCheckpoints: {
+      ingestiq: { title: "IngestIQ Complete", summary: "5 content assets parsed. Quality score: 97.8%. 186 PDF pages extracted, 12,480 clinical data rows staged, 3,842 adverse event records loaded.", recommendation: null },
+      visioniq_plus: { title: "VisionIQ+ Complete", summary: "14 efficacy claims extracted from marketing brochure. 2 claims lack supporting evidence in SmPC Section 5.1. 1 off-label language instance detected.", recommendation: "Critical: 'NeuroCalm reduces anxiety-related insomnia by 40%' — insomnia is NOT in approved indications (Section 4.1). Recommend immediate removal before MLR review." },
+      visioniq: { title: "VisionIQ Complete", summary: "4 compliance visualizations generated: score dashboard, AE frequency chart, claim traceability matrix, risk heatmap.", recommendation: null },
+      marketiq: { title: "MarketIQ Complete", summary: "Benchmarked against 4 competitor anxiolytics. NeuroCalm indication profile narrower than Serenazen and CalmPro. No EMA warning letters in class.", recommendation: "Consider label extension filing for 'generalised anxiety with sleep disturbance' to match competitor indication breadth." },
+      optimaiq: { title: "OptimaIQ Complete", summary: "Remediation plan: 6 actions prioritized by risk × impact. Fastest path to compliance: 12 business days (down from 22). Launch window preserved.", recommendation: null },
+    },
+    constraintAlerts: [
+      {
+        triggeredBy: "visioniq_plus",
+        afterThought: 4,
+        severity: "critical",
+        title: "Off-Label Claim Detected in Marketing Material",
+        message: "Marketing brochure page 8 contains the claim 'NeuroCalm effectively manages anxiety-related insomnia' — insomnia is NOT listed in approved therapeutic indications (SmPC Section 4.1). This constitutes potential off-label promotion under ABPI Code Section 3.2.",
+        constraint: "All marketing claims must map to approved indications",
+        suggestion: "Remove the insomnia claim entirely, or replace with approved language: 'NeuroCalm is indicated for the treatment of generalised anxiety disorder (GAD) in adults.' File a separate label extension application if insomnia indication is desired.",
+        revisedThoughts: [
+          { text: "🔄 Re-running VisionIQ+ claim validation with off-label filter applied...", delay: 1200 },
+          { text: "Flagging insomnia claim for immediate removal from marketing brochure page 8...", delay: 2200 },
+          { text: "Generating compliant replacement language: 'NeuroCalm is indicated for the treatment of GAD in adults' per SmPC §4.1.", delay: 2000 },
+          { text: "Revised marketing brochure compliance score: 79/100 (up from 71/100 after claim removal).", delay: 1800 },
+          { text: "✅ Off-label claim flagged for MLR removal. Revised claim language generated.", delay: 600 },
+        ],
+      },
+      {
+        triggeredBy: "optimaiq",
+        afterThought: 3,
+        severity: "warning",
+        title: "Adverse Event Reporting Gap Detected",
+        message: "3 serious adverse events (SAEs) from Q4 2024 have not been included in the Patient Information Leaflet (Section 4 — Possible Side Effects). MHRA PV regulations require all SAEs with incidence >0.1% to be listed.",
+        constraint: "All SAEs with incidence >0.1% must appear in PIL",
+        suggestion: "Add the 3 missing SAEs to PIL Section 4 with appropriate frequency categorization (Uncommon: \u22651/1,000 to <1/100). Estimated 2 additional days for PIL revision.",
+        revisedThoughts: [
+          { text: "🔄 Re-running OptimaIQ remediation timeline with PIL update factored in...", delay: 1200 },
+          { text: "Adding 3 SAEs to PIL Section 4: dizziness (0.8%), elevated liver enzymes (0.3%), QT prolongation (0.12%).", delay: 2800 },
+          { text: "Revised compliance timeline: PIL update adds 2 days. Total optimized path: 14 business days (from 12).", delay: 2200 },
+          { text: "✅ PIL revision incorporated. All SAEs >0.1% now captured. Compliance path updated.", delay: 600 },
         ],
       },
     ],
@@ -2182,6 +2308,7 @@ export default function HarmonIQApp() {
     else if (prompt.includes("forecast") || prompt.includes("demand") || prompt.includes("digest")) matchedId = "t4";
     else if (prompt.includes("shelf") || prompt.includes("compliance") || prompt.includes("planogram") || prompt.includes("image")) matchedId = "t5";
     else if (prompt.includes("promo") || prompt.includes("roi") || prompt.includes("campaign") || prompt.includes("trade spend")) matchedId = "t6";
+    else if (prompt.includes("pharma") || prompt.includes("compliance") || prompt.includes("clinical") || prompt.includes("adverse") || prompt.includes("smpc") || prompt.includes("neurocalm") || prompt.includes("drug") || prompt.includes("medicine") || prompt.includes("pharmaceutical") || prompt.includes("content audit") || prompt.includes("regulatory") || prompt.includes("off-label") || prompt.includes("marketing material")) matchedId = "t7";
     const template = SAMPLE_TEMPLATES.find(t => t.id === matchedId);
     const agents = template ? template.agents : ["ingestiq", "demandiq", "marketiq", "optimaiq", "visioniq"];
     const instructionMap = {

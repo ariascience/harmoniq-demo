@@ -831,6 +831,159 @@ t6: `<!DOCTYPE html><html><head><style>${SHARED_CSS}</style></head><body>
 </div>
 </body></html>`,
 
+// ══════════════════════════════════════════════════════════════════════
+// t7 — Pharma Content Compliance Audit
+// ══════════════════════════════════════════════════════════════════════
+t7: `<!DOCTYPE html><html><head><style>${SHARED_CSS}
+.compliance-bar{height:22px;border-radius:6px;position:relative;overflow:hidden;background:#EDEBF5;}
+.compliance-fill{height:100%;border-radius:6px;transition:width 0.5s;}
+.compliance-label{position:absolute;right:8px;top:2px;font-size:11px;font-weight:700;color:#fff;}
+.severity-badge{display:inline-block;padding:3px 10px;border-radius:6px;font-size:11px;font-weight:700;}
+.sev-critical{background:#FFEAEA;color:#E74C3C;}
+.sev-major{background:#FFF4E0;color:#E17055;}
+.sev-minor{background:#E8FFF0;color:#00B894;}
+.status-supported{background:#E8FFF0;color:#00B894;padding:2px 8px;border-radius:6px;font-size:11px;font-weight:600;}
+.status-unsupported{background:#FFEAEA;color:#E74C3C;padding:2px 8px;border-radius:6px;font-size:11px;font-weight:600;}
+.status-partial{background:#FFF4E0;color:#E17055;padding:2px 8px;border-radius:6px;font-size:11px;font-weight:600;}
+.pharma-header{background:linear-gradient(135deg,#1A1A2E 0%,#0D4F4F 60%,#134E5E 100%);}
+</style></head><body>
+<div class="report-container">
+
+<div class="header pharma-header">
+  <div class="header-logo">
+    <svg viewBox="0 0 28 28" fill="none"><circle cx="14" cy="14" r="13" stroke="#00B894" stroke-width="2"/><path d="M9 14h10M14 9v10" stroke="#00B894" stroke-width="2.5" stroke-linecap="round"/></svg>
+    <span style="font-size:13px;font-weight:700;color:#00B894;">NovaCure Pharmaceuticals</span>
+  </div>
+  <h1>Pharmaceutical Content Compliance Audit</h1>
+  <div class="subtitle">NeuroCalm 50mg &mdash; Pre-Launch Content Review &amp; Regulatory Risk Assessment</div>
+  <div class="date-badge">Generated: Feb 14, 2026 07:15 AM &nbsp;&bull;&nbsp; Workflow: Pharma Content Compliance Audit &nbsp;&bull;&nbsp; Auditor: HarmonIQ Mother Agent</div>
+</div>
+
+<div class="exec-summary">
+  <h2>Executive Summary</h2>
+  <p>Comprehensive compliance audit of <strong>5 NeuroCalm 50mg content assets</strong> (186 PDF pages, 12,480 clinical data rows, 3,842 adverse event records) identified <strong>6 regulatory issues</strong>: 2 critical (unsupported efficacy claims &amp; off-label language), 3 major (adverse event reporting gaps &amp; ABPI code deviations), and 1 minor (version formatting). The marketing brochure scores <strong>71/100</strong> and requires remediation before launch. SmPC scores a strong <strong>94/100</strong>. Competitive benchmarking reveals NeuroCalm&rsquo;s single-indication profile (GAD only) is the narrowest in class, presenting a label extension opportunity. An optimized <strong>12-business-day remediation plan</strong> preserves the Q2 launch window.</p>
+</div>
+
+<div class="kpi-row">
+  <div class="kpi-card"><div class="kpi-label">Content Assets Audited</div><div class="kpi-value">5</div><div class="kpi-delta positive">186 pages + 16K rows</div></div>
+  <div class="kpi-card"><div class="kpi-label">Avg Compliance Score</div><div class="kpi-value">82/100</div><div class="kpi-delta negative">Brochure 71 drags avg</div></div>
+  <div class="kpi-card"><div class="kpi-label">Flagged Issues</div><div class="kpi-value">6</div><div class="kpi-delta negative">2 critical, 3 major, 1 minor</div></div>
+  <div class="kpi-card"><div class="kpi-label">Days to Compliance</div><div class="kpi-value">12</div><div class="kpi-delta positive">Optimized from 22 days</div></div>
+</div>
+
+<div class="chart-section">
+  <h3>Compliance Score by Document</h3>
+  <svg viewBox="0 0 700 220" style="width:100%;max-width:700px;">
+    <text x="0" y="22" font-size="12" fill="#555" font-weight="600">SmPC v3.2</text>
+    <rect x="160" y="8" width="480" height="20" rx="4" fill="#EDEBF5"/><rect x="160" y="8" width="451" height="20" rx="4" fill="#00B894"/><text x="620" y="23" font-size="11" fill="#fff" font-weight="700">94</text>
+
+    <text x="0" y="56" font-size="12" fill="#555" font-weight="600">Clinical Trial Data</text>
+    <rect x="160" y="42" width="480" height="20" rx="4" fill="#EDEBF5"/><rect x="160" y="42" width="461" height="20" rx="4" fill="#00B894"/><text x="630" y="57" font-size="11" fill="#fff" font-weight="700">96</text>
+
+    <text x="0" y="90" font-size="12" fill="#555" font-weight="600">AE Reports</text>
+    <rect x="160" y="76" width="480" height="20" rx="4" fill="#EDEBF5"/><rect x="160" y="76" width="422" height="20" rx="4" fill="#FDCB6E"/><text x="590" y="91" font-size="11" fill="#333" font-weight="700">88</text>
+
+    <text x="0" y="124" font-size="12" fill="#555" font-weight="600">Patient Info Leaflet</text>
+    <rect x="160" y="110" width="480" height="20" rx="4" fill="#EDEBF5"/><rect x="160" y="110" width="403" height="20" rx="4" fill="#FDCB6E"/><text x="571" y="125" font-size="11" fill="#333" font-weight="700">84</text>
+
+    <text x="0" y="158" font-size="12" fill="#555" font-weight="600">Visual Assets</text>
+    <rect x="160" y="144" width="480" height="20" rx="4" fill="#EDEBF5"/><rect x="160" y="144" width="374" height="20" rx="4" fill="#E17055"/><text x="542" y="159" font-size="11" fill="#fff" font-weight="700">78</text>
+
+    <text x="0" y="192" font-size="12" fill="#555" font-weight="600">Marketing Brochure</text>
+    <rect x="160" y="178" width="480" height="20" rx="4" fill="#EDEBF5"/><rect x="160" y="178" width="341" height="20" rx="4" fill="#E74C3C"/><text x="509" y="193" font-size="11" fill="#fff" font-weight="700">71</text>
+  </svg>
+</div>
+
+<div class="table-section">
+  <h3>Flagged Issues Detail</h3>
+  <div style="overflow-x:auto;">
+  <table class="data-table">
+    <thead><tr><th>Issue ID</th><th>Document</th><th>Severity</th><th>Description</th><th>Regulatory Ref</th><th>Remediation</th></tr></thead>
+    <tbody>
+      <tr><td>ISS-001</td><td>Marketing Brochure</td><td><span class="severity-badge sev-critical">Critical</span></td><td>Off-label claim: &ldquo;manages anxiety-related insomnia&rdquo; &mdash; insomnia not in approved indications</td><td>ABPI Code &sect;3.2</td><td>Remove claim; replace with approved GAD language</td></tr>
+      <tr><td>ISS-002</td><td>Marketing Brochure</td><td><span class="severity-badge sev-critical">Critical</span></td><td>Unsupported superiority claim: &ldquo;superior efficacy vs SSRIs&rdquo; with no head-to-head trial data</td><td>EMA Art. 87(3)</td><td>Remove or add disclaimer: &ldquo;not directly compared in clinical trials&rdquo;</td></tr>
+      <tr><td>ISS-003</td><td>Patient Info Leaflet</td><td><span class="severity-badge sev-major">Major</span></td><td>3 SAEs with incidence &gt;0.1% missing from PIL Section 4 (dizziness, elevated liver enzymes, QT prolongation)</td><td>MHRA PV Reg &sect;12</td><td>Add SAEs with frequency categorization (Uncommon)</td></tr>
+      <tr><td>ISS-004</td><td>HCP Communication</td><td><span class="severity-badge sev-major">Major</span></td><td>Missing mandatory prescribing information link in HCP email template</td><td>ABPI Code &sect;4.1</td><td>Add SmPC hyperlink to email footer</td></tr>
+      <tr><td>ISS-005</td><td>HCP Communication</td><td><span class="severity-badge sev-major">Major</span></td><td>Adverse event summary incomplete &mdash; only lists top 5 of 18 AEs reported in Phase III</td><td>ABPI Code &sect;4.2</td><td>Expand AE summary to include all AEs with &gt;1% incidence</td></tr>
+      <tr><td>ISS-006</td><td>Visual Assets</td><td><span class="severity-badge sev-minor">Minor</span></td><td>MoA diagram version tag (v1.0) does not follow NovaCure document versioning standard (NC-VIS-YYYY-NNN)</td><td>Internal SOP-DM-04</td><td>Update version tag to NC-VIS-2026-001</td></tr>
+    </tbody>
+  </table>
+  </div>
+</div>
+
+<div class="table-section">
+  <h3>Claim-to-Evidence Traceability Matrix</h3>
+  <div style="overflow-x:auto;">
+  <table class="data-table">
+    <thead><tr><th>#</th><th>Marketing Claim</th><th>SmPC Reference</th><th>Clinical Evidence</th><th>Status</th></tr></thead>
+    <tbody>
+      <tr><td>1</td><td>Reduces HAM-A scores by 52% at Week 8</td><td>&sect;5.1 Primary endpoint</td><td>p&lt;0.001 vs placebo (n=1,240)</td><td><span class="status-supported">Supported</span></td></tr>
+      <tr><td>2</td><td>Rapid onset of action within 2 weeks</td><td>&sect;5.1 Secondary endpoint</td><td>Significant at Week 2 (p=0.003)</td><td><span class="status-supported">Supported</span></td></tr>
+      <tr><td>3</td><td>Well-tolerated safety profile</td><td>&sect;4.8 Undesirable effects</td><td>Discontinuation 4.2% vs 3.8% placebo</td><td><span class="status-supported">Supported</span></td></tr>
+      <tr><td>4</td><td>Once-daily convenient dosing</td><td>&sect;4.2 Posology</td><td>50mg QD, no titration required</td><td><span class="status-supported">Supported</span></td></tr>
+      <tr><td>5</td><td>Reduces anxiety-related insomnia by 40%</td><td><em>NOT IN &sect;4.1</em></td><td>Post-hoc analysis only (not pre-specified)</td><td><span class="status-unsupported">Unsupported</span></td></tr>
+      <tr><td>6</td><td>Superior efficacy vs. SSRIs</td><td><em>No head-to-head data</em></td><td>Indirect comparison only (network meta-analysis)</td><td><span class="status-unsupported">Unsupported</span></td></tr>
+      <tr><td>7</td><td>Sustained remission at 6 months</td><td>&sect;5.1 Long-term extension</td><td>68% remission rate at 24 weeks</td><td><span class="status-supported">Supported</span></td></tr>
+      <tr><td>8</td><td>No significant weight gain</td><td>&sect;4.8 Metabolic effects</td><td>Mean +0.3 kg vs +0.2 kg placebo</td><td><span class="status-supported">Supported</span></td></tr>
+      <tr><td>9</td><td>Minimal drug-drug interactions</td><td>&sect;4.5 Interactions</td><td>Weak CYP3A4 substrate</td><td><span class="status-supported">Supported</span></td></tr>
+      <tr><td>10</td><td>Improved patient quality of life (Q-LES-Q)</td><td>&sect;5.1 QoL endpoint</td><td>p=0.008 vs placebo</td><td><span class="status-supported">Supported</span></td></tr>
+      <tr><td>11</td><td>Low potential for dependence</td><td>&sect;4.4 Special warnings</td><td>No evidence of rebound anxiety in 8-week taper</td><td><span class="status-partial">Partial</span></td></tr>
+      <tr><td>12</td><td>Suitable for elderly patients</td><td>&sect;4.2 Special populations</td><td>Dose adjustment not required &ge;65 years</td><td><span class="status-supported">Supported</span></td></tr>
+      <tr><td>13</td><td>Novel GABA-A modulator mechanism</td><td>&sect;5.1 Pharmacodynamics</td><td>Selective positive allosteric modulator</td><td><span class="status-supported">Supported</span></td></tr>
+      <tr><td>14</td><td>Clinically meaningful response from Week 1</td><td>&sect;5.1 Early response</td><td>CGI-I improvement at Day 7 (p=0.04)</td><td><span class="status-partial">Partial</span></td></tr>
+    </tbody>
+  </table>
+  </div>
+</div>
+
+<div class="table-section">
+  <h3>Remediation Priority Plan</h3>
+  <div style="overflow-x:auto;">
+  <table class="data-table">
+    <thead><tr><th>Priority</th><th>Action</th><th>Risk Score</th><th>Owner</th><th>Deadline</th><th>Status</th></tr></thead>
+    <tbody>
+      <tr><td><span class="tag tag-high">P1</span></td><td>Remove off-label insomnia claim from marketing brochure (pg 8)</td><td>9.2 / 10</td><td>Medical Affairs</td><td>Feb 17</td><td><span class="tag tag-high">Open</span></td></tr>
+      <tr><td><span class="tag tag-high">P2</span></td><td>Add superiority disclaimer or remove SSRI comparison claim</td><td>8.8 / 10</td><td>Medical Affairs</td><td>Feb 18</td><td><span class="tag tag-high">Open</span></td></tr>
+      <tr><td><span class="tag tag-medium">P3</span></td><td>Add 3 missing SAEs to Patient Information Leaflet Section 4</td><td>7.4 / 10</td><td>Pharmacovigilance</td><td>Feb 21</td><td><span class="tag tag-medium">Open</span></td></tr>
+      <tr><td><span class="tag tag-medium">P4</span></td><td>Add prescribing information link to HCP email template</td><td>6.8 / 10</td><td>Regulatory Affairs</td><td>Feb 19</td><td><span class="tag tag-medium">Open</span></td></tr>
+      <tr><td><span class="tag tag-medium">P5</span></td><td>Expand AE summary in HCP communication to include all AEs &gt;1%</td><td>6.2 / 10</td><td>Medical Writing</td><td>Feb 20</td><td><span class="tag tag-medium">Open</span></td></tr>
+      <tr><td><span class="tag tag-low">P6</span></td><td>Update MoA diagram version tag to NovaCure standard</td><td>2.1 / 10</td><td>Document Control</td><td>Feb 24</td><td><span class="tag tag-low">Open</span></td></tr>
+    </tbody>
+  </table>
+  </div>
+</div>
+
+<div class="table-section">
+  <h3>Competitive Regulatory Landscape</h3>
+  <div style="overflow-x:auto;">
+  <table class="data-table">
+    <thead><tr><th>Product</th><th>Company</th><th>Approved Indications</th><th>GAD Market Share</th><th>EMA Warning Letters (24mo)</th><th>Compliance Rating</th></tr></thead>
+    <tbody>
+      <tr><td><strong>NeuroCalm 50mg</strong></td><td>NovaCure</td><td>1 (GAD)</td><td>New entrant</td><td>0</td><td><span class="tag tag-low">82/100</span></td></tr>
+      <tr><td>Serenazen 25mg</td><td>BrandX Pharma</td><td>3 (GAD, SAD, PD)</td><td>28.4%</td><td>0</td><td><span class="tag tag-low">91/100</span></td></tr>
+      <tr><td>CalmPro 100mg</td><td>BrandY Labs</td><td>2 (GAD, MDD-adj)</td><td>22.1%</td><td>0</td><td><span class="tag tag-low">88/100</span></td></tr>
+      <tr><td>AnxiRelief 75mg</td><td>BrandZ Bio</td><td>2 (GAD, Insomnia)</td><td>18.7%</td><td>1</td><td><span class="tag tag-medium">76/100</span></td></tr>
+      <tr><td>TranquiLex 50mg</td><td>BrandW Corp</td><td>4 (GAD, SAD, PD, OCD)</td><td>31.2%</td><td>0</td><td><span class="tag tag-low">93/100</span></td></tr>
+    </tbody>
+  </table>
+  </div>
+</div>
+
+<div class="recommendations">
+  <h3>Recommendations</h3>
+  <ul>
+    <li><strong>Immediate (P1-P2):</strong> Remove the off-label insomnia claim and unsupported SSRI superiority statement from the marketing brochure before MLR review. Medical Affairs to provide compliant replacement language within 3 business days.</li>
+    <li><strong>Short-term (P3-P5):</strong> Update the Patient Information Leaflet with 3 missing SAEs (dizziness 0.8%, elevated liver enzymes 0.3%, QT prolongation 0.12%) and expand the HCP communication AE summary. Pharmacovigilance to lead, target 7 business days.</li>
+    <li><strong>Strategic:</strong> File a label extension application for &ldquo;generalised anxiety disorder with sleep disturbance&rdquo; to match competitor indication breadth. AnxiRelief (BrandZ) already holds insomnia indication &mdash; clinical evidence from NeuroCalm post-hoc analysis could support a Phase IIIb study.</li>
+    <li><strong>Process Improvement:</strong> Establish automated claim-to-SmPC traceability checks in the content management system. This audit identified 2 claims that passed 3 rounds of manual MLR review &mdash; automated cross-validation would have flagged them at draft stage, saving an estimated 15 business days per launch cycle.</li>
+  </ul>
+</div>
+
+<div class="footer">HarmonIQ &mdash; Intelligent Analytics Platform &nbsp;&bull;&nbsp; NovaCure Pharmaceuticals &mdash; Confidential &nbsp;&bull;&nbsp; &copy; 2026 Aria Intelligence Systems</div>
+
+</div>
+</body></html>`,
+
 };
 
 export default CANVAS_REPORTS;
