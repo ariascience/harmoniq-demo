@@ -3291,13 +3291,197 @@ export default function HarmonIQApp() {
       },
     ];
 
+    const ArchDiagramPanel = () => {
+      const [hoveredLayer, setHoveredLayer] = useState(null);
+      const layers = [
+        { id: "client", label: "Client Layer", y: 0, color: "#0984E3", items: ["React SPA", "SSE Stream", "WebSocket"], desc: "Single-page application served via CloudFront CDN. Real-time agent thought streaming via Server-Sent Events. Progressive web app with offline capability." },
+        { id: "edge", label: "Edge & CDN", y: 68, color: "#00B894", items: ["CloudFront", "WAF", "Route 53"], desc: "AWS CloudFront distributes static assets globally. WAF protects against OWASP Top 10. Route 53 for DNS with health-check failover." },
+        { id: "api", label: "API Gateway", y: 136, color: "#6C5CE7", items: ["API Gateway", "Lambda Auth", "Rate Limiting"], desc: "AWS API Gateway with JWT/OAuth2 authentication via Lambda Authorizer. Per-tenant rate limiting. Request validation and transformation." },
+        { id: "orchestration", label: "Mother Agent Orchestration", y: 204, color: "#7C3AED", items: ["ECS Fargate", "CrewAI Flow", "Step Functions"], desc: "HarmonIQ Mother Agent runs on ECS Fargate (serverless containers). CrewAI Flow manages stateful multi-agent execution. Step Functions for long-running workflow orchestration with HITL pause/resume." },
+        { id: "agents", label: "Super Agent Compute", y: 280, color: "#E17055", items: ["IngestIQ", "VisionIQ / IQ+", "MarketIQ", "DemandIQ", "OptimaIQ"], desc: "Each Super Agent runs as an isolated ECS Task with dedicated compute allocation. GPU-backed instances for VisionIQ+ (vision transformers). Auto-scaling based on queue depth." },
+        { id: "ai", label: "AI / ML Services", y: 356, color: "#FDCB6E", items: ["Bedrock (Claude)", "SageMaker", "Textract / Rekognition"], desc: "Claude via Amazon Bedrock for reasoning and planning. SageMaker for custom ensemble models (ARIMA/Prophet/XGBoost). Textract for OCR, Rekognition for shelf image analysis." },
+        { id: "memory", label: "Memory Management", y: 432, color: "#9B59B6", items: ["ElastiCache (Session)", "DynamoDB (User/Group)", "Neptune (Org Graph)"], desc: "4-tier memory architecture: Redis ElastiCache for ephemeral session memory (<5ms reads). DynamoDB for persistent user preferences and group knowledge. Neptune graph DB for organisational knowledge graph with entity relationships." },
+        { id: "data", label: "Data & Storage", y: 508, color: "#2ECC71", items: ["S3 (Documents)", "RDS PostgreSQL", "OpenSearch"], desc: "S3 for document storage (SmPCs, PDFs, images) with versioning and lifecycle policies. RDS PostgreSQL for structured data (clinical trials, AE reports). OpenSearch for full-text search across all content assets." },
+        { id: "security", label: "Security & Compliance", y: 584, color: "#E74C3C", items: ["KMS Encryption", "IAM / Cognito", "CloudTrail Audit"], desc: "AWS KMS for encryption at rest and in transit. Cognito for multi-tenant auth with RBAC. CloudTrail for full audit trail — every agent decision, HITL override, and data access is logged for regulatory compliance (GxP, HIPAA)." },
+        { id: "observability", label: "Observability", y: 652, color: "#F39C12", items: ["CloudWatch", "X-Ray Tracing", "Grafana Dashboards"], desc: "CloudWatch for metrics and alarms. X-Ray for distributed tracing across agent chains. Grafana dashboards for real-time workflow monitoring, SLA tracking, and cost attribution per tenant." },
+      ];
+
+      return (
+        <div style={{ width: isMobile ? "100%" : 420, minWidth: isMobile ? undefined : 380, borderLeft: isMobile ? "none" : "1px solid #E8E6F0", background: "#FAFAFF", display: "flex", flexDirection: "column", overflow: "hidden" }}>
+          <div style={{ padding: "16px 20px 12px", borderBottom: "1px solid #E8E6F0", background: "#fff" }}>
+            <div style={{ fontSize: 14, fontWeight: 700, color: "#1A1A2E", display: "flex", alignItems: "center", gap: 6 }}>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#7C3AED" strokeWidth="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+              Architecture Blueprint
+            </div>
+            <div style={{ fontSize: 11, color: "#888", marginTop: 2 }}>End-to-end AWS infrastructure — click any layer to explore</div>
+          </div>
+          <div style={{ flex: 1, overflowY: "auto", padding: "16px" }}>
+            {/* Architecture Diagram */}
+            <div style={{ position: "relative", minHeight: 740 }}>
+              {/* Vertical backbone line */}
+              <div style={{ position: "absolute", left: 20, top: 24, bottom: 40, width: 2, background: "linear-gradient(to bottom, #0984E3, #00B894, #6C5CE7, #7C3AED, #E17055, #FDCB6E, #9B59B6, #2ECC71, #E74C3C, #F39C12)", borderRadius: 2 }} />
+
+              {layers.map((layer, idx) => {
+                const isHovered = hoveredLayer === layer.id;
+                return (
+                  <div key={layer.id} onMouseEnter={() => setHoveredLayer(layer.id)} onMouseLeave={() => setHoveredLayer(null)}
+                    style={{ position: "relative", marginBottom: 4, paddingLeft: 44, cursor: "pointer", transition: "all 0.2s" }}>
+                    {/* Node dot */}
+                    <div style={{ position: "absolute", left: 13, top: 14, width: 16, height: 16, borderRadius: "50%", background: isHovered ? layer.color : "#fff", border: `3px solid ${layer.color}`, transition: "all 0.2s", zIndex: 2, boxShadow: isHovered ? `0 0 12px ${layer.color}60` : "none" }} />
+
+                    {/* Layer card */}
+                    <div style={{ background: isHovered ? "#fff" : "#FAFAFF", border: `1px solid ${isHovered ? layer.color + "60" : "#E8E6F0"}`, borderRadius: 10, padding: "10px 14px", transition: "all 0.2s", boxShadow: isHovered ? `0 4px 16px ${layer.color}15` : "none" }}>
+                      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 6 }}>
+                        <div style={{ fontSize: 12, fontWeight: 700, color: layer.color }}>{layer.label}</div>
+                        <div style={{ fontSize: 9, fontWeight: 600, color: "#BBB", background: "#F0F0F5", padding: "1px 6px", borderRadius: 4 }}>L{idx + 1}</div>
+                      </div>
+                      <div style={{ display: "flex", flexWrap: "wrap", gap: 4, marginBottom: isHovered ? 8 : 0 }}>
+                        {layer.items.map((item, i) => (
+                          <span key={i} style={{ fontSize: 10, padding: "2px 8px", borderRadius: 6, background: layer.color + "12", color: layer.color, fontWeight: 600, whiteSpace: "nowrap" }}>{item}</span>
+                        ))}
+                      </div>
+                      {isHovered && (
+                        <div style={{ fontSize: 11, color: "#555", lineHeight: 1.6, borderTop: `1px solid ${layer.color}20`, paddingTop: 8, marginTop: 2 }}>
+                          {layer.desc}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Data Flow Arrows Legend */}
+            <div style={{ marginTop: 16, padding: "14px 16px", background: "#fff", borderRadius: 12, border: "1px solid #E8E6F0" }}>
+              <div style={{ fontSize: 12, fontWeight: 700, color: "#1A1A2E", marginBottom: 10 }}>Data Flow Patterns</div>
+              {[
+                { label: "User Request", flow: "Client → API GW → Mother Agent", color: "#0984E3" },
+                { label: "Agent Dispatch", flow: "Mother Agent → Super Agent → AI/ML", color: "#7C3AED" },
+                { label: "Memory I/O", flow: "Agent ↔ ElastiCache / DynamoDB / Neptune", color: "#9B59B6" },
+                { label: "SSE Streaming", flow: "Agent Thoughts → API GW → Client (real-time)", color: "#00B894" },
+                { label: "HITL Pause/Resume", flow: "Step Functions ⏸ → User Approval → Resume", color: "#E17055" },
+                { label: "Document Ingestion", flow: "S3 Upload → IngestIQ → OpenSearch Index", color: "#2ECC71" },
+              ].map((f, i) => (
+                <div key={i} style={{ display: "flex", alignItems: "flex-start", gap: 8, marginBottom: 8 }}>
+                  <div style={{ width: 8, height: 8, borderRadius: "50%", background: f.color, flexShrink: 0, marginTop: 4 }} />
+                  <div>
+                    <div style={{ fontSize: 11, fontWeight: 600, color: "#1A1A2E" }}>{f.label}</div>
+                    <div style={{ fontSize: 10, color: "#888", fontFamily: "'JetBrains Mono', monospace" }}>{f.flow}</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Memory Architecture Detail */}
+            <div style={{ marginTop: 12, padding: "14px 16px", background: "#fff", borderRadius: 12, border: "1px solid #E8E6F0" }}>
+              <div style={{ fontSize: 12, fontWeight: 700, color: "#9B59B6", marginBottom: 10, display: "flex", alignItems: "center", gap: 6 }}>
+                <span style={{ fontSize: 14 }}>💾</span> Memory Architecture
+              </div>
+              {[
+                { tier: "Session", store: "Redis ElastiCache", ttl: "Workflow duration", latency: "<5ms", color: "#E74C3C", desc: "Ephemeral working memory for each agent run. Stores intermediate results, agent outputs, and context between steps. Evicted on workflow completion." },
+                { tier: "User", store: "DynamoDB", ttl: "Persistent", latency: "<10ms", color: "#3498DB", desc: "Learned preferences (granularity, forecast horizon, severity overrides), corrections (baseline adjustments), and UI settings. Encrypted per-user with KMS." },
+                { tier: "Group", store: "DynamoDB + DAX", ttl: "Persistent", latency: "<8ms", color: "#2ECC71", desc: "Shared team knowledge: conventions, playbooks, insights. DAX accelerator for hot reads. RBAC controls which groups can read/write." },
+                { tier: "Organisation", store: "Neptune Graph DB", ttl: "Versioned", latency: "<15ms", color: "#F39C12", desc: "Company-wide knowledge graph: entity relationships, policies, baselines, governance rules. Versioned with full audit trail. Read-only for most users." },
+              ].map((m, i) => (
+                <div key={i} style={{ marginBottom: 10, padding: "10px 12px", borderRadius: 8, background: m.color + "08", border: `1px solid ${m.color}20` }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 4 }}>
+                    <span style={{ fontSize: 11, fontWeight: 700, color: m.color }}>{m.tier} Memory</span>
+                    <span style={{ fontSize: 9, color: "#888", fontFamily: "monospace" }}>{m.latency} · {m.ttl}</span>
+                  </div>
+                  <div style={{ fontSize: 10, fontWeight: 600, color: "#555", marginBottom: 3 }}>{m.store}</div>
+                  <div style={{ fontSize: 10, color: "#777", lineHeight: 1.5 }}>{m.desc}</div>
+                </div>
+              ))}
+              <div style={{ fontSize: 10, color: "#888", lineHeight: 1.6, marginTop: 6, padding: "8px 10px", background: "#F9F8FE", borderRadius: 6 }}>
+                <strong>Memory Lifecycle:</strong> Session memories are created during workflow execution. At workflow end, the Mother Agent promotes significant findings to User/Group/Org tiers based on relevance and confidence scoring. Org memory requires admin approval for writes.
+              </div>
+            </div>
+
+            {/* Agent Orchestration Detail */}
+            <div style={{ marginTop: 12, padding: "14px 16px", background: "#fff", borderRadius: 12, border: "1px solid #E8E6F0" }}>
+              <div style={{ fontSize: 12, fontWeight: 700, color: "#7C3AED", marginBottom: 10, display: "flex", alignItems: "center", gap: 6 }}>
+                <span style={{ fontSize: 14 }}>🧠</span> Agent Orchestration Engine
+              </div>
+              <div style={{ fontSize: 10, color: "#555", lineHeight: 1.6, marginBottom: 10 }}>
+                The Mother Agent uses a <strong>Plan → Execute → Evaluate → Replan</strong> loop powered by CrewAI Flows on ECS Fargate.
+              </div>
+              {[
+                { phase: "1. Plan", agent: "PlannerCrew", desc: "Decomposes user goal into ordered execution steps. Selects agents based on capabilities. Sets dependencies and HITL flags.", color: "#0984E3" },
+                { phase: "2. Execute", agent: "ExecutorCrew", desc: "Dispatches each step to the appropriate Super Agent. Streams thoughts via SSE. Injects knowledge context from all 3 tiers.", color: "#00B894" },
+                { phase: "3. Evaluate", agent: "EvaluatorCrew", desc: "Validates output against guardrails (Pydantic schemas), business constraints, and LLM quality scoring. Triggers constraint alerts if violations detected.", color: "#E17055" },
+                { phase: "4. Replan", agent: "ReplannerCrew", desc: "On failure or constraint violation: adapts the plan (retry, substitute agent, add prerequisite steps, skip). Max 3 replans per workflow.", color: "#9B59B6" },
+              ].map((p, i) => (
+                <div key={i} style={{ display: "flex", gap: 10, marginBottom: 8, alignItems: "flex-start" }}>
+                  <div style={{ width: 6, height: 6, borderRadius: "50%", background: p.color, flexShrink: 0, marginTop: 5 }} />
+                  <div>
+                    <div style={{ fontSize: 11, fontWeight: 700, color: p.color }}>{p.phase} <span style={{ fontWeight: 500, color: "#999", fontSize: 10 }}>({p.agent})</span></div>
+                    <div style={{ fontSize: 10, color: "#666", lineHeight: 1.5 }}>{p.desc}</div>
+                  </div>
+                </div>
+              ))}
+              <div style={{ marginTop: 8, padding: "8px 10px", background: "#F0EDFF", borderRadius: 6, fontSize: 10, color: "#6C5CE7", lineHeight: 1.5 }}>
+                <strong>HITL Integration:</strong> At any evaluation checkpoint, the flow can pause via AWS Step Functions wait state. The user approves/rejects via API Gateway → Lambda → Step Functions SendTaskSuccess. Flow resumes with user feedback injected into context.
+              </div>
+            </div>
+
+            {/* Security & Compliance */}
+            <div style={{ marginTop: 12, padding: "14px 16px", background: "#fff", borderRadius: 12, border: "1px solid #E8E6F0" }}>
+              <div style={{ fontSize: 12, fontWeight: 700, color: "#E74C3C", marginBottom: 10, display: "flex", alignItems: "center", gap: 6 }}>
+                <span style={{ fontSize: 14 }}>🔒</span> Security & Compliance
+              </div>
+              {[
+                { label: "Multi-Tenant Isolation", detail: "Per-tenant VPC, dedicated DynamoDB tables, KMS keys, and IAM roles. No cross-tenant data leakage." },
+                { label: "Encryption", detail: "AES-256 at rest (S3, RDS, DynamoDB). TLS 1.3 in transit. KMS-managed keys with automatic rotation." },
+                { label: "Audit Trail", detail: "CloudTrail logs every API call. Agent decisions, HITL overrides, and memory writes are immutably logged for GxP/HIPAA compliance." },
+                { label: "RBAC", detail: "Cognito User Pools with custom claims. 4 roles: Viewer, Editor, Manager, Admin. Granular per-resource permissions." },
+                { label: "Pharma Compliance", detail: "21 CFR Part 11 electronic signatures for HITL approvals. Validated audit trail for regulatory submissions. Document versioning with tamper-proof checksums." },
+              ].map((s, i) => (
+                <div key={i} style={{ display: "flex", gap: 8, marginBottom: 6, alignItems: "flex-start" }}>
+                  <div style={{ fontSize: 10, color: "#E74C3C", fontWeight: 700, flexShrink: 0, marginTop: 1 }}>●</div>
+                  <div>
+                    <span style={{ fontSize: 10, fontWeight: 700, color: "#1A1A2E" }}>{s.label}: </span>
+                    <span style={{ fontSize: 10, color: "#666" }}>{s.detail}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Cost & Performance */}
+            <div style={{ marginTop: 12, marginBottom: 20, padding: "14px 16px", background: "#fff", borderRadius: 12, border: "1px solid #E8E6F0" }}>
+              <div style={{ fontSize: 12, fontWeight: 700, color: "#2ECC71", marginBottom: 10, display: "flex", alignItems: "center", gap: 6 }}>
+                <span style={{ fontSize: 14 }}>⚡</span> Performance & Scale
+              </div>
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
+                {[
+                  { metric: "Avg Latency", value: "1.2s", sub: "API → First thought" },
+                  { metric: "Throughput", value: "500 req/s", sub: "Per tenant" },
+                  { metric: "Availability", value: "99.95%", sub: "Multi-AZ" },
+                  { metric: "Cold Start", value: "<3s", sub: "Fargate tasks" },
+                  { metric: "Max Workflow", value: "24h", sub: "Step Functions" },
+                  { metric: "Memory Read", value: "<5ms", sub: "ElastiCache P99" },
+                ].map((m, i) => (
+                  <div key={i} style={{ padding: "8px 10px", borderRadius: 6, background: "#F0FFF4", border: "1px solid #C6F6D520", textAlign: "center" }}>
+                    <div style={{ fontSize: 16, fontWeight: 800, color: "#1A1A2E" }}>{m.value}</div>
+                    <div style={{ fontSize: 10, fontWeight: 600, color: "#2ECC71" }}>{m.metric}</div>
+                    <div style={{ fontSize: 9, color: "#999" }}>{m.sub}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+    };
+
     return (
-      <div style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden" }}>
+      <div style={{ flex: 1, display: "flex", overflow: "hidden" }}>
+        {/* Left: Documentation Content */}
+        <div style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden", minWidth: 0 }}>
         <div style={{ padding: isMobile ? "14px 16px 10px" : "20px 28px 12px", borderBottom: "1px solid #E8E6F0" }}>
           <div style={{ fontSize: isMobile ? 17 : 18, fontWeight: 700, color: "#1A1A2E" }}>📖 Documentation</div>
           <div style={{ fontSize: 13, color: "#888", marginTop: 2 }}>Learn about HarmonIQ, its architecture, and each Super Agent</div>
         </div>
-        <div style={{ flex: 1, overflowY: "auto", padding: isMobile ? "14px 14px" : "28px 32px", maxWidth: 860 }}>
+        <div style={{ flex: 1, overflowY: "auto", padding: isMobile ? "14px 14px" : "28px 32px" }}>
 
           {/* Hero */}
           <div style={{ background: "linear-gradient(135deg, #1A1A2E 0%, #2D1554 100%)", borderRadius: 18, padding: isMobile ? "24px 20px" : "36px 40px", marginBottom: 36 }}>
@@ -3418,6 +3602,9 @@ export default function HarmonIQApp() {
             <div style={{ fontSize: 11, color: "#BBB", marginTop: 4 }}>© 2026 Aria Intelligent Solutions. All rights reserved.</div>
           </div>
         </div>
+        </div>
+        {/* Right: Architecture Diagram Panel */}
+        {!isMobile && <ArchDiagramPanel />}
       </div>
     );
   };
