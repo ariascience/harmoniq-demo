@@ -3293,46 +3293,43 @@ export default function HarmonIQApp() {
 
     const ArchDiagramPanel = () => {
       const [hoveredNode, setHoveredNode] = useState(null);
-      // SVG architecture diagram — full AWS graph
-      const W = 520, H = 2600;
-      const box = (x, y, w, h, label, sub, color, id, icon) => {
+      // SVG architecture diagram — full AWS graph (wide layout)
+      const W = 740, H = 2600;
+      const box = (x, y, w, h, label, sub, color, id) => {
         const hov = hoveredNode === id;
         return (
           <g key={id} onMouseEnter={() => setHoveredNode(id)} onMouseLeave={() => setHoveredNode(null)} style={{ cursor: "pointer" }}>
-            <rect x={x} y={y} width={w} height={h} rx={8} fill={hov ? color + "18" : "#fff"} stroke={hov ? color : "#D0CDE0"} strokeWidth={hov ? 2 : 1} style={{ transition: "all 0.2s", filter: hov ? `drop-shadow(0 4px 12px ${color}30)` : "none" }} />
-            <text x={x + w / 2} y={y + (icon ? 22 : (sub ? h / 2 - 5 : h / 2 + 1))} textAnchor="middle" fontSize="10" fontWeight="700" fill={color} fontFamily="'DM Sans',sans-serif">{icon || ""} {label}</text>
-            {sub && <text x={x + w / 2} y={y + (icon ? 36 : h / 2 + 9)} textAnchor="middle" fontSize="8" fill="#888" fontFamily="'DM Sans',sans-serif">{sub}</text>}
+            <rect x={x} y={y} width={w} height={h} rx={8} fill={hov ? color + "18" : "#fff"} stroke={hov ? color : "#D0CDE0"} strokeWidth={hov ? 2.5 : 1.2} style={{ transition: "all 0.2s", filter: hov ? `drop-shadow(0 4px 14px ${color}35)` : "none" }} />
+            <text x={x + w / 2} y={y + (sub ? h / 2 - 5 : h / 2 + 2)} textAnchor="middle" fontSize="11" fontWeight="700" fill={color} fontFamily="'DM Sans',sans-serif">{label}</text>
+            {sub && <text x={x + w / 2} y={y + h / 2 + 10} textAnchor="middle" fontSize="9" fill="#888" fontFamily="'DM Sans',sans-serif">{sub}</text>}
           </g>
         );
       };
       const arrow = (x1, y1, x2, y2, color = "#B0ADC0", dashed = false) => (
         <line key={`a${x1}${y1}${x2}${y2}`} x1={x1} y1={y1} x2={x2} y2={y2} stroke={color} strokeWidth={1.5} strokeDasharray={dashed ? "4,3" : "none"} markerEnd="url(#arrowhead)" />
       );
-      const arrowC = (x1, y1, cx, cy, x2, y2, color = "#B0ADC0") => (
-        <path key={`c${x1}${y1}${x2}${y2}`} d={`M${x1},${y1} Q${cx},${cy} ${x2},${y2}`} stroke={color} strokeWidth={1.5} fill="none" markerEnd="url(#arrowhead)" />
-      );
       const zone = (x, y, w, h, label, color, bg) => (
         <g key={`z${label}`}>
-          <rect x={x} y={y} width={w} height={h} rx={12} fill={bg || color + "06"} stroke={color} strokeWidth={1.5} strokeDasharray="6,4" />
-          <rect x={x + 10} y={y - 9} width={label.length * 6.5 + 16} height={18} rx={4} fill={color} />
-          <text x={x + 18} y={y + 4} fontSize="9" fontWeight="700" fill="#fff" fontFamily="'DM Sans',sans-serif">{label}</text>
+          <rect x={x} y={y} width={w} height={h} rx={14} fill={bg || color + "06"} stroke={color} strokeWidth={1.5} strokeDasharray="6,4" />
+          <rect x={x + 12} y={y - 10} width={label.length * 7 + 20} height={20} rx={5} fill={color} />
+          <text x={x + 22} y={y + 4} fontSize="10" fontWeight="700" fill="#fff" fontFamily="'DM Sans',sans-serif">{label}</text>
         </g>
       );
       const note = (x, y, text, color = "#888") => (
-        <text key={`n${x}${y}`} x={x} y={y} fontSize="7.5" fill={color} fontFamily="'DM Sans',sans-serif" fontStyle="italic">{text}</text>
+        <text key={`n${x}${y}`} x={x} y={y} fontSize="8.5" fill={color} fontFamily="'DM Sans',sans-serif" fontStyle="italic">{text}</text>
       );
 
       return (
-        <div style={{ width: isMobile ? "100%" : 560, minWidth: isMobile ? undefined : 520, borderLeft: isMobile ? "none" : "1px solid #E8E6F0", background: "#FAFAFF", display: "flex", flexDirection: "column", overflow: "hidden" }}>
+        <div style={{ flex: "1 1 0", minWidth: 0, borderLeft: "1px solid #E8E6F0", background: "#FAFAFF", display: "flex", flexDirection: "column", overflow: "hidden" }}>
           <div style={{ padding: "16px 20px 12px", borderBottom: "1px solid #E8E6F0", background: "#fff" }}>
-            <div style={{ fontSize: 14, fontWeight: 700, color: "#1A1A2E", display: "flex", alignItems: "center", gap: 6 }}>
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#7C3AED" strokeWidth="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+            <div style={{ fontSize: 15, fontWeight: 700, color: "#1A1A2E", display: "flex", alignItems: "center", gap: 8 }}>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#7C3AED" strokeWidth="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
               System Architecture — AWS
             </div>
-            <div style={{ fontSize: 11, color: "#888", marginTop: 2 }}>End-to-end cloud infrastructure with data flows — hover nodes for details</div>
+            <div style={{ fontSize: 11, color: "#888", marginTop: 3 }}>End-to-end cloud infrastructure with data flows — hover any node for details</div>
           </div>
-          <div style={{ flex: 1, overflowY: "auto", overflowX: "auto", padding: "12px" }}>
-            <svg viewBox={`0 0 ${W} ${H}`} width="100%" style={{ minWidth: 480 }}>
+          <div style={{ flex: 1, overflowY: "auto", overflowX: "hidden", padding: "16px" }}>
+            <svg viewBox={`0 0 ${W} ${H}`} width="100%" style={{ display: "block" }}>
               <defs>
                 <marker id="arrowhead" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#B0ADC0" /></marker>
                 <marker id="arrowPurple" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#7C3AED" /></marker>
@@ -3341,255 +3338,254 @@ export default function HarmonIQApp() {
                 <marker id="arrowOrange" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#E17055" /></marker>
                 <linearGradient id="bgGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#FAFAFF"/><stop offset="100%" stopColor="#F5F4FA"/></linearGradient>
               </defs>
-              <rect width={W} height={H} fill="url(#bgGrad)" rx={12} />
+              <rect width={W} height={H} fill="url(#bgGrad)" rx={14} />
 
               {/* ═══ TITLE ═══ */}
-              <text x={W / 2} y={28} textAnchor="middle" fontSize="14" fontWeight="800" fill="#1A1A2E" fontFamily="'DM Sans',sans-serif">HarmonIQ — Production Architecture on AWS</text>
-              <text x={W / 2} y={44} textAnchor="middle" fontSize="9" fill="#888" fontFamily="'DM Sans',sans-serif">Multi-tenant, secure, auto-scaling agentic AI platform</text>
+              <text x={W / 2} y={30} textAnchor="middle" fontSize="16" fontWeight="800" fill="#1A1A2E" fontFamily="'DM Sans',sans-serif">HarmonIQ — Production Architecture on AWS</text>
+              <text x={W / 2} y={48} textAnchor="middle" fontSize="10" fill="#888" fontFamily="'DM Sans',sans-serif">Multi-tenant, secure, auto-scaling agentic AI platform</text>
 
               {/* ═══ SECTION 1: CLIENT TIER ═══ */}
-              {zone(15, 60, W - 30, 90, "CLIENT TIER", "#0984E3")}
-              {box(35, 78, 100, 50, "React SPA", "Vite + DM Sans", "#0984E3", "react")}
-              {box(155, 78, 100, 50, "SSE Client", "EventSource API", "#0984E3", "sse")}
-              {box(275, 78, 100, 50, "Auth UI", "Cognito Hosted UI", "#0984E3", "authui")}
-              {box(395, 78, 90, 50, "PWA Shell", "Offline cache", "#0984E3", "pwa")}
+              {zone(20, 65, W - 40, 95, "CLIENT TIER", "#0984E3")}
+              {box(40, 84, 140, 55, "React SPA", "Vite + DM Sans", "#0984E3", "react")}
+              {box(210, 84, 140, 55, "SSE Client", "EventSource API", "#0984E3", "sse")}
+              {box(380, 84, 140, 55, "Auth UI", "Cognito Hosted UI", "#0984E3", "authui")}
+              {box(550, 84, 130, 55, "PWA Shell", "Offline cache", "#0984E3", "pwa")}
 
               {/* ═══ ARROWS: Client → Edge ═══ */}
-              {arrow(85, 128, 85, 172)}
-              {arrow(205, 128, 205, 172)}
-              {arrow(325, 128, 325, 172)}
-              {note(92, 155, "HTTPS / TLS 1.3")}
+              {arrow(110, 139, 110, 185)}
+              {arrow(280, 139, 280, 185)}
+              {arrow(450, 139, 450, 185)}
+              {note(120, 168, "HTTPS / TLS 1.3")}
 
               {/* ═══ SECTION 2: EDGE & SECURITY ═══ */}
-              {zone(15, 170, W - 30, 100, "EDGE & SECURITY — AWS", "#00B894")}
-              {box(35, 192, 110, 55, "CloudFront", "CDN — 400+ PoPs", "#00B894", "cf")}
-              {box(165, 192, 100, 55, "AWS WAF", "OWASP Top 10", "#00B894", "waf")}
-              {box(285, 192, 100, 55, "Route 53", "DNS + Health Check", "#00B894", "r53")}
-              {box(405, 192, 80, 55, "Shield", "DDoS Protect", "#00B894", "shield")}
+              {zone(20, 183, W - 40, 105, "EDGE & SECURITY — AWS", "#00B894")}
+              {box(40, 206, 150, 58, "CloudFront", "CDN — 400+ PoPs", "#00B894", "cf")}
+              {box(215, 206, 140, 58, "AWS WAF", "OWASP Top 10", "#00B894", "waf")}
+              {box(380, 206, 140, 58, "Route 53", "DNS + Health Check", "#00B894", "r53")}
+              {box(545, 206, 140, 58, "Shield", "DDoS Protect", "#00B894", "shield")}
 
               {/* ═══ ARROWS: Edge → API ═══ */}
-              {arrow(90, 247, 90, 295)}
-              {arrow(215, 247, 215, 295)}
-              {note(97, 278, "Filtered traffic")}
+              {arrow(115, 264, 115, 310)}
+              {arrow(285, 264, 285, 310)}
+              {note(125, 293, "Filtered traffic")}
 
               {/* ═══ SECTION 3: API LAYER ═══ */}
-              {zone(15, 293, W - 30, 110, "API LAYER", "#6C5CE7")}
-              {box(35, 315, 120, 55, "API Gateway", "REST + WebSocket", "#6C5CE7", "apigw")}
-              {box(175, 315, 110, 55, "Lambda Auth", "JWT / OAuth2 / RBAC", "#6C5CE7", "lambdaauth")}
-              {box(305, 315, 100, 55, "Cognito", "User Pools + MFA", "#6C5CE7", "cognito")}
-              {box(420, 315, 75, 55, "Throttle", "Per-tenant", "#6C5CE7", "throttle")}
+              {zone(20, 308, W - 40, 115, "API LAYER", "#6C5CE7")}
+              {box(40, 332, 150, 58, "API Gateway", "REST + WebSocket", "#6C5CE7", "apigw")}
+              {box(215, 332, 150, 58, "Lambda Auth", "JWT / OAuth2 / RBAC", "#6C5CE7", "lambdaauth")}
+              {box(390, 332, 140, 58, "Cognito", "User Pools + MFA", "#6C5CE7", "cognito")}
+              {box(555, 332, 125, 58, "Throttle", "Per-tenant", "#6C5CE7", "throttle")}
 
-              {arrow(155, 342, 175, 342)}
-              {arrow(285, 342, 305, 342)}
-              {note(35, 385, "SSE streaming ↓            REST APIs ↓            HITL callbacks ↑", "#6C5CE7")}
+              {arrow(190, 361, 215, 361)}
+              {arrow(365, 361, 390, 361)}
+              {note(40, 404, "SSE streaming ↓               REST APIs ↓               HITL callbacks ↑", "#6C5CE7")}
 
               {/* ═══ ARROWS: API → Orchestration ═══ */}
-              {arrow(95, 403, 95, 435)}
-              {arrow(230, 403, 230, 435)}
+              {arrow(115, 423, 115, 455)}
+              {arrow(290, 423, 290, 455)}
 
               {/* ═══ SECTION 4: ORCHESTRATION ENGINE ═══ */}
-              {zone(15, 430, W - 30, 200, "MOTHER AGENT — ORCHESTRATION ENGINE", "#7C3AED")}
+              {zone(20, 450, W - 40, 210, "MOTHER AGENT — ORCHESTRATION ENGINE", "#7C3AED")}
 
-              {box(35, 455, 145, 55, "ECS Fargate", "HarmonIQ Flow (CrewAI)", "#7C3AED", "fargate")}
-              {box(200, 455, 130, 55, "Step Functions", "Workflow State Machine", "#7C3AED", "sfn")}
-              {box(350, 455, 140, 55, "EventBridge", "SSE Event Bus", "#7C3AED", "eb")}
+              {box(40, 478, 190, 58, "ECS Fargate", "HarmonIQ Flow (CrewAI)", "#7C3AED", "fargate")}
+              {box(260, 478, 190, 58, "Step Functions", "Workflow State Machine", "#7C3AED", "sfn")}
+              {box(480, 478, 190, 58, "EventBridge", "SSE Event Bus", "#7C3AED", "eb")}
 
-              {arrow(180, 482, 200, 482)}
-              {arrow(330, 482, 350, 482)}
+              {arrow(230, 507, 260, 507)}
+              {arrow(450, 507, 480, 507)}
 
               {/* Plan-Execute-Evaluate-Replan loop */}
-              {box(60, 530, 95, 42, "Planner", "Goal → Plan", "#9B59B6", "planner")}
-              {box(175, 530, 95, 42, "Executor", "Dispatch tasks", "#00B894", "executor")}
-              {box(290, 530, 95, 42, "Evaluator", "Guardrails check", "#E17055", "evaluator")}
-              {box(405, 530, 80, 42, "Replanner", "Adapt plan", "#E74C3C", "replanner")}
+              {box(50, 555, 140, 45, "Planner", "Goal → Plan", "#9B59B6", "planner")}
+              {box(220, 555, 140, 45, "Executor", "Dispatch tasks", "#00B894", "executor")}
+              {box(390, 555, 140, 45, "Evaluator", "Guardrails check", "#E17055", "evaluator")}
+              {box(560, 555, 120, 45, "Replanner", "Adapt plan", "#E74C3C", "replanner")}
 
-              {arrow(155, 551, 175, 551)}
-              {arrow(270, 551, 290, 551)}
-              {arrow(385, 551, 405, 551)}
+              {arrow(190, 577, 220, 577)}
+              {arrow(360, 577, 390, 577)}
+              {arrow(530, 577, 560, 577)}
               {/* Replan loop back arrow */}
-              <path d="M445,572 L445,590 L107,590 L107,572" stroke="#E74C3C" strokeWidth={1.2} fill="none" strokeDasharray="4,3" markerEnd="url(#arrowRed)" />
-              {note(220, 601, "← Replan loop (max 3 iterations) →", "#E74C3C")}
+              <path d="M620,600 L620,618 L120,618 L120,600" stroke="#E74C3C" strokeWidth={1.2} fill="none" strokeDasharray="4,3" markerEnd="url(#arrowRed)" />
+              {note(310, 630, "← Replan loop (max 3 iterations) →", "#E74C3C")}
 
               {/* HITL box */}
-              {box(170, 610, 180, 35, "HITL Pause / Resume", "Step Functions wait state", "#FF6B6B", "hitl")}
-              {arrow(260, 572, 260, 610, "#FF6B6B")}
+              {box(240, 638, 230, 38, "HITL Pause / Resume", "Step Functions wait state", "#FF6B6B", "hitl")}
+              {arrow(355, 600, 355, 638, "#FF6B6B")}
 
               {/* ═══ ARROWS: Orchestration → Agents ═══ */}
-              {arrow(107, 572, 107, 670)}
-              {arrow(222, 572, 222, 670)}
-              {arrow(337, 572, 337, 670)}
-              {note(240, 660, "Task dispatch ↓", "#7C3AED")}
+              {arrow(120, 600, 120, 700)}
+              {arrow(290, 600, 290, 700)}
+              {arrow(460, 600, 460, 700)}
+              {note(310, 690, "Task dispatch ↓", "#7C3AED")}
 
               {/* ═══ SECTION 5: SUPER AGENT COMPUTE ═══ */}
-              {zone(15, 668, W - 30, 140, "SUPER AGENT COMPUTE — ECS TASKS", "#E17055")}
+              {zone(20, 698, W - 40, 145, "SUPER AGENT COMPUTE — ECS TASKS", "#E17055")}
 
-              {box(25, 695, 88, 50, "IngestIQ", "Data parsing", "#6C5CE7", "a_ingest")}
-              {box(123, 695, 82, 50, "VisionIQ", "Charts", "#00B894", "a_vision")}
-              {box(215, 695, 88, 50, "VisionIQ+", "Document AI", "#0984E3", "a_visionp")}
-              {box(313, 695, 82, 50, "MarketIQ", "Intel", "#E17055", "a_market")}
-              {box(405, 695, 88, 50, "DemandIQ", "Forecast", "#FDCB6E", "a_demand")}
+              {box(35, 726, 110, 55, "IngestIQ", "Data parsing", "#6C5CE7", "a_ingest")}
+              {box(160, 726, 110, 55, "VisionIQ", "Charts", "#00B894", "a_vision")}
+              {box(285, 726, 110, 55, "VisionIQ+", "Document AI", "#0984E3", "a_visionp")}
+              {box(410, 726, 110, 55, "MarketIQ", "Intel", "#E17055", "a_market")}
+              {box(535, 726, 110, 55, "DemandIQ", "Forecast", "#FDCB6E", "a_demand")}
 
-              {box(180, 760, 95, 42, "OptimaIQ", "Optimization", "#A29BFE", "a_optima")}
-              {note(292, 775, "← GPU instances for VisionIQ+", "#0984E3")}
+              {box(290, 795, 130, 42, "OptimaIQ", "Optimization", "#A29BFE", "a_optima")}
+              {note(440, 812, "← GPU instances for VisionIQ+", "#0984E3")}
 
-              {arrow(69, 745, 69, 835)}
-              {arrow(259, 802, 259, 835)}
-              {arrow(449, 745, 449, 835)}
+              {arrow(90, 781, 90, 870)}
+              {arrow(355, 837, 355, 870)}
+              {arrow(590, 781, 590, 870)}
 
               {/* ═══ SECTION 6: AI / ML SERVICES ═══ */}
-              {zone(15, 833, W - 30, 120, "AI / ML SERVICES — AWS", "#FDCB6E")}
+              {zone(20, 868, W - 40, 125, "AI / ML SERVICES — AWS", "#FDCB6E")}
 
-              {box(30, 858, 130, 55, "Amazon Bedrock", "Claude Sonnet / Opus", "#FDCB6E", "bedrock")}
-              {box(178, 858, 130, 55, "SageMaker", "ARIMA + Prophet + XGB", "#FDCB6E", "sagemaker")}
-              {box(326, 858, 90, 55, "Textract", "OCR / Tables", "#FDCB6E", "textract")}
-              {box(430, 858, 70, 55, "Rekognition", "Shelf vision", "#FDCB6E", "rekog")}
+              {box(40, 895, 160, 58, "Amazon Bedrock", "Claude Sonnet / Opus", "#FDCB6E", "bedrock")}
+              {box(225, 895, 160, 58, "SageMaker", "ARIMA + Prophet + XGB", "#FDCB6E", "sagemaker")}
+              {box(410, 895, 140, 58, "Textract", "OCR / Tables", "#FDCB6E", "textract")}
+              {box(575, 895, 120, 58, "Rekognition", "Shelf vision", "#FDCB6E", "rekog")}
 
-              {note(30, 930, "LLM reasoning          Ensemble ML         Document AI        Image AI")}
+              {note(40, 972, "LLM reasoning              Ensemble ML              Document AI            Image AI")}
 
               {/* ═══ SECTION 7: MEMORY MANAGEMENT ═══ */}
-              {zone(15, 960, W - 30, 280, "MEMORY MANAGEMENT — 4 TIER ARCHITECTURE", "#9B59B6")}
+              {zone(20, 1000, W - 40, 290, "MEMORY MANAGEMENT — 4 TIER ARCHITECTURE", "#9B59B6")}
 
               {/* Session Memory */}
-              {box(30, 988, 220, 48, "ElastiCache (Redis)", "Session Memory — <5ms · Ephemeral", "#E74C3C", "mem_session")}
-              {note(35, 1050, "Working memory for active workflow. Agent outputs, intermediate state.", "#E74C3C")}
-              {note(35, 1062, "Evicted on workflow completion. Cluster mode for HA.", "#E74C3C")}
+              {box(40, 1030, 320, 52, "ElastiCache (Redis)", "Session Memory — <5ms · Ephemeral", "#E74C3C", "mem_session")}
+              {note(45, 1098, "Working memory for active workflow. Agent outputs, intermediate state.", "#E74C3C")}
+              {note(45, 1112, "Evicted on workflow completion. Cluster mode for HA.", "#E74C3C")}
 
               {/* User Memory */}
-              {box(270, 988, 220, 48, "DynamoDB", "User Memory — <10ms · Persistent", "#3498DB", "mem_user")}
-              {note(275, 1050, "Preferences, corrections, UI settings. KMS-encrypted per user.", "#3498DB")}
-              {note(275, 1062, "On-demand capacity. Point-in-time recovery enabled.", "#3498DB")}
+              {box(390, 1030, 310, 52, "DynamoDB", "User Memory — <10ms · Persistent", "#3498DB", "mem_user")}
+              {note(395, 1098, "Preferences, corrections, UI settings. KMS-encrypted per user.", "#3498DB")}
+              {note(395, 1112, "On-demand capacity. Point-in-time recovery enabled.", "#3498DB")}
 
               {/* Group Memory */}
-              {box(30, 1078, 220, 48, "DynamoDB + DAX", "Group Memory — <8ms · Persistent", "#2ECC71", "mem_group")}
-              {note(35, 1140, "Team knowledge, playbooks, shared rules. DAX for hot reads.", "#2ECC71")}
-              {note(35, 1152, "RBAC per group. Cross-group read via admin role.", "#2ECC71")}
+              {box(40, 1128, 320, 52, "DynamoDB + DAX", "Group Memory — <8ms · Persistent", "#2ECC71", "mem_group")}
+              {note(45, 1196, "Team knowledge, playbooks, shared rules. DAX for hot reads.", "#2ECC71")}
+              {note(45, 1210, "RBAC per group. Cross-group read via admin role.", "#2ECC71")}
 
               {/* Org Memory */}
-              {box(270, 1078, 220, 48, "Neptune (Graph DB)", "Org Memory — <15ms · Versioned", "#F39C12", "mem_org")}
-              {note(275, 1140, "Company knowledge graph: policies, baselines, entity relationships.", "#F39C12")}
-              {note(275, 1152, "Versioned with audit trail. Write requires admin approval.", "#F39C12")}
+              {box(390, 1128, 310, 52, "Neptune (Graph DB)", "Org Memory — <15ms · Versioned", "#F39C12", "mem_org")}
+              {note(395, 1196, "Company knowledge graph: policies, baselines, entity relationships.", "#F39C12")}
+              {note(395, 1210, "Versioned with audit trail. Write requires admin approval.", "#F39C12")}
 
               {/* Memory lifecycle arrows */}
-              <rect x={80} y={1170} width={360} height={52} rx={8} fill="#9B59B612" stroke="#9B59B6" strokeWidth={1} strokeDasharray="4,3" />
-              <text x={260} y={1186} textAnchor="middle" fontSize="9" fontWeight="700" fill="#9B59B6" fontFamily="'DM Sans',sans-serif">Memory Lifecycle Manager</text>
-              <text x={260} y={1200} textAnchor="middle" fontSize="8" fill="#777" fontFamily="'DM Sans',sans-serif">Session → promotes to User/Group/Org based on confidence scoring</text>
-              <text x={260} y={1212} textAnchor="middle" fontSize="8" fill="#777" fontFamily="'DM Sans',sans-serif">Recall at workflow start · Write after each agent · Persist at end</text>
+              <rect x={120} y={1224} width={500} height={52} rx={8} fill="#9B59B612" stroke="#9B59B6" strokeWidth={1} strokeDasharray="4,3" />
+              <text x={370} y={1242} textAnchor="middle" fontSize="10" fontWeight="700" fill="#9B59B6" fontFamily="'DM Sans',sans-serif">Memory Lifecycle Manager</text>
+              <text x={370} y={1257} textAnchor="middle" fontSize="9" fill="#777" fontFamily="'DM Sans',sans-serif">Session → promotes to User/Group/Org based on confidence scoring</text>
+              <text x={370} y={1270} textAnchor="middle" fontSize="9" fill="#777" fontFamily="'DM Sans',sans-serif">Recall at workflow start · Write after each agent · Persist at end</text>
 
               {/* Bidirectional arrows from agents to memory */}
-              <path d="M69,808 L69,828 L15,828 L15,988" stroke="#9B59B6" strokeWidth={1.2} fill="none" strokeDasharray="3,3" markerEnd="url(#arrowhead)" />
-              <path d="M449,808 L449,828 L490,828 L490,988" stroke="#9B59B6" strokeWidth={1.2} fill="none" strokeDasharray="3,3" markerEnd="url(#arrowhead)" />
-              {note(20, 908, "Memory R/W ↕", "#9B59B6")}
+              <path d="M90,843 L90,865 L20,865 L20,1030" stroke="#9B59B6" strokeWidth={1.2} fill="none" strokeDasharray="3,3" markerEnd="url(#arrowhead)" />
+              <path d="M590,843 L590,865 L710,865 L710,1030" stroke="#9B59B6" strokeWidth={1.2} fill="none" strokeDasharray="3,3" markerEnd="url(#arrowhead)" />
+              {note(25, 948, "Memory R/W ↕", "#9B59B6")}
 
               {/* ═══ SECTION 8: DATA & STORAGE ═══ */}
-              {zone(15, 1250, W - 30, 140, "DATA & STORAGE LAYER — AWS", "#2ECC71")}
+              {zone(20, 1300, W - 40, 145, "DATA & STORAGE LAYER — AWS", "#2ECC71")}
 
-              {box(30, 1278, 130, 55, "S3", "Documents, PDFs, Images", "#2ECC71", "s3")}
-              {box(178, 1278, 140, 55, "RDS PostgreSQL", "Structured data / Metadata", "#2ECC71", "rds")}
-              {box(336, 1278, 150, 55, "OpenSearch", "Full-text search / Analytics", "#2ECC71", "opensearch")}
+              {box(40, 1330, 190, 58, "S3", "Documents, PDFs, Images", "#2ECC71", "s3")}
+              {box(260, 1330, 200, 58, "RDS PostgreSQL", "Structured data / Metadata", "#2ECC71", "rds")}
+              {box(490, 1330, 200, 58, "OpenSearch", "Full-text search / Analytics", "#2ECC71", "opensearch")}
 
-              {arrow(95, 1333, 95, 1360)}
-              {arrow(248, 1333, 248, 1360)}
-              {arrow(411, 1333, 411, 1360)}
+              {arrow(135, 1388, 135, 1415)}
+              {arrow(360, 1388, 360, 1415)}
+              {arrow(590, 1388, 590, 1415)}
 
-              {note(30, 1357, "Versioned + Lifecycle       Multi-AZ + Encrypted        Index all content assets")}
+              {note(40, 1415, "Versioned + Lifecycle          Multi-AZ + Encrypted           Index all content assets")}
 
               {/* Cross arrows from data ↔ memory */}
-              {arrow(140, 1228, 140, 1278, "#2ECC71")}
-              {arrow(380, 1228, 380, 1278, "#2ECC71")}
+              {arrow(200, 1280, 200, 1330, "#2ECC71")}
+              {arrow(540, 1280, 540, 1330, "#2ECC71")}
 
               {/* ═══ SECTION 9: SECURITY & COMPLIANCE ═══ */}
-              {zone(15, 1400, W - 30, 180, "SECURITY, GOVERNANCE & COMPLIANCE", "#E74C3C")}
+              {zone(20, 1455, W - 40, 190, "SECURITY, GOVERNANCE & COMPLIANCE", "#E74C3C")}
 
-              {box(30, 1428, 110, 50, "AWS KMS", "Encryption at rest", "#E74C3C", "kms")}
-              {box(155, 1428, 110, 50, "IAM Roles", "Per-tenant isolation", "#E74C3C", "iam")}
-              {box(280, 1428, 100, 50, "Secrets Mgr", "API keys rotation", "#E74C3C", "secrets")}
-              {box(395, 1428, 95, 50, "GuardDuty", "Threat detection", "#E74C3C", "guardduty")}
+              {box(40, 1485, 155, 55, "AWS KMS", "Encryption at rest", "#E74C3C", "kms")}
+              {box(215, 1485, 155, 55, "IAM Roles", "Per-tenant isolation", "#E74C3C", "iam")}
+              {box(390, 1485, 155, 55, "Secrets Mgr", "API keys rotation", "#E74C3C", "secrets")}
+              {box(565, 1485, 130, 55, "GuardDuty", "Threat detection", "#E74C3C", "guardduty")}
 
-              {box(30, 1495, 150, 50, "CloudTrail", "Full audit trail — every API call", "#E74C3C", "cloudtrail")}
-              {box(200, 1495, 140, 50, "Config Rules", "Compliance posture checks", "#E74C3C", "configrules")}
-              {box(355, 1495, 135, 50, "Cognito + RBAC", "4 roles · Per-resource perms", "#E74C3C", "cognitoroles")}
+              {box(40, 1555, 200, 55, "CloudTrail", "Full audit trail — every API call", "#E74C3C", "cloudtrail")}
+              {box(265, 1555, 200, 55, "Config Rules", "Compliance posture checks", "#E74C3C", "configrules")}
+              {box(490, 1555, 200, 55, "Cognito + RBAC", "4 roles · Per-resource perms", "#E74C3C", "cognitoroles")}
 
-              {note(30, 1560, "21 CFR Part 11 · GxP · HIPAA · GDPR · ABPI Code — immutable audit logging")}
+              {note(40, 1625, "21 CFR Part 11 · GxP · HIPAA · GDPR · ABPI Code — immutable audit logging")}
 
               {/* Side annotation: security spans all layers */}
-              <rect x={W - 22} y={170} width={16} height={1390} rx={4} fill="#E74C3C10" stroke="#E74C3C" strokeWidth={0.8} strokeDasharray="3,3" />
-              <text x={W - 14} y={880} textAnchor="middle" fontSize="8" fill="#E74C3C" fontFamily="'DM Sans',sans-serif" transform={`rotate(-90, ${W - 14}, 880)`}>SECURITY BOUNDARY — Encryption + IAM + Audit across all layers</text>
+              <rect x={W - 26} y={183} width={18} height={1440} rx={4} fill="#E74C3C10" stroke="#E74C3C" strokeWidth={0.8} strokeDasharray="3,3" />
+              <text x={W - 17} y={920} textAnchor="middle" fontSize="9" fill="#E74C3C" fontFamily="'DM Sans',sans-serif" transform={`rotate(-90, ${W - 17}, 920)`}>SECURITY BOUNDARY — Encryption + IAM + Audit across all layers</text>
 
               {/* ═══ SECTION 10: OBSERVABILITY ═══ */}
-              {zone(15, 1600, W - 30, 120, "OBSERVABILITY & MONITORING", "#F39C12")}
+              {zone(20, 1665, W - 40, 125, "OBSERVABILITY & MONITORING", "#F39C12")}
 
-              {box(30, 1625, 130, 55, "CloudWatch", "Metrics + Alarms + Logs", "#F39C12", "cw")}
-              {box(178, 1625, 120, 55, "X-Ray", "Distributed tracing", "#F39C12", "xray")}
-              {box(316, 1625, 90, 55, "Grafana", "Dashboards", "#F39C12", "grafana")}
-              {box(420, 1625, 75, 55, "SNS", "Alerts", "#F39C12", "sns")}
+              {box(40, 1692, 160, 58, "CloudWatch", "Metrics + Alarms + Logs", "#F39C12", "cw")}
+              {box(225, 1692, 155, 58, "X-Ray", "Distributed tracing", "#F39C12", "xray")}
+              {box(405, 1692, 140, 58, "Grafana", "Dashboards", "#F39C12", "grafana")}
+              {box(570, 1692, 120, 58, "SNS", "Alerts", "#F39C12", "sns")}
 
-              {note(30, 1700, "Agent chain tracing · Workflow SLA · Cost attribution · Anomaly alerts")}
+              {note(40, 1770, "Agent chain tracing · Workflow SLA · Cost attribution · Anomaly alerts")}
 
               {/* ═══ SECTION 11: DATA FLOW DIAGRAM ═══ */}
-              <text x={W / 2} y={1755} textAnchor="middle" fontSize="13" fontWeight="800" fill="#1A1A2E" fontFamily="'DM Sans',sans-serif">Data Flow — User Request Lifecycle</text>
+              <text x={W / 2} y={1820} textAnchor="middle" fontSize="15" fontWeight="800" fill="#1A1A2E" fontFamily="'DM Sans',sans-serif">Data Flow — User Request Lifecycle</text>
 
-              {zone(15, 1770, W - 30, 340, "END-TO-END FLOW", "#7C3AED")}
+              {zone(20, 1838, W - 40, 345, "END-TO-END FLOW", "#7C3AED")}
 
-              {/* Flow: User → CloudFront → API GW → Mother Agent → PlannerCrew → Executor → Agent → Bedrock → Evaluator → HITL → Results → S3 → SSE → User */}
-              {box(200, 1790, 120, 36, "User Request", "Natural language goal", "#0984E3", "f_user")}
-              {arrow(260, 1826, 260, 1846)}
-              {box(180, 1846, 160, 32, "CloudFront + WAF + API GW", "", "#00B894", "f_edge")}
-              {arrow(260, 1878, 260, 1898)}
-              {box(195, 1898, 130, 32, "Lambda Authorizer", "JWT + RBAC check", "#6C5CE7", "f_auth")}
-              {arrow(260, 1930, 260, 1950)}
-              {box(170, 1950, 180, 36, "Mother Agent (Fargate)", "CrewAI Flow initializes", "#7C3AED", "f_mother")}
-              {arrow(260, 1986, 260, 2006)}
-              {box(190, 2006, 140, 32, "PlannerCrew", "Decompose → execution plan", "#9B59B6", "f_planner")}
-              {arrow(260, 2038, 260, 2058)}
-              {box(190, 2058, 140, 32, "ExecutorCrew", "Dispatch to Super Agent", "#00B894", "f_exec")}
-              {arrow(260, 2090, 260, 2110)}
+              {box(280, 1858, 180, 38, "User Request", "Natural language goal", "#0984E3", "f_user")}
+              {arrow(370, 1896, 370, 1916)}
+              {box(250, 1916, 240, 35, "CloudFront + WAF + API GW", "", "#00B894", "f_edge")}
+              {arrow(370, 1951, 370, 1971)}
+              {box(270, 1971, 200, 35, "Lambda Authorizer", "JWT + RBAC check", "#6C5CE7", "f_auth")}
+              {arrow(370, 2006, 370, 2026)}
+              {box(240, 2026, 260, 38, "Mother Agent (Fargate)", "CrewAI Flow initializes", "#7C3AED", "f_mother")}
+              {arrow(370, 2064, 370, 2084)}
+              {box(270, 2084, 200, 35, "PlannerCrew", "Decompose → execution plan", "#9B59B6", "f_planner")}
+              {arrow(370, 2119, 370, 2139)}
+              {box(270, 2139, 200, 35, "ExecutorCrew", "Dispatch to Super Agent", "#00B894", "f_exec")}
+              {arrow(370, 2174, 370, 2194)}
 
               {/* Agent + Bedrock side by side */}
-              {box(120, 2110, 120, 36, "Super Agent", "ECS Task", "#E17055", "f_agent")}
-              {box(280, 2110, 120, 36, "Bedrock / SM", "LLM + ML inference", "#FDCB6E", "f_ai")}
-              {arrow(240, 2128, 280, 2128, "#FDCB6E")}
+              {box(160, 2194, 180, 38, "Super Agent", "ECS Task", "#E17055", "f_agent")}
+              {box(400, 2194, 180, 38, "Bedrock / SM", "LLM + ML inference", "#FDCB6E", "f_ai")}
+              {arrow(340, 2213, 400, 2213, "#FDCB6E")}
 
-              {arrow(180, 2146, 180, 2170)}
-              {box(120, 2170, 120, 32, "EvaluatorCrew", "Guardrails + constraints", "#E17055", "f_eval")}
-              {arrow(180, 2202, 180, 2222)}
+              {arrow(250, 2232, 250, 2256)}
+              {box(160, 2256, 180, 35, "EvaluatorCrew", "Guardrails + constraints", "#E17055", "f_eval")}
+              {arrow(250, 2291, 250, 2311)}
 
               {/* HITL branch */}
-              {box(110, 2222, 140, 32, "Constraint Check", "Pass / Fail / HITL", "#E74C3C", "f_constraint")}
-              {box(310, 2222, 120, 32, "HITL Checkpoint", "User approves/rejects", "#FF6B6B", "f_hitl2")}
-              {arrow(250, 2238, 310, 2238, "#FF6B6B")}
+              {box(150, 2311, 200, 35, "Constraint Check", "Pass / Fail / HITL", "#E74C3C", "f_constraint")}
+              {box(430, 2311, 180, 35, "HITL Checkpoint", "User approves/rejects", "#FF6B6B", "f_hitl2")}
+              {arrow(350, 2328, 430, 2328, "#FF6B6B")}
 
-              {arrow(180, 2254, 180, 2278)}
-              {box(130, 2278, 120, 32, "Memory Write", "Session + promote", "#9B59B6", "f_memwrite")}
-              {arrow(190, 2310, 190, 2334)}
+              {arrow(250, 2346, 250, 2370)}
+              {box(170, 2370, 160, 35, "Memory Write", "Session + promote", "#9B59B6", "f_memwrite")}
+              {arrow(250, 2405, 250, 2430)}
 
               {/* Final output */}
-              {box(120, 2334, 280, 40, "Output → Canvas Report + Relics", "S3 storage + OpenSearch index + SSE push to client", "#2ECC71", "f_output")}
+              {box(140, 2430, 440, 44, "Output → Canvas Report + Relics", "S3 storage + OpenSearch index + SSE push to client", "#2ECC71", "f_output")}
 
               {/* SSE stream back up */}
-              <path d="M400,2354 L460,2354 L460,1808 L320,1808" stroke="#00B894" strokeWidth={1.5} fill="none" strokeDasharray="5,3" markerEnd="url(#arrowGreen)" />
-              <text x={470} y={2100} textAnchor="start" fontSize="8" fill="#00B894" fontFamily="'DM Sans',sans-serif" transform="rotate(-90, 470, 2100)">SSE stream — real-time agent thoughts</text>
+              <path d="M580,2452 L650,2452 L650,1876 L460,1876" stroke="#00B894" strokeWidth={1.5} fill="none" strokeDasharray="5,3" markerEnd="url(#arrowGreen)" />
+              <text x={662} y={2180} textAnchor="start" fontSize="9" fill="#00B894" fontFamily="'DM Sans',sans-serif" transform="rotate(-90, 662, 2180)">SSE stream — real-time agent thoughts</text>
 
               {/* ═══ SECTION 12: INFRASTRUCTURE SUMMARY ═══ */}
-              <text x={W / 2} y={2140 + 290} textAnchor="middle" fontSize="13" fontWeight="800" fill="#1A1A2E" fontFamily="'DM Sans',sans-serif">Infrastructure Summary</text>
+              <text x={W / 2} y={2510} textAnchor="middle" fontSize="15" fontWeight="800" fill="#1A1A2E" fontFamily="'DM Sans',sans-serif">Infrastructure Summary</text>
 
               {/* Summary boxes */}
               {[
-                { x: 20, label: "20+", sub: "AWS Services", color: "#FF9900" },
-                { x: 110, label: "4-Tier", sub: "Memory Arch", color: "#9B59B6" },
-                { x: 200, label: "6", sub: "Super Agents", color: "#E17055" },
-                { x: 290, label: "99.95%", sub: "Availability", color: "#00B894" },
-                { x: 380, label: "<5ms", sub: "Memory P99", color: "#E74C3C" },
-                { x: 452, label: "GxP", sub: "Compliant", color: "#6C5CE7" },
+                { x: 30, label: "20+", sub: "AWS Services", color: "#FF9900" },
+                { x: 150, label: "4-Tier", sub: "Memory Arch", color: "#9B59B6" },
+                { x: 270, label: "6", sub: "Super Agents", color: "#E17055" },
+                { x: 390, label: "99.95%", sub: "Availability", color: "#00B894" },
+                { x: 510, label: "<5ms", sub: "Memory P99", color: "#E74C3C" },
+                { x: 620, label: "GxP", sub: "Compliant", color: "#6C5CE7" },
               ].map((s, i) => (
                 <g key={`s${i}`}>
-                  <rect x={s.x} y={2445} width={75} height={52} rx={8} fill={s.color + "10"} stroke={s.color + "40"} strokeWidth={1} />
-                  <text x={s.x + 37} y={2466} textAnchor="middle" fontSize="14" fontWeight="800" fill={s.color} fontFamily="'DM Sans',sans-serif">{s.label}</text>
-                  <text x={s.x + 37} y={2482} textAnchor="middle" fontSize="8" fill="#888" fontFamily="'DM Sans',sans-serif">{s.sub}</text>
+                  <rect x={s.x} y={2525} width={95} height={55} rx={10} fill={s.color + "10"} stroke={s.color + "40"} strokeWidth={1} />
+                  <text x={s.x + 47} y={2548} textAnchor="middle" fontSize="16" fontWeight="800" fill={s.color} fontFamily="'DM Sans',sans-serif">{s.label}</text>
+                  <text x={s.x + 47} y={2566} textAnchor="middle" fontSize="9" fill="#888" fontFamily="'DM Sans',sans-serif">{s.sub}</text>
                 </g>
               ))}
 
               {/* AWS + HarmonIQ branding */}
-              <text x={W / 2} y={2530} textAnchor="middle" fontSize="9" fill="#BBB" fontFamily="'DM Sans',sans-serif">HarmonIQ — Aria Intelligent Solutions · Powered by AWS · © 2026</text>
+              <text x={W / 2} y={H - 10} textAnchor="middle" fontSize="10" fill="#BBB" fontFamily="'DM Sans',sans-serif">HarmonIQ — Aria Intelligent Solutions · Powered by AWS · © 2026</text>
 
               {/* Hover tooltip overlay */}
               {hoveredNode && (() => {
@@ -3646,8 +3642,8 @@ export default function HarmonIQApp() {
                 const tip = tooltips[hoveredNode];
                 if (!tip) return null;
                 return (
-                  <foreignObject x={10} y={H - 68} width={W - 20} height={60}>
-                    <div style={{ background: "#1A1A2E", color: "#E8E6F0", padding: "8px 14px", borderRadius: 8, fontSize: 10, lineHeight: 1.6, fontFamily: "'DM Sans', sans-serif" }}>
+                  <foreignObject x={12} y={H - 75} width={W - 24} height={65}>
+                    <div style={{ background: "#1A1A2E", color: "#E8E6F0", padding: "10px 16px", borderRadius: 10, fontSize: 11, lineHeight: 1.6, fontFamily: "'DM Sans', sans-serif", boxShadow: "0 4px 20px rgba(0,0,0,0.3)" }}>
                       <span style={{ fontWeight: 700, color: "#A29BFE" }}>{hoveredNode}: </span>{tip}
                     </div>
                   </foreignObject>
@@ -3662,7 +3658,7 @@ export default function HarmonIQApp() {
     return (
       <div style={{ flex: 1, display: "flex", overflow: "hidden" }}>
         {/* Left: Documentation Content */}
-        <div style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden", minWidth: 0 }}>
+        <div style={{ flex: "0 0 35%", maxWidth: 480, display: "flex", flexDirection: "column", overflow: "hidden", minWidth: 0 }}>
         <div style={{ padding: isMobile ? "14px 16px 10px" : "20px 28px 12px", borderBottom: "1px solid #E8E6F0" }}>
           <div style={{ fontSize: isMobile ? 17 : 18, fontWeight: 700, color: "#1A1A2E" }}>📖 Documentation</div>
           <div style={{ fontSize: 13, color: "#888", marginTop: 2 }}>Learn about HarmonIQ, its architecture, and each Super Agent</div>
