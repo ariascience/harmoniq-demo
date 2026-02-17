@@ -142,21 +142,39 @@ const MEMORY_ORG = [
   { id: "mo10", type: "org", label: "MLR review turnaround SLA: 5 business days for standard, 2 days for critical", scope: "policy", department: "Medical Affairs", lastUpdated: "Feb 1, 2026", version: 3, detail: "Medical-Legal-Regulatory (MLR) review committee meets Mon/Wed/Fri. Standard items queued for next session. Critical items (off-label, safety) escalated to ad-hoc review within 48 hours.", confidence: 0.98, tags: ["pharma", "mlr", "review", "sla"], accessLevel: "all_users" },
 ];
 
-// Memory events that get injected into workflow timeline
-const MEMORY_WORKFLOW_EVENTS = [
-  { position: "start", type: "memory_recall", agent: "HarmonIQ", text: "💾 Recalling org memory: \"Q3 baseline growth +4.2% YoY is normal seasonal range\"", color: "#9B59B6", delay: 400 },
-  { position: "start", type: "memory_recall", agent: "HarmonIQ", text: "💾 Recalling user pref: \"SKU-level granularity preferred over category-level\"", color: "#9B59B6", delay: 350 },
-  { position: "start", type: "memory_recall", agent: "HarmonIQ", text: "💾 Loading group rule: \"Ensemble model ceiling — no single model weight > 0.6\"", color: "#9B59B6", delay: 300 },
-  { position: "after_ingest", type: "memory_write", agent: "IngestIQ", text: "💾 Writing session memory: \"3 quality issues found, score 99.1%, 249K rows staged\"", color: "#8E44AD", delay: 300 },
-  { position: "after_ingest", type: "memory_write", agent: "IngestIQ", text: "💾 Updating entity memory: Store 1205 latest turnover £64.2k (Tier-A confirmed)", color: "#8E44AD", delay: 250 },
-  { position: "after_demand", type: "memory_recall", agent: "DemandIQ", text: "💾 Recalling episodic: \"Jan forecast was 12% under — user applied +8% baseline correction\"", color: "#9B59B6", delay: 350 },
-  { position: "after_demand", type: "memory_write", agent: "DemandIQ", text: "💾 Writing session memory: \"Ensemble weights — ARIMA 0.15, Prophet 0.30, XGBoost 0.55\"", color: "#8E44AD", delay: 300 },
-  { position: "after_demand", type: "memory_write", agent: "DemandIQ", text: "💾 Persisting to org memory: \"Feb forecast confidence 87%, methodology: adaptive ensemble\"", color: "#8E44AD", delay: 250 },
-  { position: "after_market", type: "memory_write", agent: "MarketIQ", text: "💾 Writing session memory: \"Competitor Brand X dropped SKU-441 by 8.5%\"", color: "#8E44AD", delay: 300 },
-  { position: "after_market", type: "memory_write", agent: "MarketIQ", text: "💾 Updating group insight: \"On-Trade gap widened to -4.2% vs market +1.8%\"", color: "#8E44AD", delay: 250 },
-  { position: "after_optima", type: "memory_write", agent: "OptimaIQ", text: "💾 Writing session memory: \"Optimal 7% discount on 18 SKUs, 15.2% margin preserved\"", color: "#8E44AD", delay: 300 },
-  { position: "end", type: "memory_write", agent: "HarmonIQ", text: "💾 Persisting workflow summary to org memory — available for future runs", color: "#8E44AD", delay: 400 },
-];
+// Memory events that get injected into workflow timeline — keyed by template ID
+const MEMORY_WORKFLOW_EVENTS_MAP = {
+  default: [
+    { position: "start", type: "memory_recall", agent: "HarmonIQ", text: "💾 Recalling org memory: \"Q3 baseline growth +4.2% YoY is normal seasonal range\"", color: "#9B59B6", delay: 400 },
+    { position: "start", type: "memory_recall", agent: "HarmonIQ", text: "💾 Recalling user pref: \"SKU-level granularity preferred over category-level\"", color: "#9B59B6", delay: 350 },
+    { position: "start", type: "memory_recall", agent: "HarmonIQ", text: "💾 Loading group rule: \"Ensemble model ceiling — no single model weight > 0.6\"", color: "#9B59B6", delay: 300 },
+    { position: "after_ingest", type: "memory_write", agent: "IngestIQ", text: "💾 Writing session memory: \"3 quality issues found, score 99.1%, 249K rows staged\"", color: "#8E44AD", delay: 300 },
+    { position: "after_ingest", type: "memory_write", agent: "IngestIQ", text: "💾 Updating entity memory: Store 1205 latest turnover £64.2k (Tier-A confirmed)", color: "#8E44AD", delay: 250 },
+    { position: "after_demand", type: "memory_recall", agent: "DemandIQ", text: "💾 Recalling episodic: \"Jan forecast was 12% under — user applied +8% baseline correction\"", color: "#9B59B6", delay: 350 },
+    { position: "after_demand", type: "memory_write", agent: "DemandIQ", text: "💾 Writing session memory: \"Ensemble weights — ARIMA 0.15, Prophet 0.30, XGBoost 0.55\"", color: "#8E44AD", delay: 300 },
+    { position: "after_demand", type: "memory_write", agent: "DemandIQ", text: "💾 Persisting to org memory: \"Feb forecast confidence 87%, methodology: adaptive ensemble\"", color: "#8E44AD", delay: 250 },
+    { position: "after_market", type: "memory_write", agent: "MarketIQ", text: "💾 Writing session memory: \"Competitor Brand X dropped SKU-441 by 8.5%\"", color: "#8E44AD", delay: 300 },
+    { position: "after_market", type: "memory_write", agent: "MarketIQ", text: "💾 Updating group insight: \"On-Trade gap widened to -4.2% vs market +1.8%\"", color: "#8E44AD", delay: 250 },
+    { position: "after_optima", type: "memory_write", agent: "OptimaIQ", text: "💾 Writing session memory: \"Optimal 7% discount on 18 SKUs, 15.2% margin preserved\"", color: "#8E44AD", delay: 300 },
+    { position: "end", type: "memory_write", agent: "HarmonIQ", text: "💾 Persisting workflow summary to org memory — available for future runs", color: "#8E44AD", delay: 400 },
+  ],
+  t7: [
+    { position: "start", type: "memory_recall", agent: "HarmonIQ", text: "💾 Recalling org memory: \"Pharma compliance threshold ≥85/100 for regulatory submission\"", color: "#9B59B6", delay: 400 },
+    { position: "start", type: "memory_recall", agent: "HarmonIQ", text: "💾 Recalling user pref: \"Always flag off-label claims as Critical severity\"", color: "#9B59B6", delay: 350 },
+    { position: "start", type: "memory_recall", agent: "HarmonIQ", text: "💾 Loading group rule: \"ABPI Code §3.2 — marketing claims must map to approved indications only\"", color: "#9B59B6", delay: 300 },
+    { position: "start", type: "memory_recall", agent: "HarmonIQ", text: "💾 Loading org policy: \"MLR review turnaround SLA: 5 business days standard, 2 days critical\"", color: "#9B59B6", delay: 250 },
+    { position: "after_ingest", type: "memory_write", agent: "IngestIQ", text: "💾 Writing session memory: \"5 documents ingested — 186 SmPC pages, 24 brochure pages, 12,480 clinical rows parsed\"", color: "#8E44AD", delay: 300 },
+    { position: "after_ingest", type: "memory_write", agent: "IngestIQ", text: "💾 Updating entity memory: \"NC-SmPC-2026-032 version 3.2 — 12 regulatory sections extracted\"", color: "#8E44AD", delay: 250 },
+    { position: "after_vision", type: "memory_write", agent: "VisionIQ+", text: "💾 Writing session memory: \"Off-label claim detected on brochure page 8 — anxiety-related insomnia not in approved indications\"", color: "#8E44AD", delay: 300 },
+    { position: "after_vision", type: "memory_write", agent: "VisionIQ+", text: "💾 Persisting to group memory: \"NeuroCalm SmPC §5.1 primary endpoint: HAM-A reduction 52% at Week 8\"", color: "#8E44AD", delay: 250 },
+    { position: "after_vision", type: "memory_write", agent: "VisionIQ", text: "💾 Writing session memory: \"Compliance dashboard rendered — 6 documents scored, range 71–96\"", color: "#8E44AD", delay: 280 },
+    { position: "after_market", type: "memory_write", agent: "MarketIQ", text: "💾 Writing session memory: \"ABPI Code audit complete — 2 potential violations flagged in marketing brochure\"", color: "#8E44AD", delay: 300 },
+    { position: "after_market", type: "memory_write", agent: "MarketIQ", text: "💾 Updating group insight: \"Competitor BrainEase received EMA warning letter for off-label claims in Feb 2025\"", color: "#8E44AD", delay: 250 },
+    { position: "after_optima", type: "memory_write", agent: "OptimaIQ", text: "💾 Writing session memory: \"Remediation plan optimised — 12 business days to full compliance (from 22 days baseline)\"", color: "#8E44AD", delay: 300 },
+    { position: "after_optima", type: "memory_write", agent: "OptimaIQ", text: "💾 Persisting to org memory: \"NeuroCalm overall compliance score: 84.2/100 — below submission threshold\"", color: "#8E44AD", delay: 250 },
+    { position: "end", type: "memory_write", agent: "HarmonIQ", text: "💾 Persisting pharma compliance audit summary to org memory — linked to NC-SmPC-2026-032", color: "#8E44AD", delay: 400 },
+  ],
+};
 
 const MEMORY_USER_ACCESS = {
   session: { canRead: true, canWrite: true, icon: "🔴", color: "#E74C3C", label: "Session Memory", desc: "Temporary working memory for the current workflow run. Cleared on completion." },
@@ -2364,6 +2382,7 @@ export default function HarmonIQApp() {
     const handoffsSource = ucData?.motherHandoffs || MOTHER_AGENT_HANDOFFS;
     const hitlCheckpointsData = ucData?.hitlCheckpoints || {};
     const constraintAlertsData = ucData?.constraintAlerts || [];
+    const MEMORY_WORKFLOW_EVENTS = MEMORY_WORKFLOW_EVENTS_MAP[currentUcId] || MEMORY_WORKFLOW_EVENTS_MAP.default;
 
     // Build the full timeline with HITL checkpoints and constraint alerts
     const agentOrder = selectedWorkflowAgents.length > 0 ? selectedWorkflowAgents : ["ingestiq", "demandiq", "marketiq", "optimaiq", "visioniq"];
