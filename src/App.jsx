@@ -1381,6 +1381,7 @@ function AgentBrainPanel({ thoughts, isRunning, activeAgents, connectors,
   workflowKnowledge, workflowTerminology, workflowSkills,
   companyKnowledge, terminologyDefs, coreSkills,
   agentBrainTab, setAgentBrainTab, sessionMemories, userMemories, groupMemories, orgMemories,
+  isAdminView,
 }) {
   const panelRef = useRef(null);
   const [elapsed, setElapsed] = useState(0);
@@ -1422,8 +1423,8 @@ function AgentBrainPanel({ thoughts, isRunning, activeAgents, connectors,
       <div style={{ padding: "16px 18px", borderBottom: "1px solid #2A2A3C" }}>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-            <span style={{ fontSize: 16 }}>🧠</span>
-            <span style={{ fontSize: 15, fontWeight: 700, color: "#E8E6F0" }}>Agent Brain</span>
+            <span style={{ fontSize: 16 }}>{isAdminView ? "🧠" : "📋"}</span>
+            <span style={{ fontSize: 15, fontWeight: 700, color: "#E8E6F0" }}>{isAdminView ? "Agent Brain" : "Activity Log"}</span>
             <div style={{ width: 7, height: 7, borderRadius: "50%", background: isRunning ? "#C3E88D" : "#546E7A", animation: isRunning ? "pulse 1.5s infinite" : "none", marginLeft: 2 }} />
           </div>
           {(isRunning || elapsed > 0) && (
@@ -1444,18 +1445,24 @@ function AgentBrainPanel({ thoughts, isRunning, activeAgents, connectors,
       </div>
 
       {/* Tab Switcher */}
-      <div style={{ display: "flex", borderBottom: "1px solid #2A2A3C" }}>
-        {[{ id: "thinking", label: "🧠 Thinking", icon: "" }, { id: "memory", label: "💾 Memory", icon: "" }].map(tab => (
-          <div key={tab.id} onClick={() => setAgentBrainTab(tab.id)} style={{ flex: 1, padding: "10px 14px", textAlign: "center", fontSize: 11.5, fontWeight: agentBrainTab === tab.id ? 700 : 500, color: agentBrainTab === tab.id ? "#E8E6F0" : "#546E7A", borderBottom: agentBrainTab === tab.id ? "2px solid #A29BFE" : "2px solid transparent", cursor: "pointer", transition: "all 0.2s", fontFamily: "'JetBrains Mono', monospace" }}>
-            {tab.label}
-            {tab.id === "memory" && sessionMemories && sessionMemories.length > 0 && (
-              <span style={{ marginLeft: 6, background: "#9B59B6", color: "#fff", fontSize: 9, padding: "1px 5px", borderRadius: 8, fontWeight: 700 }}>{sessionMemories.length}</span>
-            )}
-          </div>
-        ))}
-      </div>
+      {isAdminView ? (
+        <div style={{ display: "flex", borderBottom: "1px solid #2A2A3C" }}>
+          {[{ id: "thinking", label: "🧠 Thinking", icon: "" }, { id: "memory", label: "💾 Memory", icon: "" }].map(tab => (
+            <div key={tab.id} onClick={() => setAgentBrainTab(tab.id)} style={{ flex: 1, padding: "10px 14px", textAlign: "center", fontSize: 11.5, fontWeight: agentBrainTab === tab.id ? 700 : 500, color: agentBrainTab === tab.id ? "#E8E6F0" : "#546E7A", borderBottom: agentBrainTab === tab.id ? "2px solid #A29BFE" : "2px solid transparent", cursor: "pointer", transition: "all 0.2s", fontFamily: "'JetBrains Mono', monospace" }}>
+              {tab.label}
+              {tab.id === "memory" && sessionMemories && sessionMemories.length > 0 && (
+                <span style={{ marginLeft: 6, background: "#9B59B6", color: "#fff", fontSize: 9, padding: "1px 5px", borderRadius: 8, fontWeight: 700 }}>{sessionMemories.length}</span>
+              )}
+            </div>
+          ))}
+        </div>
+      ) : (
+        <div style={{ padding: "10px 14px", borderBottom: "1px solid #2A2A3C", fontSize: 11.5, fontWeight: 700, color: "#E8E6F0", fontFamily: "'JetBrains Mono', monospace" }}>
+          📋 Agent Activity
+        </div>
+      )}
 
-      {agentBrainTab === "memory" ? (
+      {isAdminView && agentBrainTab === "memory" ? (
         /* Memory Panel View */
         <div style={{ flex: 1, overflowY: "auto", padding: "8px 12px" }}>
           {/* Session Memories - Live */}
@@ -1586,8 +1593,8 @@ function AgentBrainPanel({ thoughts, isRunning, activeAgents, connectors,
         {hitlPaused && hitlCheckpoint && (
           <div style={{ margin: "8px 4px", padding: "14px", background: "#2A2A3C", borderRadius: 10, borderLeft: "4px solid #FFCB6B", animation: "fadeIn 0.4s ease" }}>
             <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 8 }}>
-              <span style={{ fontSize: 14 }}>🔍</span>
-              <span style={{ fontSize: 13, fontWeight: 700, color: "#FFCB6B", fontFamily: "'JetBrains Mono', monospace" }}>HITL Checkpoint — {hitlCheckpoint.title}</span>
+              <span style={{ fontSize: 14 }}>{isAdminView ? "🔍" : "✋"}</span>
+              <span style={{ fontSize: 13, fontWeight: 700, color: "#FFCB6B", fontFamily: "'JetBrains Mono', monospace" }}>{isAdminView ? `HITL Checkpoint — ${hitlCheckpoint.title}` : `Review Required — ${hitlCheckpoint.title}`}</span>
             </div>
             <div style={{ fontSize: 12, color: "#B8B5C8", lineHeight: 1.6, marginBottom: 8, fontFamily: "'JetBrains Mono', monospace" }}>{hitlCheckpoint.summary}</div>
             {hitlCheckpoint.recommendation && (
@@ -1595,23 +1602,30 @@ function AgentBrainPanel({ thoughts, isRunning, activeAgents, connectors,
                 💡 {hitlCheckpoint.recommendation}
               </div>
             )}
-            {hitlAdjustMode ? (
-              <div>
-                <textarea
-                  value={hitlAdjustText}
-                  onChange={e => onHitlAdjustTextChange(e.target.value)}
-                  placeholder="Type your adjustment note..."
-                  style={{ width: "100%", minHeight: 60, padding: 10, borderRadius: 8, border: "1px solid #3A3A4C", background: "#1E1E2E", color: "#E8E6F0", fontSize: 11, fontFamily: "'JetBrains Mono', monospace", resize: "vertical", outline: "none", marginBottom: 8 }}
-                />
-                <div style={{ display: "flex", gap: 6 }}>
-                  <button onClick={onHitlAdjustSubmit} style={{ padding: "6px 14px", borderRadius: 6, background: "#7C3AED", color: "#fff", border: "none", fontSize: 11, fontWeight: 600, cursor: "pointer" }}>Submit Adjustment</button>
-                  <button onClick={() => { onHitlAdjustTextChange(""); onHitlApprove(); }} style={{ padding: "6px 14px", borderRadius: 6, background: "transparent", color: "#546E7A", border: "1px solid #3A3A4C", fontSize: 11, cursor: "pointer" }}>Cancel</button>
+            {isAdminView ? (
+              hitlAdjustMode ? (
+                <div>
+                  <textarea
+                    value={hitlAdjustText}
+                    onChange={e => onHitlAdjustTextChange(e.target.value)}
+                    placeholder="Type your adjustment note..."
+                    style={{ width: "100%", minHeight: 60, padding: 10, borderRadius: 8, border: "1px solid #3A3A4C", background: "#1E1E2E", color: "#E8E6F0", fontSize: 11, fontFamily: "'JetBrains Mono', monospace", resize: "vertical", outline: "none", marginBottom: 8 }}
+                  />
+                  <div style={{ display: "flex", gap: 6 }}>
+                    <button onClick={onHitlAdjustSubmit} style={{ padding: "6px 14px", borderRadius: 6, background: "#7C3AED", color: "#fff", border: "none", fontSize: 11, fontWeight: 600, cursor: "pointer" }}>Submit Adjustment</button>
+                    <button onClick={() => { onHitlAdjustTextChange(""); onHitlApprove(); }} style={{ padding: "6px 14px", borderRadius: 6, background: "transparent", color: "#546E7A", border: "1px solid #3A3A4C", fontSize: 11, cursor: "pointer" }}>Cancel</button>
+                  </div>
                 </div>
-              </div>
+              ) : (
+                <div style={{ display: "flex", gap: 6 }}>
+                  <button onClick={onHitlApprove} style={{ padding: "7px 14px", borderRadius: 6, background: "#00B894", color: "#fff", border: "none", fontSize: 12, fontWeight: 600, cursor: "pointer" }}>✓ Approve & Continue</button>
+                  <button onClick={onHitlStartAdjust} style={{ padding: "7px 14px", borderRadius: 6, background: "transparent", color: "#C792EA", border: "1px solid #C792EA40", fontSize: 12, fontWeight: 600, cursor: "pointer" }}>✏️ Adjust</button>
+                </div>
+              )
             ) : (
               <div style={{ display: "flex", gap: 6 }}>
-                <button onClick={onHitlApprove} style={{ padding: "7px 14px", borderRadius: 6, background: "#00B894", color: "#fff", border: "none", fontSize: 12, fontWeight: 600, cursor: "pointer" }}>✓ Approve & Continue</button>
-                <button onClick={onHitlStartAdjust} style={{ padding: "7px 14px", borderRadius: 6, background: "transparent", color: "#C792EA", border: "1px solid #C792EA40", fontSize: 12, fontWeight: 600, cursor: "pointer" }}>✏️ Adjust</button>
+                <button onClick={onHitlApprove} style={{ padding: "7px 14px", borderRadius: 6, background: "#00B894", color: "#fff", border: "none", fontSize: 12, fontWeight: 600, cursor: "pointer" }}>✓ Approve</button>
+                <button onClick={onHitlApprove} style={{ padding: "7px 14px", borderRadius: 6, background: "transparent", color: "#E74C3C", border: "1px solid #E74C3C40", fontSize: 12, fontWeight: 600, cursor: "pointer" }}>✗ Reject</button>
               </div>
             )}
           </div>
@@ -1622,27 +1636,35 @@ function AgentBrainPanel({ thoughts, isRunning, activeAgents, connectors,
           <div style={{ margin: "8px 4px", padding: "14px", background: "#2A2A3C", borderRadius: 10, borderLeft: "4px solid #E74C3C", animation: "fadeIn 0.4s ease" }}>
             <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 8 }}>
               <span style={{ fontSize: 14 }}>⚠️</span>
-              <span style={{ fontSize: 13, fontWeight: 700, color: "#E74C3C", fontFamily: "'JetBrains Mono', monospace" }}>Constraint Violated: {constraintData.title}</span>
+              <span style={{ fontSize: 13, fontWeight: 700, color: "#E74C3C", fontFamily: "'JetBrains Mono', monospace" }}>{isAdminView ? `Constraint Violated: ${constraintData.title}` : `Alert: ${constraintData.title}`}</span>
             </div>
             <div style={{ fontSize: 12, color: "#B8B5C8", lineHeight: 1.6, marginBottom: 6, fontFamily: "'JetBrains Mono', monospace" }}>{constraintData.message}</div>
-            <div style={{ fontSize: 11, color: "#F78C6C", marginBottom: 8, fontFamily: "'JetBrains Mono', monospace", padding: "4px 8px", background: "#F78C6C10", borderRadius: 4, display: "inline-block" }}>
-              Constraint: <span style={{ textDecoration: "line-through" }}>{constraintData.constraint}</span>
-            </div>
-            {constraintData.suggestion && (
-              <div style={{ fontSize: 12, color: "#C3E88D", fontStyle: "italic", marginBottom: 10, padding: "6px 10px", background: "#C3E88D10", borderRadius: 6, lineHeight: 1.5 }}>
-                💡 Suggestion: {constraintData.suggestion}
+            {isAdminView && (
+              <div style={{ fontSize: 11, color: "#F78C6C", marginBottom: 8, fontFamily: "'JetBrains Mono', monospace", padding: "4px 8px", background: "#F78C6C10", borderRadius: 4, display: "inline-block" }}>
+                Constraint: <span style={{ textDecoration: "line-through" }}>{constraintData.constraint}</span>
               </div>
             )}
-            <textarea
-              value={constraintInput}
-              onChange={e => onConstraintInputChange(e.target.value)}
-              placeholder="Type your adjustment (or leave blank to use suggestion)..."
-              style={{ width: "100%", minHeight: 50, padding: 10, borderRadius: 8, border: "1px solid #3A3A4C", background: "#1E1E2E", color: "#E8E6F0", fontSize: 11, fontFamily: "'JetBrains Mono', monospace", resize: "vertical", outline: "none", marginBottom: 8 }}
-            />
-            <div style={{ display: "flex", gap: 6 }}>
-              <button onClick={onConstraintApply} style={{ padding: "7px 14px", borderRadius: 6, background: "#00B894", color: "#fff", border: "none", fontSize: 12, fontWeight: 600, cursor: "pointer" }}>🔄 Apply & Re-run from {constraintData.agentName}</button>
-              <button onClick={onConstraintSkip} style={{ padding: "7px 14px", borderRadius: 6, background: "transparent", color: "#546E7A", border: "1px solid #3A3A4C", fontSize: 12, cursor: "pointer" }}>⏭ Skip</button>
-            </div>
+            {constraintData.suggestion && (
+              <div style={{ fontSize: 12, color: "#C3E88D", fontStyle: "italic", marginBottom: 10, padding: "6px 10px", background: "#C3E88D10", borderRadius: 6, lineHeight: 1.5 }}>
+                💡 {isAdminView ? `Suggestion: ${constraintData.suggestion}` : constraintData.suggestion}
+              </div>
+            )}
+            {isAdminView ? (
+              <>
+                <textarea
+                  value={constraintInput}
+                  onChange={e => onConstraintInputChange(e.target.value)}
+                  placeholder="Type your adjustment (or leave blank to use suggestion)..."
+                  style={{ width: "100%", minHeight: 50, padding: 10, borderRadius: 8, border: "1px solid #3A3A4C", background: "#1E1E2E", color: "#E8E6F0", fontSize: 11, fontFamily: "'JetBrains Mono', monospace", resize: "vertical", outline: "none", marginBottom: 8 }}
+                />
+                <div style={{ display: "flex", gap: 6 }}>
+                  <button onClick={onConstraintApply} style={{ padding: "7px 14px", borderRadius: 6, background: "#00B894", color: "#fff", border: "none", fontSize: 12, fontWeight: 600, cursor: "pointer" }}>🔄 Apply & Re-run from {constraintData.agentName}</button>
+                  <button onClick={onConstraintSkip} style={{ padding: "7px 14px", borderRadius: 6, background: "transparent", color: "#546E7A", border: "1px solid #3A3A4C", fontSize: 12, cursor: "pointer" }}>⏭ Skip</button>
+                </div>
+              </>
+            ) : (
+              <button onClick={onConstraintApply} style={{ padding: "7px 14px", borderRadius: 6, background: "#00B894", color: "#fff", border: "none", fontSize: 12, fontWeight: 600, cursor: "pointer", width: "100%" }}>Acknowledge & Continue</button>
+            )}
           </div>
         )}
 
@@ -1655,11 +1677,11 @@ function AgentBrainPanel({ thoughts, isRunning, activeAgents, connectors,
         )}
       </div>
 
-      {/* Connections section at bottom */}
+      {/* Bottom sections */}
       <div style={{ borderTop: "1px solid #2A2A3C" }}>
         {activeAgents && activeAgents.length > 0 && (
           <div style={{ padding: "10px 14px", borderBottom: "1px solid #2A2A3C" }}>
-            <div style={{ fontSize: 10, fontWeight: 600, color: "#546E7A", marginBottom: 6, textTransform: "uppercase", letterSpacing: "0.8px" }}>Agents Used · {activeAgents.length}</div>
+            <div style={{ fontSize: 10, fontWeight: 600, color: "#546E7A", marginBottom: 6, textTransform: "uppercase", letterSpacing: "0.8px" }}>{isAdminView ? "Agents Used" : "Agents Working"} · {activeAgents.length}</div>
             <div style={{ display: "flex", flexWrap: "wrap", gap: 4 }}>
               {activeAgents.map(a => {
                 const ag = SUPER_AGENTS.find(x => x.id === a);
@@ -1672,7 +1694,7 @@ function AgentBrainPanel({ thoughts, isRunning, activeAgents, connectors,
             </div>
           </div>
         )}
-        {(() => {
+        {isAdminView && (() => {
           const totalActive = (workflowKnowledge?.length || 0) + (workflowTerminology?.length || 0) + (workflowSkills?.length || 0);
           if (totalActive === 0) return null;
           const renderChips = (ids, source, typeColor) => (ids || []).map(id => { const item = (source || []).find(s => s.id === id); return item ? <span key={id} style={{ display: "inline-flex", alignItems: "center", gap: 3, background: typeColor + "20", color: typeColor, padding: "2px 8px", borderRadius: 4, fontSize: 10, fontWeight: 600, fontFamily: "'JetBrains Mono', 'Fira Code', monospace" }}>{item.icon} {item.name}</span> : null; });
@@ -1687,26 +1709,28 @@ function AgentBrainPanel({ thoughts, isRunning, activeAgents, connectors,
             </div>
           );
         })()}
-        <div style={{ padding: "10px 14px" }}>
-          <div style={{ fontSize: 10, fontWeight: 600, color: "#546E7A", marginBottom: 8, textTransform: "uppercase", letterSpacing: "0.8px" }}>Connections · {connectors ? connectors.filter(c => c.status === "connected").length : 0}</div>
-          {(connectors || []).filter(c => c.status === "connected").map((c, i) => (
-            <div key={i} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "8px 10px", borderRadius: 6, background: "#252536", marginBottom: 4 }}>
-              <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                <ConnectorIcon id={c.id} size={16} />
-                <div>
-                  <span style={{ fontSize: 11.5, color: "#B8B5C8", fontWeight: 500 }}>{c.name}</span>
-                  <div style={{ fontSize: 9, color: "#546E7A" }}>
-                    {c.files ? `${c.files.length} file${c.files.length > 1 ? "s" : ""}` : c.tables ? `${c.tables} tables` : "Active"}
+        {isAdminView && (
+          <div style={{ padding: "10px 14px" }}>
+            <div style={{ fontSize: 10, fontWeight: 600, color: "#546E7A", marginBottom: 8, textTransform: "uppercase", letterSpacing: "0.8px" }}>Connections · {connectors ? connectors.filter(c => c.status === "connected").length : 0}</div>
+            {(connectors || []).filter(c => c.status === "connected").map((c, i) => (
+              <div key={i} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "8px 10px", borderRadius: 6, background: "#252536", marginBottom: 4 }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                  <ConnectorIcon id={c.id} size={16} />
+                  <div>
+                    <span style={{ fontSize: 11.5, color: "#B8B5C8", fontWeight: 500 }}>{c.name}</span>
+                    <div style={{ fontSize: 9, color: "#546E7A" }}>
+                      {c.files ? `${c.files.length} file${c.files.length > 1 ? "s" : ""}` : c.tables ? `${c.tables} tables` : "Active"}
+                    </div>
                   </div>
                 </div>
+                <div style={{ width: 6, height: 6, borderRadius: "50%", background: "#00B894" }} />
               </div>
-              <div style={{ width: 6, height: 6, borderRadius: "50%", background: "#00B894" }} />
-            </div>
-          ))}
-          {(connectors || []).filter(c => c.status === "connected").length === 0 && (
-            <div style={{ fontSize: 11, color: "#546E7A", fontStyle: "italic", padding: "4px 10px" }}>No sources connected</div>
-          )}
-        </div>
+            ))}
+            {(connectors || []).filter(c => c.status === "connected").length === 0 && (
+              <div style={{ fontSize: 11, color: "#546E7A", fontStyle: "italic", padding: "4px 10px" }}>No sources connected</div>
+            )}
+          </div>
+        )}
       </div>
       </>
       )}
@@ -1731,6 +1755,7 @@ function ApprovalModal({
   onHitlApprove, onHitlStartAdjust, onHitlAdjustTextChange, onHitlAdjustSubmit,
   constraintPaused, constraintData, constraintInput,
   onConstraintInputChange, onConstraintApply, onConstraintSkip,
+  isAdminView,
 }) {
   const isHitl = hitlPaused && hitlCheckpoint;
   const isConstraint = constraintPaused && constraintData;
@@ -1745,9 +1770,9 @@ function ApprovalModal({
           <>
             <div style={{ padding: "22px 26px 16px", borderBottom: "1px solid #F0EDF5" }}>
               <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 6 }}>
-                <div style={{ width: 36, height: 36, borderRadius: 10, background: "linear-gradient(135deg, #FFCB6B, #FFB300)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18 }}>🔍</div>
+                <div style={{ width: 36, height: 36, borderRadius: 10, background: "linear-gradient(135deg, #FFCB6B, #FFB300)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18 }}>{isAdminView ? "🔍" : "✋"}</div>
                 <div>
-                  <div style={{ fontSize: 11, fontWeight: 600, color: "#7C3AED", textTransform: "uppercase", letterSpacing: "0.5px" }}>HITL Checkpoint</div>
+                  <div style={{ fontSize: 11, fontWeight: 600, color: "#7C3AED", textTransform: "uppercase", letterSpacing: "0.5px" }}>{isAdminView ? "HITL Checkpoint" : "Review Required"}</div>
                   <div style={{ fontSize: 16, fontWeight: 700, color: "#1A1A2E" }}>{hitlCheckpoint.title}</div>
                 </div>
               </div>
@@ -1760,23 +1785,30 @@ function ApprovalModal({
                   <span>{hitlCheckpoint.recommendation}</span>
                 </div>
               )}
-              {hitlAdjustMode ? (
-                <div>
-                  <textarea
-                    value={hitlAdjustText}
-                    onChange={e => onHitlAdjustTextChange(e.target.value)}
-                    placeholder="Type your adjustment note..."
-                    style={{ width: "100%", minHeight: 80, padding: 14, borderRadius: 10, border: "1px solid #DDD", background: "#FAFAFA", color: "#333", fontSize: 13, fontFamily: "'DM Sans', sans-serif", resize: "vertical", outline: "none", marginBottom: 12 }}
-                  />
-                  <div style={{ display: "flex", gap: 8 }}>
-                    <button onClick={onHitlAdjustSubmit} style={{ padding: "10px 20px", borderRadius: 10, background: "#7C3AED", color: "#fff", border: "none", fontSize: 13, fontWeight: 600, cursor: "pointer", flex: 1 }}>Submit Adjustment</button>
-                    <button onClick={() => { onHitlAdjustTextChange(""); onHitlApprove(); }} style={{ padding: "10px 20px", borderRadius: 10, background: "#F5F5F5", color: "#666", border: "1px solid #DDD", fontSize: 13, cursor: "pointer" }}>Cancel</button>
+              {isAdminView ? (
+                hitlAdjustMode ? (
+                  <div>
+                    <textarea
+                      value={hitlAdjustText}
+                      onChange={e => onHitlAdjustTextChange(e.target.value)}
+                      placeholder="Type your adjustment note..."
+                      style={{ width: "100%", minHeight: 80, padding: 14, borderRadius: 10, border: "1px solid #DDD", background: "#FAFAFA", color: "#333", fontSize: 13, fontFamily: "'DM Sans', sans-serif", resize: "vertical", outline: "none", marginBottom: 12 }}
+                    />
+                    <div style={{ display: "flex", gap: 8 }}>
+                      <button onClick={onHitlAdjustSubmit} style={{ padding: "10px 20px", borderRadius: 10, background: "#7C3AED", color: "#fff", border: "none", fontSize: 13, fontWeight: 600, cursor: "pointer", flex: 1 }}>Submit Adjustment</button>
+                      <button onClick={() => { onHitlAdjustTextChange(""); onHitlApprove(); }} style={{ padding: "10px 20px", borderRadius: 10, background: "#F5F5F5", color: "#666", border: "1px solid #DDD", fontSize: 13, cursor: "pointer" }}>Cancel</button>
+                    </div>
                   </div>
-                </div>
+                ) : (
+                  <div style={{ display: "flex", gap: 10 }}>
+                    <button onClick={onHitlApprove} style={{ padding: "12px 24px", borderRadius: 10, background: "#00B894", color: "#fff", border: "none", fontSize: 14, fontWeight: 600, cursor: "pointer", flex: 1, transition: "all 0.2s" }}>✓ Approve & Continue</button>
+                    <button onClick={onHitlStartAdjust} style={{ padding: "12px 24px", borderRadius: 10, background: "#F9F8FE", color: "#7C3AED", border: "1px solid #7C3AED40", fontSize: 14, fontWeight: 600, cursor: "pointer", transition: "all 0.2s" }}>✏️ Adjust</button>
+                  </div>
+                )
               ) : (
                 <div style={{ display: "flex", gap: 10 }}>
-                  <button onClick={onHitlApprove} style={{ padding: "12px 24px", borderRadius: 10, background: "#00B894", color: "#fff", border: "none", fontSize: 14, fontWeight: 600, cursor: "pointer", flex: 1, transition: "all 0.2s" }}>✓ Approve & Continue</button>
-                  <button onClick={onHitlStartAdjust} style={{ padding: "12px 24px", borderRadius: 10, background: "#F9F8FE", color: "#7C3AED", border: "1px solid #7C3AED40", fontSize: 14, fontWeight: 600, cursor: "pointer", transition: "all 0.2s" }}>✏️ Adjust</button>
+                  <button onClick={onHitlApprove} style={{ padding: "12px 24px", borderRadius: 10, background: "#00B894", color: "#fff", border: "none", fontSize: 14, fontWeight: 600, cursor: "pointer", flex: 1, transition: "all 0.2s" }}>✓ Approve</button>
+                  <button onClick={onHitlApprove} style={{ padding: "12px 24px", borderRadius: 10, background: "#FFF5F5", color: "#E74C3C", border: "1px solid #E74C3C40", fontSize: 14, fontWeight: 600, cursor: "pointer", transition: "all 0.2s" }}>✗ Reject</button>
                 </div>
               )}
             </div>
@@ -1790,32 +1822,40 @@ function ApprovalModal({
               <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 6 }}>
                 <div style={{ width: 36, height: 36, borderRadius: 10, background: "linear-gradient(135deg, #E74C3C, #C0392B)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18 }}>⚠️</div>
                 <div>
-                  <div style={{ fontSize: 11, fontWeight: 600, color: "#E74C3C", textTransform: "uppercase", letterSpacing: "0.5px" }}>Constraint Violation</div>
+                  <div style={{ fontSize: 11, fontWeight: 600, color: "#E74C3C", textTransform: "uppercase", letterSpacing: "0.5px" }}>{isAdminView ? "Constraint Violation" : "Alert"}</div>
                   <div style={{ fontSize: 16, fontWeight: 700, color: "#1A1A2E" }}>{constraintData.title}</div>
                 </div>
               </div>
             </div>
             <div style={{ padding: "16px 26px 20px" }}>
               <div style={{ fontSize: 14, color: "#444", lineHeight: 1.7, marginBottom: 10 }}>{constraintData.message}</div>
-              <div style={{ fontSize: 12, color: "#BF360C", marginBottom: 12, padding: "8px 12px", background: "#FFF3E0", borderRadius: 8, display: "inline-block" }}>
-                Constraint: <span style={{ textDecoration: "line-through" }}>{constraintData.constraint}</span>
-              </div>
+              {isAdminView && (
+                <div style={{ fontSize: 12, color: "#BF360C", marginBottom: 12, padding: "8px 12px", background: "#FFF3E0", borderRadius: 8, display: "inline-block" }}>
+                  Constraint: <span style={{ textDecoration: "line-through" }}>{constraintData.constraint}</span>
+                </div>
+              )}
               {constraintData.suggestion && (
                 <div style={{ fontSize: 13, color: "#2E7D32", fontStyle: "italic", marginBottom: 14, padding: "10px 14px", background: "#E8F5E9", borderRadius: 10, lineHeight: 1.6, display: "flex", alignItems: "flex-start", gap: 8 }}>
                   <span style={{ fontSize: 16, flexShrink: 0 }}>💡</span>
-                  <span>Suggestion: {constraintData.suggestion}</span>
+                  <span>{isAdminView ? `Suggestion: ${constraintData.suggestion}` : constraintData.suggestion}</span>
                 </div>
               )}
-              <textarea
-                value={constraintInput}
-                onChange={e => onConstraintInputChange(e.target.value)}
-                placeholder="Type your adjustment (or leave blank to use suggestion)..."
-                style={{ width: "100%", minHeight: 70, padding: 14, borderRadius: 10, border: "1px solid #DDD", background: "#FAFAFA", color: "#333", fontSize: 13, fontFamily: "'DM Sans', sans-serif", resize: "vertical", outline: "none", marginBottom: 12 }}
-              />
-              <div style={{ display: "flex", gap: 10 }}>
-                <button onClick={onConstraintApply} style={{ padding: "12px 24px", borderRadius: 10, background: "#00B894", color: "#fff", border: "none", fontSize: 14, fontWeight: 600, cursor: "pointer", flex: 1, transition: "all 0.2s" }}>🔄 Apply & Re-run from {constraintData.agentName}</button>
-                <button onClick={onConstraintSkip} style={{ padding: "12px 24px", borderRadius: 10, background: "#F5F5F5", color: "#666", border: "1px solid #DDD", fontSize: 14, cursor: "pointer", transition: "all 0.2s" }}>⏭ Skip</button>
-              </div>
+              {isAdminView ? (
+                <>
+                  <textarea
+                    value={constraintInput}
+                    onChange={e => onConstraintInputChange(e.target.value)}
+                    placeholder="Type your adjustment (or leave blank to use suggestion)..."
+                    style={{ width: "100%", minHeight: 70, padding: 14, borderRadius: 10, border: "1px solid #DDD", background: "#FAFAFA", color: "#333", fontSize: 13, fontFamily: "'DM Sans', sans-serif", resize: "vertical", outline: "none", marginBottom: 12 }}
+                  />
+                  <div style={{ display: "flex", gap: 10 }}>
+                    <button onClick={onConstraintApply} style={{ padding: "12px 24px", borderRadius: 10, background: "#00B894", color: "#fff", border: "none", fontSize: 14, fontWeight: 600, cursor: "pointer", flex: 1, transition: "all 0.2s" }}>🔄 Apply & Re-run from {constraintData.agentName}</button>
+                    <button onClick={onConstraintSkip} style={{ padding: "12px 24px", borderRadius: 10, background: "#F5F5F5", color: "#666", border: "1px solid #DDD", fontSize: 14, cursor: "pointer", transition: "all 0.2s" }}>⏭ Skip</button>
+                  </div>
+                </>
+              ) : (
+                <button onClick={onConstraintApply} style={{ padding: "12px 24px", borderRadius: 10, background: "#00B894", color: "#fff", border: "none", fontSize: 14, fontWeight: 600, cursor: "pointer", width: "100%", transition: "all 0.2s" }}>OK, Continue</button>
+              )}
             </div>
           </>
         )}
@@ -2195,6 +2235,12 @@ export default function HarmonIQApp() {
   const [loginError, setLoginError] = useState("");
 
   const [page, setPage] = useState("home");
+  const [isAdminView, setIsAdminView] = useState(false);
+  const [showAdminLoginModal, setShowAdminLoginModal] = useState(false);
+  const [adminLoginUser, setAdminLoginUser] = useState("");
+  const [adminLoginPass, setAdminLoginPass] = useState("");
+  const [adminLoginError, setAdminLoginError] = useState("");
+  const BUSINESS_NAV_IDS = ["home", "templates", "canvas", "relics"];
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
   const [notifications, setNotifications] = useState(SAMPLE_NOTIFICATIONS);
@@ -2217,6 +2263,8 @@ export default function HarmonIQApp() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   // Close Agent Brain overlay when switching to mobile viewport
   useEffect(() => { if (isMobile) setShowAgentBrain(false); }, [isMobile]);
+  // Page guard — redirect business users away from admin-only pages
+  useEffect(() => { if (!isAdminView && !BUSINESS_NAV_IDS.includes(page) && page !== "knowledgemanage") setPage("home"); }, [isAdminView, page]);
   const [selectedWorkflowAgents, setSelectedWorkflowAgents] = useState([]);
 
   // Active use case tracking (for per-use-case data)
@@ -2658,7 +2706,16 @@ export default function HarmonIQApp() {
 
   // ─── Page Renderers ───
 
-  const STEP_LABELS = ["Plan Review", "Connect Data", "Configure Agents", "Execute"];
+  const STEP_LABELS = isAdminView ? ["Plan Review", "Connect Data", "Configure Agents", "Execute"] : ["Review Plan", "Review Agents", "Running"];
+
+  // For business users: internal steps 1,3,4 map to display steps 1,2,3
+  const bizStepMap = [1, 3, 4]; // internal workflowStep values for each business display step
+  const getDisplayStep = (internalStep) => {
+    if (isAdminView) return internalStep;
+    const idx = bizStepMap.findIndex(s => s >= internalStep);
+    return idx === -1 ? STEP_LABELS.length : idx + 1;
+  };
+  const displayStep = getDisplayStep(workflowStep);
 
   const renderStepIndicator = () => {
     if (workflowStep < 1) return null;
@@ -2666,9 +2723,9 @@ export default function HarmonIQApp() {
       <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 0, padding: isMobile ? "10px 10px 6px" : "16px 20px 8px", animation: "fadeIn 0.4s ease" }}>
         {STEP_LABELS.map((label, idx) => {
           const stepNum = idx + 1;
-          const isComplete = workflowStep > stepNum;
-          const isCurrent = workflowStep === stepNum;
-          const isFuture = workflowStep < stepNum;
+          const isComplete = displayStep > stepNum;
+          const isCurrent = displayStep === stepNum;
+          const isFuture = displayStep < stepNum;
           return (
             <div key={label} style={{ display: "flex", alignItems: "center" }}>
               <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 3 }}>
@@ -2694,17 +2751,57 @@ export default function HarmonIQApp() {
     );
   };
 
+  // ─── Admin Login Modal ───
+  const AdminLoginModal = () => {
+    if (!showAdminLoginModal) return null;
+    const handleLogin = () => {
+      if (adminLoginUser === "admin" && adminLoginPass === "admin") {
+        setIsAdminView(true);
+        setShowAdminLoginModal(false);
+        setAdminLoginUser("");
+        setAdminLoginPass("");
+        setAdminLoginError("");
+      } else {
+        setAdminLoginError("Invalid credentials. Please try again.");
+      }
+    };
+    return (
+      <div style={{ position: "fixed", inset: 0, zIndex: 9999, background: "rgba(0,0,0,0.55)", display: "flex", alignItems: "center", justifyContent: "center", backdropFilter: "blur(4px)" }}>
+        <div style={{ background: "#fff", borderRadius: 20, padding: "36px 32px", width: 360, maxWidth: "90vw", boxShadow: "0 24px 80px rgba(0,0,0,0.25)" }}>
+          <div style={{ textAlign: "center", marginBottom: 24 }}>
+            <div style={{ width: 56, height: 56, borderRadius: "50%", background: "linear-gradient(135deg, #7C3AED, #2D1554)", display: "inline-flex", alignItems: "center", justifyContent: "center", fontSize: 28, marginBottom: 12 }}>🔐</div>
+            <div style={{ fontSize: 20, fontWeight: 700, color: "#1A1A2E" }}>Admin Access</div>
+            <div style={{ fontSize: 13, color: "#888", marginTop: 4 }}>Enter admin credentials to unlock the full platform</div>
+          </div>
+          <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+            <div>
+              <div style={{ fontSize: 12, fontWeight: 600, color: "#555", marginBottom: 4 }}>Username</div>
+              <input value={adminLoginUser} onChange={e => { setAdminLoginUser(e.target.value); setAdminLoginError(""); }} onKeyDown={e => e.key === "Enter" && handleLogin()} placeholder="admin" style={{ width: "100%", padding: "10px 14px", borderRadius: 10, border: "1px solid #DDD", fontSize: 14, outline: "none", boxSizing: "border-box" }} />
+            </div>
+            <div>
+              <div style={{ fontSize: 12, fontWeight: 600, color: "#555", marginBottom: 4 }}>Password</div>
+              <input type="password" value={adminLoginPass} onChange={e => { setAdminLoginPass(e.target.value); setAdminLoginError(""); }} onKeyDown={e => e.key === "Enter" && handleLogin()} placeholder="••••••" style={{ width: "100%", padding: "10px 14px", borderRadius: 10, border: "1px solid #DDD", fontSize: 14, outline: "none", boxSizing: "border-box" }} />
+            </div>
+            {adminLoginError && <div style={{ fontSize: 12, color: "#E74C3C", textAlign: "center" }}>{adminLoginError}</div>}
+            <button onClick={handleLogin} style={{ padding: "12px", borderRadius: 10, border: "none", background: "linear-gradient(135deg, #7C3AED, #2D1554)", color: "#fff", fontWeight: 700, fontSize: 14, cursor: "pointer", marginTop: 4 }}>Unlock Admin View</button>
+            <button onClick={() => { setShowAdminLoginModal(false); setAdminLoginUser(""); setAdminLoginPass(""); setAdminLoginError(""); }} style={{ padding: "10px", borderRadius: 10, border: "1px solid #DDD", background: "#fff", color: "#888", fontSize: 13, cursor: "pointer" }}>Cancel</button>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   const renderHome = () => (
     <div style={{ display: "flex", flex: 1, height: "100%", position: "relative" }}>
       <div style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden" }}>
         <div style={{ padding: isMobile ? "14px 16px 10px" : "20px 28px 12px", borderBottom: "1px solid #E8E6F0", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
           <div style={{ flex: 1, minWidth: 0 }}>
-            <div style={{ fontSize: isMobile ? 17 : 20, fontWeight: 700, color: "#1A1A2E" }}>{workflowCreated ? "Workflow Builder" : "What can I help you with?"}</div>
-            {!workflowCreated && <div style={{ fontSize: isMobile ? 12 : 14, color: "#888", marginTop: 2 }}>Let's align your goal with HarmonIQ better</div>}
+            <div style={{ fontSize: isMobile ? 17 : 20, fontWeight: 700, color: "#1A1A2E" }}>{workflowCreated ? (isAdminView ? "Workflow Builder" : "Your Workflow") : "What can I help you with?"}</div>
+            {!workflowCreated && <div style={{ fontSize: isMobile ? 12 : 14, color: "#888", marginTop: 2 }}>{isAdminView ? "Let's align your goal with HarmonIQ better" : "Describe what you need and I'll take care of the rest"}</div>}
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: 6, flexShrink: 0 }}>
-            {workflowCreated && !isMobile && <button onClick={() => setShowShareModal(true)} style={{ padding: "8px 14px", borderRadius: 8, border: "1px solid #DDD", background: "#fff", fontSize: 12, cursor: "pointer", display: "flex", alignItems: "center", gap: 4 }}>🔗 Share</button>}
-            <button onClick={() => setShowAgentBrain(!showAgentBrain)} style={{ padding: isMobile ? "6px 10px" : "8px 14px", borderRadius: 8, border: "1px solid #DDD", background: showAgentBrain ? "#F0EDFF" : "#fff", fontSize: 12, cursor: "pointer" }}>🧠{!isMobile && " Agent Brain"}</button>
+            {workflowCreated && !isMobile && isAdminView && <button onClick={() => setShowShareModal(true)} style={{ padding: "8px 14px", borderRadius: 8, border: "1px solid #DDD", background: "#fff", fontSize: 12, cursor: "pointer", display: "flex", alignItems: "center", gap: 4 }}>🔗 Share</button>}
+            <button onClick={() => setShowAgentBrain(!showAgentBrain)} style={{ padding: isMobile ? "6px 10px" : "8px 14px", borderRadius: 8, border: "1px solid #DDD", background: showAgentBrain ? "#F0EDFF" : "#fff", fontSize: 12, cursor: "pointer" }}>{isAdminView ? "🧠" : "📋"}{!isMobile && (isAdminView ? " Agent Brain" : " Activity Log")}</button>
           </div>
         </div>
 
@@ -2716,8 +2813,8 @@ export default function HarmonIQApp() {
           <div style={{ margin: "0 28px", padding: "10px 16px", borderRadius: 10, background: "linear-gradient(90deg, #FFF3CD, #FFF8E1)", border: "1px solid #FFE082", display: "flex", alignItems: "center", gap: 10, animation: "fadeIn 0.4s ease" }}>
             <span style={{ fontSize: 16 }}>⚠️</span>
             <div style={{ flex: 1 }}>
-              <div style={{ fontSize: 12, fontWeight: 700, color: "#E65100" }}>Constraint violated: {constraintData.title}</div>
-              <div style={{ fontSize: 11, color: "#BF360C" }}>Agent paused, awaiting your input</div>
+              <div style={{ fontSize: 12, fontWeight: 700, color: "#E65100" }}>{isAdminView ? `Constraint violated: ${constraintData.title}` : `Attention needed: ${constraintData.title}`}</div>
+              <div style={{ fontSize: 11, color: "#BF360C" }}>{isAdminView ? "Agent paused, awaiting your input" : "The system needs your attention before continuing"}</div>
             </div>
             <div style={{ width: 8, height: 8, borderRadius: "50%", background: "#FF9800", animation: "pulse 1.5s infinite" }} />
           </div>
@@ -2730,15 +2827,24 @@ export default function HarmonIQApp() {
               <div style={{ display: "flex", alignItems: "flex-start", gap: 16, marginBottom: 32 }}>
                 <div style={{ width: 48, height: 48, borderRadius: "50%", background: "linear-gradient(135deg, #7C3AED, #2D1554)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 24, flexShrink: 0 }}>🧠</div>
                 <div style={{ flex: 1 }}>
-                  <div style={{ fontSize: 12, fontWeight: 600, color: "#7C3AED", marginBottom: 4, textTransform: "uppercase", letterSpacing: "0.5px" }}>HarmonIQ Orchestrator</div>
+                  <div style={{ fontSize: 12, fontWeight: 600, color: "#7C3AED", marginBottom: 4, textTransform: "uppercase", letterSpacing: "0.5px" }}>{isAdminView ? "HarmonIQ Orchestrator" : "HarmonIQ Assistant"}</div>
                   <div style={{ background: "#F9F8FE", borderRadius: "4px 16px 16px 16px", padding: "18px 22px", border: "1px solid #E8E6F0" }}>
                     <div style={{ fontSize: 20, fontWeight: 700, color: "#1A1A2E", marginBottom: 8, animation: "fadeIn 0.5s ease" }}>Hello! 👋</div>
-                    <div style={{ fontSize: 15, color: "#555", lineHeight: 1.7, animation: "fadeIn 0.5s ease 0.15s both" }}>
-                      How are you doing today? I coordinate <span style={{ color: "#7C3AED", fontWeight: 600 }}>six specialised Super Agents</span> behind the scenes — from data ingestion to optimisation — so you can focus on the decision, not the pipeline.
-                    </div>
-                    <div style={{ fontSize: 14, color: "#666", lineHeight: 1.7, marginTop: 10, animation: "fadeIn 0.5s ease 0.3s both" }}>
-                      Tell me what you're working on and I'll break it into an execution plan, wire up the right data sources, and run the agents end-to-end. Let's go. ✨
-                    </div>
+                    {isAdminView ? (<>
+                      <div style={{ fontSize: 15, color: "#555", lineHeight: 1.7, animation: "fadeIn 0.5s ease 0.15s both" }}>
+                        How are you doing today? I coordinate <span style={{ color: "#7C3AED", fontWeight: 600 }}>six specialised Super Agents</span> behind the scenes — from data ingestion to optimisation — so you can focus on the decision, not the pipeline.
+                      </div>
+                      <div style={{ fontSize: 14, color: "#666", lineHeight: 1.7, marginTop: 10, animation: "fadeIn 0.5s ease 0.3s both" }}>
+                        Tell me what you're working on and I'll break it into an execution plan, wire up the right data sources, and run the agents end-to-end. Let's go. ✨
+                      </div>
+                    </>) : (<>
+                      <div style={{ fontSize: 15, color: "#555", lineHeight: 1.7, animation: "fadeIn 0.5s ease 0.15s both" }}>
+                        I'm <span style={{ color: "#7C3AED", fontWeight: 600 }}>HarmonIQ</span>, your intelligent workflow assistant. I'll handle all the complexity behind the scenes — just tell me what you need in plain language.
+                      </div>
+                      <div style={{ fontSize: 14, color: "#666", lineHeight: 1.7, marginTop: 10, animation: "fadeIn 0.5s ease 0.3s both" }}>
+                        You can type a request below, or pick a ready-made template to get started quickly.
+                      </div>
+                    </>)}
                   </div>
                 </div>
               </div>
@@ -2746,7 +2852,7 @@ export default function HarmonIQApp() {
               {/* Quick action chips */}
               <div style={{ display: "flex", gap: 10, justifyContent: "center", flexWrap: "wrap", marginBottom: 40, animation: "fadeIn 0.5s ease 0.45s both" }}>
                 {[
-                  { icon: "📁", label: "Connect Data", onClick: () => setShowConnectData(true) },
+                  ...(isAdminView ? [{ icon: "📁", label: "Connect Data", onClick: () => setShowConnectData(true) }] : []),
                   { icon: "📊", label: "Use Template", onClick: () => setPage("templates") },
                 ].map(b => (
                   <button key={b.label} onClick={b.onClick} style={{ padding: "10px 22px", borderRadius: 12, border: "1px solid #E0DFF0", background: "#FAFAFE", fontSize: 14, cursor: "pointer", display: "flex", alignItems: "center", gap: 6, fontWeight: 500, color: "#444", transition: "all 0.2s" }} onMouseEnter={e => e.target.style.background = "#F0EDFF"} onMouseLeave={e => e.target.style.background = "#FAFAFE"}>
@@ -2767,10 +2873,10 @@ export default function HarmonIQApp() {
               {workflowStep >= 1 && (
                 <div style={{ animation: "fadeIn 0.4s ease" }}>
                   <div style={{ marginBottom: 20 }}>
-                    <div style={{ fontSize: 15, fontWeight: 700, color: "#1A1A2E", marginBottom: 4 }}>📋 Goal Decomposition</div>
-                    <div style={{ fontSize: 13.5, color: "#555", marginBottom: 12, paddingLeft: 20, lineHeight: 1.6 }}>Mother Agent has decomposed your request into the following execution plan. Each task is assigned to a specialised Super Agent.</div>
+                    <div style={{ fontSize: 15, fontWeight: 700, color: "#1A1A2E", marginBottom: 4 }}>{isAdminView ? "📋 Goal Decomposition" : "📋 What I'll do for you"}</div>
+                    <div style={{ fontSize: 13.5, color: "#555", marginBottom: 12, paddingLeft: 20, lineHeight: 1.6 }}>{isAdminView ? "Mother Agent has decomposed your request into the following execution plan. Each task is assigned to a specialised Super Agent." : "I've broken down your request into clear steps. Here's what will happen:"}</div>
 
-                    <div style={{ fontSize: 15, fontWeight: 700, color: "#1A1A2E", marginBottom: 4 }}>🔧 Execution Plan</div>
+                    <div style={{ fontSize: 15, fontWeight: 700, color: "#1A1A2E", marginBottom: 4 }}>{isAdminView ? "🔧 Execution Plan" : "🔧 Execution Steps"}</div>
                     <div style={{ paddingLeft: 20, marginBottom: 12 }}>
                       {[
                         "Ingest and normalise uploaded sales data, inventory snapshots, and linked data sources",
@@ -2785,20 +2891,20 @@ export default function HarmonIQApp() {
                       ))}
                     </div>
 
-                    <div style={{ fontSize: 15, fontWeight: 700, color: "#6C5CE7", marginBottom: 8 }}>✅ Success Criteria</div>
+                    {isAdminView && <><div style={{ fontSize: 15, fontWeight: 700, color: "#6C5CE7", marginBottom: 8 }}>✅ Success Criteria</div>
                     <div style={{ paddingLeft: 20, marginBottom: 12 }}>
                       {["Projected units ≥ 400,000 target", "Blended margin ≥ 15%", "At-risk SKU count reduced by ≥ 50%", "Generate downloadable recommendation report with executive summary"].map((s, i) => (
                         <div key={i} style={{ fontSize: 13.5, color: "#555", marginBottom: 4, display: "flex", alignItems: "flex-start", gap: 6 }}>
                           <span style={{ color: "#00B894" }}>✓</span> {s}
                         </div>
                       ))}
-                    </div>
+                    </div></>}
                   </div>
                 </div>
               )}
 
-              {/* ═══ STEP 2: Connect Data ═══ */}
-              {workflowStep >= 2 && (
+              {/* ═══ STEP 2: Connect Data — admin only ═══ */}
+              {isAdminView && workflowStep >= 2 && (
                 <div style={{ animation: "fadeIn 0.4s ease" }}>
                   {/* Input Data Preview */}
                   {activeUseCaseId && <InputDataPreview useCaseId={activeUseCaseId} />}
@@ -2808,8 +2914,8 @@ export default function HarmonIQApp() {
                 </div>
               )}
 
-              {/* ═══ STEP 3: Knowledge Configuration ═══ */}
-              {workflowStep >= 3 && (
+              {/* ═══ STEP 3: Knowledge Configuration — admin only ═══ */}
+              {isAdminView && workflowStep >= 3 && (
                 <div style={{ animation: "fadeIn 0.4s ease", marginBottom: 16 }}>
                   <div style={{ fontSize: 15, fontWeight: 700, color: "#1A1A2E", marginBottom: 4 }}>{"\u{1F9E0}"} Knowledge Configuration</div>
                   <div style={{ fontSize: 12, color: "#888", marginBottom: 12 }}>Domain knowledge, terminology, and skills that guide agent behaviour</div>
@@ -2848,7 +2954,10 @@ export default function HarmonIQApp() {
               {/* ═══ STEP 3: Configure Agents ═══ */}
               {workflowStep >= 3 && (
                 <div style={{ animation: "fadeIn 0.4s ease" }}>
-                  <div style={{ fontSize: 15, fontWeight: 700, color: "#1A1A2E", marginBottom: 10 }}>🤖 Super Agent Workflow</div>
+                  <div style={{ fontSize: 15, fontWeight: 700, color: "#1A1A2E", marginBottom: 10 }}>{isAdminView ? "🤖 Super Agent Workflow" : "🤖 Processing Pipeline"}</div>
+                  {!isAdminView && <div style={{ fontSize: 13, color: "#888", marginBottom: 14 }}>These intelligent agents will work together in sequence to process your request:</div>}
+
+                  {isAdminView ? (
                   <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 20 }}>
                     {selectedWorkflowAgents.map((agentId, idx) => {
                       const agent = SUPER_AGENTS.find(a => a.id === agentId);
@@ -2883,6 +2992,27 @@ export default function HarmonIQApp() {
                       );
                     })}
                   </div>
+                  ) : (
+                  /* Business user: simplified visual pipeline */
+                  <div style={{ display: "flex", alignItems: "center", gap: 0, flexWrap: "wrap", marginBottom: 20, padding: "16px 12px", background: "#FAFAFF", borderRadius: 14, border: "1px solid #E8E6F0" }}>
+                    {selectedWorkflowAgents.map((agentId, idx) => {
+                      const agent = SUPER_AGENTS.find(a => a.id === agentId);
+                      const friendlyDesc = { ingestiq: "Reads & prepares your data", visioniq: "Creates visual charts", visioniq_plus: "Analyses documents", marketiq: "Checks market context", demandiq: "Forecasts demand", optimaiq: "Optimises the plan" }[agentId] || agent.desc;
+                      return (
+                        <div key={agentId} style={{ display: "flex", alignItems: "center" }}>
+                          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 4, padding: "8px 14px", minWidth: 90 }}>
+                            <div style={{ width: 40, height: 40, borderRadius: 12, background: agent.color + "18", border: `2px solid ${agent.color}40`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20 }}>{agent.icon}</div>
+                            <div style={{ fontSize: 12, fontWeight: 700, color: agent.color }}>{agent.name}</div>
+                            <div style={{ fontSize: 10, color: "#888", textAlign: "center", lineHeight: 1.3 }}>{friendlyDesc}</div>
+                          </div>
+                          {idx < selectedWorkflowAgents.length - 1 && (
+                            <div style={{ display: "flex", alignItems: "center", color: "#C4B5FD", fontSize: 18, margin: "0 2px", marginBottom: 20 }}>→</div>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                  )}
                 </div>
               )}
 
@@ -2945,17 +3075,17 @@ export default function HarmonIQApp() {
                 {/* Step 1: Approve plan */}
                 {workflowStep === 1 && (
                   <>
-                    <button onClick={() => setWorkflowStep(2)} style={{ padding: "10px 22px", borderRadius: 10, background: "#7C3AED", color: "#fff", border: "none", fontSize: 13, fontWeight: 600, cursor: "pointer", display: "flex", alignItems: "center", gap: 6 }}>✓ Looks Good, Next</button>
-                    <button onClick={() => { resetHome(); }} style={{ padding: "10px 18px", borderRadius: 10, border: "1px solid #DDD", background: "#fff", fontSize: 13, cursor: "pointer", color: "#666" }}>✏️ Revise Plan</button>
+                    <button onClick={() => setWorkflowStep(isAdminView ? 2 : 3)} style={{ padding: "10px 22px", borderRadius: 10, background: "#7C3AED", color: "#fff", border: "none", fontSize: 13, fontWeight: 600, cursor: "pointer", display: "flex", alignItems: "center", gap: 6 }}>{isAdminView ? "✓ Looks Good, Next" : "✓ Looks Good"}</button>
+                    <button onClick={() => { resetHome(); }} style={{ padding: "10px 18px", borderRadius: 10, border: "1px solid #DDD", background: "#fff", fontSize: 13, cursor: "pointer", color: "#666" }}>✏️ {isAdminView ? "Revise Plan" : "Start Over"}</button>
                   </>
                 )}
-                {/* Step 2: Data ready */}
-                {workflowStep === 2 && (
+                {/* Step 2: Data ready — admin only */}
+                {isAdminView && workflowStep === 2 && (
                   <button onClick={() => setWorkflowStep(3)} style={{ padding: "10px 22px", borderRadius: 10, background: "#7C3AED", color: "#fff", border: "none", fontSize: 13, fontWeight: 600, cursor: "pointer", display: "flex", alignItems: "center", gap: 6 }}>✓ Data Ready, Next</button>
                 )}
                 {/* Step 3: Approve & Run */}
                 {workflowStep === 3 && (
-                  <button onClick={runWorkflow} style={{ padding: "10px 22px", borderRadius: 10, background: "#00B894", color: "#fff", border: "none", fontSize: 13, fontWeight: 600, cursor: "pointer", display: "flex", alignItems: "center", gap: 6 }}>▶ Approve & Run</button>
+                  <button onClick={runWorkflow} style={{ padding: "10px 22px", borderRadius: 10, background: "#00B894", color: "#fff", border: "none", fontSize: 13, fontWeight: 600, cursor: "pointer", display: "flex", alignItems: "center", gap: 6 }}>{isAdminView ? "▶ Approve & Run" : "▶ Run Workflow"}</button>
                 )}
                 {/* Step 4: Running / Complete */}
                 {workflowStep === 4 && (
@@ -2992,7 +3122,7 @@ export default function HarmonIQApp() {
               constraintPaused={constraintPaused} constraintData={constraintData} constraintInput={constraintInput}
               onConstraintInputChange={setConstraintInput} onConstraintApply={handleConstraintApply} onConstraintSkip={handleConstraintSkip}
               workflowKnowledge={workflowKnowledge} workflowTerminology={workflowTerminology} workflowSkills={workflowSkills} companyKnowledge={companyKnowledge} terminologyDefs={terminologyDefs} coreSkills={coreSkills}
-              agentBrainTab={agentBrainTab} setAgentBrainTab={setAgentBrainTab} sessionMemories={sessionMemories} userMemories={userMemories} groupMemories={groupMemories} orgMemories={orgMemories}
+              agentBrainTab={agentBrainTab} setAgentBrainTab={setAgentBrainTab} sessionMemories={sessionMemories} userMemories={userMemories} groupMemories={groupMemories} orgMemories={orgMemories} isAdminView={isAdminView}
             />
           </div>
         </div>
@@ -3005,7 +3135,7 @@ export default function HarmonIQApp() {
           constraintPaused={constraintPaused} constraintData={constraintData} constraintInput={constraintInput}
           onConstraintInputChange={setConstraintInput} onConstraintApply={handleConstraintApply} onConstraintSkip={handleConstraintSkip}
           workflowKnowledge={workflowKnowledge} workflowTerminology={workflowTerminology} workflowSkills={workflowSkills} companyKnowledge={companyKnowledge} terminologyDefs={terminologyDefs} coreSkills={coreSkills}
-          agentBrainTab={agentBrainTab} setAgentBrainTab={setAgentBrainTab} sessionMemories={sessionMemories} userMemories={userMemories} groupMemories={groupMemories} orgMemories={orgMemories}
+          agentBrainTab={agentBrainTab} setAgentBrainTab={setAgentBrainTab} sessionMemories={sessionMemories} userMemories={userMemories} groupMemories={groupMemories} orgMemories={orgMemories} isAdminView={isAdminView}
         />
       )}
     </div>
@@ -3098,7 +3228,7 @@ export default function HarmonIQApp() {
           )}
         </div>
       </div>
-      {showAgentBrain && !isMobile && <AgentBrainPanel thoughts={agentThoughts} isRunning={isRunning} activeAgents={activeAgents} connectors={connectors} workflowKnowledge={workflowKnowledge} workflowTerminology={workflowTerminology} workflowSkills={workflowSkills} companyKnowledge={companyKnowledge} terminologyDefs={terminologyDefs} coreSkills={coreSkills} agentBrainTab={agentBrainTab} setAgentBrainTab={setAgentBrainTab} sessionMemories={sessionMemories} userMemories={userMemories} groupMemories={groupMemories} orgMemories={orgMemories} />}
+      {showAgentBrain && !isMobile && <AgentBrainPanel thoughts={agentThoughts} isRunning={isRunning} activeAgents={activeAgents} connectors={connectors} workflowKnowledge={workflowKnowledge} workflowTerminology={workflowTerminology} workflowSkills={workflowSkills} companyKnowledge={companyKnowledge} terminologyDefs={terminologyDefs} coreSkills={coreSkills} agentBrainTab={agentBrainTab} setAgentBrainTab={setAgentBrainTab} sessionMemories={sessionMemories} userMemories={userMemories} groupMemories={groupMemories} orgMemories={orgMemories} isAdminView={isAdminView} />}
     </div>
   );
 
@@ -4350,15 +4480,15 @@ export default function HarmonIQApp() {
             <div onClick={e => e.stopPropagation()} style={{ width: 240, height: "100%", background: "#1A1A2E", display: "flex", flexDirection: "column", animation: "slideInLeft 0.25s ease" }}>
               <HarmonIQLogo />
               <div style={{ flex: 1, padding: "8px 10px", display: "flex", flexDirection: "column", gap: 2 }}>
-                {NAV_ITEMS.map(item => (
+                {(isAdminView ? NAV_ITEMS : NAV_ITEMS.filter(n => BUSINESS_NAV_IDS.includes(n.id))).map(item => (
                   <div key={item.id} onClick={() => { setPage(item.id); setSelectedTemplate(null); setExpandedAgent(null); if (item.id !== "canvas") setCanvasSelectedUseCase(null); setMobileMenuOpen(false); }}
                     style={{ display: "flex", alignItems: "center", gap: 10, padding: "12px 14px", borderRadius: 10, cursor: "pointer", color: page === item.id ? "#A29BFE" : "#8888A8", background: page === item.id ? "#2D1B69" : "transparent", fontSize: 14, fontWeight: page === item.id ? 600 : 400 }}>
                     <span style={{ flexShrink: 0, display: "flex" }}>{item.icon}</span>
                     <span>{item.label}</span>
                   </div>
                 ))}
-                {/* Mobile Knowledge Config */}
-                <div style={{ borderTop: "1px solid #2D1B69", marginTop: 8, paddingTop: 8 }}>
+                {/* Mobile Knowledge Config — admin only */}
+                {isAdminView && <div style={{ borderTop: "1px solid #2D1B69", marginTop: 8, paddingTop: 8 }}>
                   <div onClick={() => setKnowledgeConfigExpanded(!knowledgeConfigExpanded)} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 14px", borderRadius: 10, cursor: "pointer", color: "#8888A8", fontSize: 14 }}>
                     <span style={{ display: "flex", alignItems: "center", gap: 10 }}><span>{"\u{1F9E0}"}</span> Knowledge Config</span>
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ transform: knowledgeConfigExpanded ? "rotate(180deg)" : "none" }}><polyline points="6 9 12 15 18 9"/></svg>
@@ -4372,9 +4502,9 @@ export default function HarmonIQApp() {
                       <span>{sub.icon} {sub.label}</span><span style={{ fontSize: 10, opacity: 0.7 }}>{sub.count}</span>
                     </div>
                   ))}
-                </div>
-                {/* Mobile Memory System */}
-                <div style={{ borderTop: "1px solid #2D1B69", marginTop: 8, paddingTop: 8 }}>
+                </div>}
+                {/* Mobile Memory System — admin only */}
+                {isAdminView && <div style={{ borderTop: "1px solid #2D1B69", marginTop: 8, paddingTop: 8 }}>
                   <div onClick={() => setMemoryExpandedSection(!memoryExpandedSection)} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 14px", borderRadius: 10, cursor: "pointer", color: "#8888A8", fontSize: 14 }}>
                     <span style={{ display: "flex", alignItems: "center", gap: 10 }}><span>{"\u{1F4BE}"}</span> Memory System</span>
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ transform: memoryExpandedSection ? "rotate(180deg)" : "none" }}><polyline points="6 9 12 15 18 9"/></svg>
@@ -4389,7 +4519,7 @@ export default function HarmonIQApp() {
                       <span>{sub.icon} {sub.label}</span><span style={{ fontSize: 10, opacity: 0.7 }}>{sub.count}</span>
                     </div>
                   ))}
-                </div>
+                </div>}
               </div>
             </div>
           </div>
@@ -4399,7 +4529,7 @@ export default function HarmonIQApp() {
         <div style={{ width: sidebarCollapsed ? 56 : 200, minWidth: sidebarCollapsed ? 56 : 200, background: "#1A1A2E", display: "flex", flexDirection: "column", transition: "width 0.25s ease, min-width 0.25s ease", overflow: "hidden" }}>
           <HarmonIQLogo collapsed={sidebarCollapsed} />
           <div style={{ flex: 1, padding: sidebarCollapsed ? "8px 6px" : "8px 10px", display: "flex", flexDirection: "column", gap: 2 }}>
-            {NAV_ITEMS.map(item => (
+            {(isAdminView ? NAV_ITEMS : NAV_ITEMS.filter(n => BUSINESS_NAV_IDS.includes(n.id))).map(item => (
               <div
                 key={item.id}
                 onClick={() => { setPage(item.id); setSelectedTemplate(null); setExpandedAgent(null); if (item.id !== "canvas") setCanvasSelectedUseCase(null); }}
@@ -4415,8 +4545,8 @@ export default function HarmonIQApp() {
               </div>
             ))}
           </div>
-          {/* Knowledge Config section */}
-          <div style={{ borderTop: "1px solid #2D1B69", padding: sidebarCollapsed ? "8px 6px" : "8px 10px" }}>
+          {/* Knowledge Config section — admin only */}
+          {isAdminView && <div style={{ borderTop: "1px solid #2D1B69", padding: sidebarCollapsed ? "8px 6px" : "8px 10px" }}>
             <div onClick={() => { if (sidebarCollapsed) { setSidebarCollapsed(false); setKnowledgeConfigExpanded(true); } else setKnowledgeConfigExpanded(!knowledgeConfigExpanded); }} style={{ display: "flex", alignItems: "center", gap: 10, padding: sidebarCollapsed ? "10px 0" : "10px 12px", borderRadius: 10, cursor: "pointer", color: knowledgeConfigExpanded ? "#A29BFE" : "#8888A8", justifyContent: sidebarCollapsed ? "center" : "space-between", transition: "all 0.2s" }}>
               <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
                 <span style={{ fontSize: 16, flexShrink: 0 }}>{"\u{1F9E0}"}</span>
@@ -4438,9 +4568,9 @@ export default function HarmonIQApp() {
                 ))}
               </div>
             )}
-          </div>
-          {/* Memory System section */}
-          <div style={{ borderTop: "1px solid #2D1B69", padding: sidebarCollapsed ? "8px 6px" : "8px 10px" }}>
+          </div>}
+          {/* Memory System section — admin only */}
+          {isAdminView && <div style={{ borderTop: "1px solid #2D1B69", padding: sidebarCollapsed ? "8px 6px" : "8px 10px" }}>
             <div onClick={() => { if (sidebarCollapsed) { setSidebarCollapsed(false); setMemoryExpandedSection(true); } else setMemoryExpandedSection(!memoryExpandedSection); }} style={{ display: "flex", alignItems: "center", gap: 10, padding: sidebarCollapsed ? "10px 0" : "10px 12px", borderRadius: 10, cursor: "pointer", color: memoryExpandedSection ? "#A29BFE" : "#8888A8", justifyContent: sidebarCollapsed ? "center" : "space-between", transition: "all 0.2s" }}>
               <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
                 <span style={{ fontSize: 16, flexShrink: 0 }}>{"\u{1F4BE}"}</span>
@@ -4466,6 +4596,18 @@ export default function HarmonIQApp() {
                 ))}
               </div>
             )}
+          </div>}
+          {/* Admin View Toggle */}
+          <div style={{ borderTop: "1px solid #2D1B69", padding: sidebarCollapsed ? "10px 6px" : "10px 12px" }}>
+            <div onClick={() => { if (isAdminView) { setIsAdminView(false); } else { setShowAdminLoginModal(true); } }} style={{ display: "flex", alignItems: "center", gap: 10, padding: sidebarCollapsed ? "8px 0" : "8px 10px", borderRadius: 10, cursor: "pointer", justifyContent: sidebarCollapsed ? "center" : "space-between", transition: "all 0.2s", background: isAdminView ? "#2D1B6960" : "transparent" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                <span style={{ fontSize: 14 }}>{isAdminView ? "\u{1F513}" : "\u{1F512}"}</span>
+                {!sidebarCollapsed && <span style={{ fontSize: 12, fontWeight: 600, color: isAdminView ? "#A29BFE" : "#8888A8" }}>Admin View</span>}
+              </div>
+              {!sidebarCollapsed && <div style={{ width: 34, height: 18, borderRadius: 9, background: isAdminView ? "#7C3AED" : "#3A3755", display: "flex", alignItems: "center", padding: "0 2px", transition: "background 0.25s", cursor: "pointer" }}>
+                <div style={{ width: 14, height: 14, borderRadius: "50%", background: "#fff", transform: isAdminView ? "translateX(16px)" : "translateX(0)", transition: "transform 0.25s" }} />
+              </div>}
+            </div>
           </div>
           <div style={{ padding: "12px", borderTop: "1px solid #2D1B69", display: "flex", justifyContent: sidebarCollapsed ? "center" : "space-between", alignItems: "center" }}>
             <div onClick={() => setSidebarCollapsed(!sidebarCollapsed)} style={{ cursor: "pointer", color: "#8888A8", display: "flex", padding: 4 }}>
@@ -4536,6 +4678,7 @@ export default function HarmonIQApp() {
           onHitlApprove={handleHitlApprove} onHitlStartAdjust={() => setHitlAdjustMode(true)} onHitlAdjustTextChange={setHitlAdjustText} onHitlAdjustSubmit={handleHitlAdjust}
           constraintPaused={constraintPaused} constraintData={constraintData} constraintInput={constraintInput}
           onConstraintInputChange={setConstraintInput} onConstraintApply={handleConstraintApply} onConstraintSkip={handleConstraintSkip}
+          isAdminView={isAdminView}
         />
       )}
       {isLoggedIn && showShareModal && <ShareModal onClose={() => setShowShareModal(false)} />}
@@ -4558,6 +4701,7 @@ export default function HarmonIQApp() {
           }}
         />
       )}
+      {isLoggedIn && <AdminLoginModal />}
       {isLoggedIn && showConnectData && (
         <ConnectDataModal
           connectors={connectors}
